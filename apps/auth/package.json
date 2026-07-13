@@ -1,0 +1,32 @@
+{
+  "name": "auth",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "bootstrap:usstm-administrators": "tsx src/bootstrap-administrators.ts",
+    "bootstrap:portal-client": "tsx src/bootstrap-portal-client.ts",
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "lint": "tsc --noEmit",
+    "migrate": "tsx src/migrate.ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@better-auth/oauth-provider": "^1.6.23",
+    "@hono/node-server": "^1.19.9",
+    "better-auth": "^1.6.23",
+    "hono": "^4.11.9",
+    "pg": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/pg": "^8.18.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6",
+    "vitest": "^4.0.18"
+  }
+}

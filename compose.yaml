@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: usstm
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d usstm"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/10-roles.sql:ro
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    networks: [internal]
+
+  portal:
+    build:
+      context: .
+      dockerfile: apps/portal/Dockerfile
+    environment:
+      ACCESS_CONTACT_GUIDANCE: ${ACCESS_CONTACT_GUIDANCE:-Contact USSTM for access.}
+      DATABASE_URL: postgres://portal:portal@postgres:5432/usstm
+      AUTH_ISSUER: http://localhost:3001/api/auth
+      AUTH_SERVICE_URL: http://auth:3001
+      PORTAL_OAUTH_CLIENT_ID: ${PORTAL_OAUTH_CLIENT_ID:?Set PORTAL_OAUTH_CLIENT_ID in .env}
+      PORTAL_OAUTH_CLIENT_SECRET: ${PORTAL_OAUTH_CLIENT_SECRET:?Set PORTAL_OAUTH_CLIENT_SECRET in .env}
+      PORTAL_OAUTH_REDIRECT_URI: http://localhost:3000/auth/callback
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    networks: [internal, public]
+
+  auth:
+    build:
+      context: .
+      dockerfile: apps/auth/Dockerfile
+    environment:
+      DATABASE_URL: postgres://auth:auth@postgres:5432/usstm
+      ACCESS_CONTACT_GUIDANCE: ${ACCESS_CONTACT_GUIDANCE:-Contact USSTM for access.}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Set BETTER_AUTH_SECRET in .env}
+      BETTER_AUTH_URL: http://localhost:3001
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:?Set GOOGLE_CLIENT_ID in .env}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:?Set GOOGLE_CLIENT_SECRET in .env}
+      PORTAL_OAUTH_CLIENT_ID: ${PORTAL_OAUTH_CLIENT_ID:?Set PORTAL_OAUTH_CLIENT_ID in .env}
+      PORTAL_OAUTH_CLIENT_SECRET: ${PORTAL_OAUTH_CLIENT_SECRET:?Set PORTAL_OAUTH_CLIENT_SECRET in .env}
+      PORTAL_URL: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+    networks: [internal, public]
+
+networks:
+  internal:
+    internal: true
+  public:
+
+volumes:
+  postgres-data:
