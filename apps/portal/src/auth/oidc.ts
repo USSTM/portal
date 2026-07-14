@@ -12,22 +12,27 @@ function config() {
   const issuer = process.env.AUTH_ISSUER ?? "http://localhost:3001/api/auth"
   const service = process.env.AUTH_SERVICE_URL ?? "http://localhost:3001"
   const secret = required("PORTAL_OAUTH_CLIENT_SECRET")
-  configuration ??= new client.Configuration(
-    {
-      issuer,
-      authorization_endpoint: `${issuer}/oauth2/authorize`,
-      token_endpoint: `${service}/api/auth/oauth2/token`,
-      revocation_endpoint: `${service}/api/auth/oauth2/revoke`,
-      userinfo_endpoint: `${service}/api/auth/oauth2/userinfo`,
-      jwks_uri: `${service}/api/auth/jwks`,
-    },
-    required("PORTAL_OAUTH_CLIENT_ID"),
-    {
-      client_secret: secret,
-      token_endpoint_auth_method: "client_secret_basic",
-    },
-    client.ClientSecretBasic(secret),
-  )
+  if (!configuration) {
+    configuration = new client.Configuration(
+      {
+        issuer,
+        authorization_endpoint: `${issuer}/oauth2/authorize`,
+        token_endpoint: `${service}/api/auth/oauth2/token`,
+        revocation_endpoint: `${service}/api/auth/oauth2/revoke`,
+        userinfo_endpoint: `${service}/api/auth/oauth2/userinfo`,
+        jwks_uri: `${service}/api/auth/jwks`,
+      },
+      required("PORTAL_OAUTH_CLIENT_ID"),
+      {
+        client_secret: secret,
+        token_endpoint_auth_method: "client_secret_post",
+      },
+      client.ClientSecretPost(secret),
+    )
+    if (!issuer.startsWith("https://")) {
+      client.allowInsecureRequests(configuration)
+    }
+  }
   return configuration
 }
 

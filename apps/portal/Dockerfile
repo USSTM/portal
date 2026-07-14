@@ -14,4 +14,4 @@ COPY --from=build /app/apps/portal/node_modules ./node_modules
 COPY --from=build /app/apps/portal/dist ./dist
 COPY --from=build /app/apps/portal/migrations ./migrations
 EXPOSE 3000
-CMD ["node", "dist/server/server.js"]
+CMD ["node", "node_modules/srvx/bin/srvx.mjs", "--dir", ".", "--entry", "dist/server/server.js", "--static", "dist/client", "--prod"]

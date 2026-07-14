@@ -33,7 +33,7 @@ export async function bootstrapPortalClient() {
        "redirectUris", "tokenEndpointAuthMethod", "grantTypes",
        "responseTypes", public, type, "requirePKCE", "createdAt", "updatedAt"
      ) values ($1, $2, $3, true, $4, 'USSTM Portal', $5,
-       'client_secret_basic', $6, $7, false, 'web', true,
+       'client_secret_post', $6, $7, false, 'web', true,
        current_timestamp, current_timestamp)`,
     [
       randomUUID(),
