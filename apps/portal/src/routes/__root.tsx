@@ -23,7 +23,6 @@ import {
   User,
   LogOut,
   Menu,
-  FlaskConical,
   Users,
   Tent,
   History,
@@ -51,6 +50,16 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         rel: 'stylesheet',
         href: appCss,
+      },
+      {
+        rel: 'icon',
+        href: '/favicon.ico',
+        type: 'image/x-icon',
+      },
+      {
+        rel: 'shortcut icon',
+        href: '/favicon.ico',
+        type: 'image/x-icon',
       },
     ],
   }),
@@ -96,14 +105,20 @@ function PortalLayout() {
   if (shell.kind === 'anonymous' || shell.kind === 'denied') return <Outlet />
 
   const navigation = navigationForCapabilities(shell.capabilities)
-  const mainNav = navigation.filter(n => n.label !== 'Account' && n.label !== 'Sign Out')
-  
+  const mainNav = navigation.filter(
+    (n) => n.label !== 'Account' && n.label !== 'Sign Out',
+  )
+
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col md:flex-row antialiased">
       {/* Mobile Top Navigation (Hidden on Desktop) */}
       <nav className="md:hidden flex justify-between items-center px-4 h-16 w-full bg-card text-primary border-b border-border sticky top-0 z-50">
         <div className="font-bold text-xl text-primary flex items-center gap-2">
-          <FlaskConical className="w-6 h-6" />
+          <img
+            src="/logo.png"
+            alt="USSTM Logo"
+            className="w-6 h-6 object-contain"
+          />
           USSTM Portal
         </div>
         <button className="p-2 text-muted-foreground hover:text-primary transition-colors">
@@ -115,12 +130,17 @@ function PortalLayout() {
       <aside className="hidden md:flex flex-col h-screen py-6 gap-2 bg-card text-primary text-sm border-r border-border shadow-sm fixed left-0 top-0 w-72 z-40">
         {/* Header */}
         <div className="px-6 pb-6 border-b border-border mb-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-             <FlaskConical className="w-6 h-6 text-primary" />
+          <div className="w-10 h-10 flex items-center justify-center shrink-0">
+            <img
+              src="/logo.png"
+              alt="USSTM Logo"
+              className="w-8 h-8 object-contain"
+            />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-primary tracking-tight">USSTM Portal</h1>
-            <p className="text-xs text-muted-foreground font-medium">Science Society</p>
+            <h1 className="text-xl font-bold text-primary tracking-tight">
+              USSTM Portal
+            </h1>
           </div>
         </div>
 
@@ -128,8 +148,14 @@ function PortalLayout() {
         <nav className="flex-1 overflow-y-auto px-4 flex flex-col gap-1">
           {mainNav.map((item) => (
             <Link
-              activeProps={{ className: 'border-l-4 border-primary bg-primary/10 text-primary font-semibold' }}
-              inactiveProps={{ className: 'border-l-4 border-transparent text-muted-foreground hover:bg-secondary' }}
+              activeProps={{
+                className:
+                  'border-l-4 border-primary bg-primary/10 text-primary font-semibold',
+              }}
+              inactiveProps={{
+                className:
+                  'border-l-4 border-transparent text-muted-foreground hover:bg-secondary',
+              }}
               className="flex items-center gap-3 px-4 py-2 transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
               key={item.to + (item.hash || '')}
               hash={item.hash}
@@ -145,8 +171,14 @@ function PortalLayout() {
         <div className="px-4 border-t border-border pt-4 flex flex-col gap-1 mt-auto">
           <Link
             to="/account"
-            activeProps={{ className: 'border-l-4 border-primary bg-primary/10 text-primary font-semibold' }}
-            inactiveProps={{ className: 'border-l-4 border-transparent text-muted-foreground hover:bg-secondary' }}
+            activeProps={{
+              className:
+                'border-l-4 border-primary bg-primary/10 text-primary font-semibold',
+            }}
+            inactiveProps={{
+              className:
+                'border-l-4 border-transparent text-muted-foreground hover:bg-secondary',
+            }}
             className="flex items-center gap-3 px-4 py-2 transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
           >
             <User className="w-5 h-5" />

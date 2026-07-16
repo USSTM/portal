@@ -194,12 +194,16 @@ describeWithDatabase('Club Events', () => {
       eventId: created.id,
     })
 
+    const completedEndAt = new Date(Date.now() - 60_000)
+    const completedStartAt = new Date(
+      completedEndAt.getTime() - 2 * 60 * 60_000,
+    )
     const [completed] = await db
       .insert(events)
       .values({
         ...eventInput(club.id),
-        endAt: new Date('2029-01-01T12:00:00Z'),
-        startAt: new Date('2029-01-01T10:00:00Z'),
+        endAt: completedEndAt,
+        startAt: completedStartAt,
       })
       .returning()
     await expect(
