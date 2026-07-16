@@ -15,6 +15,7 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
     "test:integration": "pnpm -r --if-present test:integration",
+    "db:up": "docker compose --env-file .env.local up -d postgres",
     "db:migrate": "pnpm --filter @usstm/portal db:migrate",
     "build": "pnpm -r --if-present build",
     "ci": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm db:migrate && pnpm build"

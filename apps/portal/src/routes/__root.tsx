@@ -12,6 +12,21 @@ import { navigationForCapabilities } from '../auth/capabilities'
 import { getPortalShell } from '../auth/shell'
 import { Button } from '../components/ui/button'
 import type { QueryClient } from '@tanstack/react-query'
+import {
+  LayoutDashboard,
+  Clock,
+  Book,
+  Mail,
+  Calendar,
+  Shield,
+  User,
+  LogOut,
+  Menu,
+  FlaskConical,
+  Users,
+  Tent,
+  History,
+} from 'lucide-react'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -46,43 +61,112 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   shellComponent: RootDocument,
 })
 
+function NavIcon({ label, className }: { label: string; className?: string }) {
+  switch (label) {
+    case 'Dashboard':
+      return <LayoutDashboard className={className} />
+    case 'Office Hours':
+      return <Clock className={className} />
+    case 'Resources':
+      return <Book className={className} />
+    case 'Contact':
+      return <Mail className={className} />
+    case 'Events':
+      return <Calendar className={className} />
+    case 'Account':
+      return <User className={className} />
+    case 'Members':
+    case 'Board members':
+      return <Users className={className} />
+    case 'Clubs':
+    case 'Club Access':
+      return <Tent className={className} />
+    case 'Audit history':
+      return <History className={className} />
+    case 'Board Member':
+    default:
+      return <Shield className={className} />
+  }
+}
+
 function PortalLayout() {
   const shell = Route.useLoaderData()
 
-  if (shell.kind === 'denied') return <Outlet />
+  if (shell.kind === 'anonymous' || shell.kind === 'denied') return <Outlet />
 
   const navigation = navigationForCapabilities(shell.capabilities)
+  const mainNav = navigation.filter(n => n.label !== 'Account' && n.label !== 'Sign Out')
+  
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="border-b bg-background">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link className="font-semibold tracking-tight" to="/">
-            USSTM Portal
-          </Link>
-          <nav
-            aria-label="Portal"
-            className="order-3 flex w-full gap-1 overflow-x-auto sm:order-2 sm:w-auto"
+    <div className="bg-background text-foreground min-h-screen flex flex-col md:flex-row antialiased">
+      {/* Mobile Top Navigation (Hidden on Desktop) */}
+      <nav className="md:hidden flex justify-between items-center px-4 h-16 w-full bg-card text-primary border-b border-border sticky top-0 z-50">
+        <div className="font-bold text-xl text-primary flex items-center gap-2">
+          <FlaskConical className="w-6 h-6" />
+          USSTM Portal
+        </div>
+        <button className="p-2 text-muted-foreground hover:text-primary transition-colors">
+          <Menu className="w-6 h-6" />
+        </button>
+      </nav>
+
+      {/* Navigation Sidebar (Hidden on Mobile) */}
+      <aside className="hidden md:flex flex-col h-screen py-6 gap-2 bg-card text-primary text-sm border-r border-border shadow-sm fixed left-0 top-0 w-72 z-40">
+        {/* Header */}
+        <div className="px-6 pb-6 border-b border-border mb-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+             <FlaskConical className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold text-primary tracking-tight">USSTM Portal</h1>
+            <p className="text-xs text-muted-foreground font-medium">Science Society</p>
+          </div>
+        </div>
+
+        {/* Main Navigation Links */}
+        <nav className="flex-1 overflow-y-auto px-4 flex flex-col gap-1">
+          {mainNav.map((item) => (
+            <Link
+              activeProps={{ className: 'border-l-4 border-primary bg-primary/10 text-primary font-semibold' }}
+              inactiveProps={{ className: 'border-l-4 border-transparent text-muted-foreground hover:bg-secondary' }}
+              className="flex items-center gap-3 px-4 py-2 transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
+              key={item.to + (item.hash || '')}
+              hash={item.hash}
+              to={item.to}
+            >
+              <NavIcon label={item.label} className="w-5 h-5" />
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Footer Navigation Links */}
+        <div className="px-4 border-t border-border pt-4 flex flex-col gap-1 mt-auto">
+          <Link
+            to="/account"
+            activeProps={{ className: 'border-l-4 border-primary bg-primary/10 text-primary font-semibold' }}
+            inactiveProps={{ className: 'border-l-4 border-transparent text-muted-foreground hover:bg-secondary' }}
+            className="flex items-center gap-3 px-4 py-2 transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
           >
-            {navigation.map((item) => (
-              <Link
-                activeProps={{ className: 'bg-secondary text-foreground' }}
-                className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground"
-                key={item.to}
-                hash={item.hash}
-                to={item.to}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+            <User className="w-5 h-5" />
+            Account
+          </Link>
           <form action="/auth/logout?client=portal&returnTo=/" method="post">
-            <Button size="sm" type="submit" variant="outline">
-              Sign out
-            </Button>
+            <button
+              type="submit"
+              className="w-full flex items-center gap-3 px-4 py-2 border-l-4 border-transparent text-muted-foreground hover:bg-secondary transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
+            >
+              <LogOut className="w-5 h-5" />
+              Sign Out
+            </button>
           </form>
         </div>
-      </header>
-      <Outlet />
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 md:ml-72 p-4 md:p-8 w-full mx-auto flex flex-col gap-8 max-w-6xl">
+        <Outlet />
+      </main>
     </div>
   )
 }

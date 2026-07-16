@@ -4,6 +4,7 @@ export type PortalIdentity =
   | { email: string; kind: 'superuser' }
   | { email: string; kind: 'administrator' }
   | { email: string; kind: 'member' }
+  | { kind: 'anonymous' }
   | { kind: 'denied' }
 
 export async function admitPortalRequest(
@@ -20,26 +21,28 @@ export async function admitPortalRequest(
   },
 ): Promise<PortalIdentity> {
   const token = getCookie(cookieHeader, dependencies.cookieName)
-  if (!token) return { kind: 'denied' }
+  if (!token) return { kind: 'anonymous' }
 
+  let session: Awaited<ReturnType<typeof verifySession>>
   try {
-    const session = await verifySession(token, {
+    session = await verifySession(token, {
       audience: dependencies.audience,
       issuer: dependencies.issuer,
       key: dependencies.key,
       keyId: dependencies.keyId,
     })
-    if (session.email === normalizeEmail(dependencies.superuserEmail)) {
-      return { email: session.email, kind: 'superuser' }
-    }
-    if (await dependencies.isActiveAdministrator(session.email)) {
-      return { email: session.email, kind: 'administrator' }
-    }
-    if (await dependencies.isActiveMember(session.email)) {
-      return { email: session.email, kind: 'member' }
-    }
   } catch {
-    // Deliberately indistinguishable from an unknown email or missing session.
+    return { kind: 'anonymous' }
+  }
+
+  if (session.email === normalizeEmail(dependencies.superuserEmail)) {
+    return { email: session.email, kind: 'superuser' }
+  }
+  if (await dependencies.isActiveAdministrator(session.email)) {
+    return { email: session.email, kind: 'administrator' }
+  }
+  if (await dependencies.isActiveMember(session.email)) {
+    return { email: session.email, kind: 'member' }
   }
   return { kind: 'denied' }
 }

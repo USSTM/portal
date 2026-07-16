@@ -1,7 +1,11 @@
 import { config } from 'dotenv'
 import { defineConfig } from 'drizzle-kit'
+import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
-config({ path: ['.env.local', '.env'] })
+const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
+
+config({ path: [join(repoRoot, '.env.local'), join(repoRoot, '.env')] })
 
 export default defineConfig({
   out: './drizzle',

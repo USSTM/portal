@@ -28,7 +28,7 @@ describe('Portal admission', () => {
     ).resolves.toEqual({ email: 'admin@example.com', kind: 'superuser' })
   })
 
-  it('returns the same generic denial for unknown emails and invalid sessions', async () => {
+  it('denies an authenticated email that has not been provisioned', async () => {
     const { privateKey, publicKey } = await generateKeyPair('ES256')
     const now = Math.floor(Date.now() / 1000)
     const token = await signSession(
@@ -49,8 +49,28 @@ describe('Portal admission', () => {
     await expect(
       admitPortalRequest(`__Host-portal-session=${token}`, dependencies),
     ).resolves.toEqual({ kind: 'denied' })
+  })
+
+  it('returns anonymous when no valid portal session exists', async () => {
+    const { publicKey } = await generateKeyPair('ES256')
+    const dependencies = {
+      audience: 'portal',
+      cookieName: '__Host-portal-session',
+      issuer: 'usstm-auth',
+      key: publicKey,
+      keyId: 'test-key',
+      superuserEmail: 'admin@example.com',
+      isActiveAdministrator: async () => false,
+      isActiveMember: async () => false,
+    }
+
     await expect(admitPortalRequest(undefined, dependencies)).resolves.toEqual({
-      kind: 'denied',
+      kind: 'anonymous',
+    })
+    await expect(
+      admitPortalRequest('__Host-portal-session=invalid', dependencies),
+    ).resolves.toEqual({
+      kind: 'anonymous',
     })
   })
 

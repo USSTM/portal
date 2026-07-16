@@ -1,8 +1,15 @@
+import { config } from 'dotenv'
 import { serve } from '@hono/node-server'
 import { importJWK } from 'jose'
+import { fileURLToPath } from 'node:url'
+import { join } from 'node:path'
 
 import { createAuthApp, type AuthClient } from './app.js'
 import { googleBoundary } from './google.js'
+
+const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
+
+config({ path: [join(repoRoot, '.env.local'), join(repoRoot, '.env')] })
 
 const port = Number(process.env.AUTH_PORT ?? 3001)
 const clients = parseClients(process.env.AUTH_CLIENTS)

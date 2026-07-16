@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>USSTM Portal - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#001b3d",
+                        "error": "#ba1a1a",
+                        "surface": "#faf8ff",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "error-container": "#ffdad6",
+                        "surface-container-highest": "#dae2fd",
+                        "surface-container": "#eaedff",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#415f8f",
+                        "inverse-surface": "#283044",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "primary": "#001531",
+                        "outline": "#747780",
+                        "surface-container-low": "#f2f3ff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#aac7fe",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#e2e7ff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "on-secondary-fixed": "#0b1c30",
+                        "tertiary-fixed": "#e0e3e5",
+                        "secondary": "#505f76",
+                        "on-tertiary-container": "#8e9193",
+                        "tertiary": "#121617",
+                        "outline-variant": "#c4c6d0",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#7491c4",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "tertiary-container": "#272a2c",
+                        "on-surface": "#131b2e",
+                        "primary-container": "#002956",
+                        "on-secondary-container": "#54647a",
+                        "surface-dim": "#d2d9f4",
+                        "on-surface-variant": "#43474f",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d3e4fe",
+                        "inverse-on-surface": "#eef0ff",
+                        "secondary-container": "#d0e1fb",
+                        "background": "#faf8ff",
+                        "primary-fixed": "#d6e3ff",
+                        "on-background": "#131b2e",
+                        "surface-bright": "#faf8ff",
+                        "on-primary-fixed-variant": "#284775",
+                        "surface-variant": "#dae2fd",
+                        "primary-fixed-dim": "#aac7fe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "margin_mobile": "16px",
+                        "margin_desktop": "32px",
+                        "base": "4px",
+                        "gutter": "24px",
+                        "container_max_width": "1440px",
+                        "sidebar_width": "280px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row antialiased">
+<!-- Mobile Top Navigation (Hidden on Desktop) -->
+<nav class="md:hidden flex justify-between items-center px-margin_mobile h-16 w-full max-w-container_max_width mx-auto bg-surface text-primary border-b border-outline-variant sticky top-0 z-50">
+<div class="font-headline-md text-headline-md font-bold text-primary">USSTM Portal</div>
+<!-- Hamburger Menu (Visual Only for UI) -->
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<!-- Navigation Sidebar (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col h-screen py-6 gap-2 bg-surface text-primary font-body-sm text-body-sm border-r border-outline-variant shadow-sm fixed left-0 top-0 w-sidebar_width z-40">
+<!-- Header -->
+<div class="px-6 pb-6 border-b border-outline-variant mb-4 flex items-center gap-3">
+<!-- Avatar Placeholder -->
+<div class="w-10 h-10 rounded-full bg-surface-container-high overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A small, professional, minimalist logo icon for a university science society. The design uses geometric shapes in shades of deep navy blue and soft white, conveying a sense of academic rigor and institutional authority. Set against a clean, light-mode background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_B-9Q-RKlt85uKxG-quXeCieGgubrKsCuWBRcb2Y3PQ4HzUdD_vkPXbbaoZtyslM-WpxL9UWn2e5vVCMtd6FJfyY1iVPVZ0TtbVVn-VTURJLTStM4f03GWBRsDYmCD0DWWUCftHWcPbDpABHDJ_H2HWHvgYNu2OBIKR5EiWoxMThKtNK3w9sTK02P9UJEhDu2hFipVZ7d3mecgfcSEsWS7KkWOtQDZ9k8A7CF_46886A8v69ThWBTkw"/>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">USSTM Portal</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Science Society</p>
+</div>
+</div>
+<!-- Main Navigation Links -->
+<nav class="flex-1 overflow-y-auto px-4 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-2 text-primary font-semibold border-l-4 border-primary bg-primary-container/10 transition-all duration-200 active:opacity-80 rounded-r-DEFAULT" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 border-l-4 border-transparent rounded-r-DEFAULT" href="#">
+<span class="material-symbols-outlined">schedule</span>
+                Office Hours
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 border-l-4 border-transparent rounded-r-DEFAULT" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+                Resources
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 border-l-4 border-transparent rounded-r-DEFAULT" href="#">
+<span class="material-symbols-outlined">contact_support</span>
+                Contact
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 border-l-4 border-transparent rounded-r-DEFAULT" href="#">
+<span class="material-symbols-outlined">event</span>
+                Events
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 border-l-4 border-transparent rounded-r-DEFAULT" href="#">
+<span class="material-symbols-outlined">admin_panel_settings</span>
+                Administration
+            </a>
+</nav>
+<!-- Footer Navigation Links -->
+<div class="px-4 border-t border-outline-variant pt-4 flex flex-col gap-1 mt-auto">
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 border-l-4 border-transparent rounded-r-DEFAULT" href="#">
+<span class="material-symbols-outlined">person</span>
+                Account
+            </a>
+<a class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:bg-surface-container-low transition-colors cursor-pointer active:scale-95 border-l-4 border-transparent rounded-r-DEFAULT" href="#">
+<span class="material-symbols-outlined">logout</span>
+                Sign Out
+            </a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-sidebar_width p-margin_mobile md:p-margin_desktop w-full max-w-container_max_width mx-auto flex flex-col gap-8">
+<!-- Page Header -->
+<header class="flex flex-col gap-2">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary tracking-tight">Welcome, Alex Rivera</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Access essential tools, manage activities, and connect with the Science Society network from your centralized portal.</p>
+</header>
+<!-- Module Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Events Card -->
+<a class="group block p-6 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:bg-surface-container-low transition-all duration-300 relative overflow-hidden flex flex-col h-full" href="#">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+<div class="mb-4 w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">event</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Events</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex-1">Manage your club's events</p>
+<div class="mt-4 flex items-center text-primary font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+                    Access Module <span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</a>
+<!-- Office Hours Card -->
+<a class="group block p-6 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:bg-surface-container-low transition-all duration-300 relative overflow-hidden flex flex-col h-full" href="#">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+<div class="mb-4 w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">schedule</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Office Hours</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex-1">View the board schedule</p>
+<div class="mt-4 flex items-center text-primary font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+                    Access Module <span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</a>
+<!-- Resources Card -->
+<a class="group block p-6 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:bg-surface-container-low transition-all duration-300 relative overflow-hidden flex flex-col h-full" href="#">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+<div class="mb-4 w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">menu_book</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Resources</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex-1">Finance &amp; operations links</p>
+<div class="mt-4 flex items-center text-primary font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+                    Access Module <span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</a>
+<!-- Contact Card -->
+<a class="group block p-6 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:bg-surface-container-low transition-all duration-300 relative overflow-hidden flex flex-col h-full" href="#">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+<div class="mb-4 w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">contact_support</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Contact</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex-1">Get in touch with USSTM</p>
+<div class="mt-4 flex items-center text-primary font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+                    Access Module <span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</a>
+<!-- Administration Card -->
+<a class="group block p-6 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.1)] hover:bg-surface-container-low transition-all duration-300 relative overflow-hidden flex flex-col h-full md:col-span-2 lg:col-span-1" href="#">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors"></div>
+<div class="mb-4 w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">admin_panel_settings</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2">Administration</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex-1">Manage members, clubs &amp; more</p>
+<div class="mt-4 flex items-center text-primary font-label-sm text-label-sm opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
+                    Access Module <span class="material-symbols-outlined ml-1 text-sm">arrow_forward</span>
+</div>
+</a>
+</section>
+</main>
+<!-- Mobile Bottom Navigation (Visible on Mobile only, optional fallback for full nav UX, omitted here as per 'Pivot' rules, sidebar is preferred for full nav structure if hidden, but prompt requests Sidebar active on Dashboard. Will rely on the hamburger conceptually opening the sidebar, or typical mobile drawer pattern. Keeping it clean without bottom nav to match the 'professional' minimal vibe, relying on standard drawer pattern implied by header.) -->
+</body></html>

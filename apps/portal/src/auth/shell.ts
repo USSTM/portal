@@ -29,6 +29,7 @@ interface MemberAccountInput {
 }
 
 export type PortalShell =
+  | { kind: 'anonymous' }
   | { kind: 'denied' }
   | {
       kind: 'superuser'
@@ -61,6 +62,7 @@ export function projectMemberAccount(input: MemberAccountInput): MemberAccount {
 export const getPortalShell = createServerFn({ method: 'GET' }).handler(() =>
   withRequestId(async () => {
     const identity = await getPortalIdentity()
+    if (identity.kind === 'anonymous') return { kind: 'anonymous' } as const
     if (identity.kind === 'denied') return { kind: 'denied' } as const
 
     if (identity.kind === 'superuser') {
@@ -136,7 +138,7 @@ export const getPortalShell = createServerFn({ method: 'GET' }).handler(() =>
 export const getPortalContact = createServerFn({ method: 'GET' }).handler(() =>
   withRequestId(async () => {
     const shell = await getPortalShell()
-    if (shell.kind === 'denied') return shell
+    if (shell.kind === 'anonymous' || shell.kind === 'denied') return shell
 
     return {
       ...shell,

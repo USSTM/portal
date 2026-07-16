@@ -90,7 +90,13 @@ export function requireResourceAdministrationAuthority(
 }
 
 export function requireResourceBrowseAuthority(identity: PortalIdentity) {
-  if (identity.kind !== 'denied') return identity.email
+  if (
+    identity.kind === 'member' ||
+    identity.kind === 'administrator' ||
+    identity.kind === 'superuser'
+  ) {
+    return identity.email
+  }
   throw new Error('Access denied')
 }
 

@@ -1,13 +1,30 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { fileURLToPath } from 'node:url'
 
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
 
-const config = defineConfig({
-  resolve: { tsconfigPaths: true },
-  plugins: [
+const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
+
+const config = defineConfig(({ mode }) => {
+  const environment = loadEnv(mode, repoRoot, '')
+  for (const [name, value] of Object.entries(environment)) {
+    process.env[name] ??= value
+  }
+
+  return {
+    envDir: repoRoot,
+    resolve: { tsconfigPaths: true },
+    server: {
+      proxy: {
+        '/auth': {
+          target: `http://localhost:${process.env.AUTH_PORT ?? '3001'}`,
+        },
+      },
+    },
+    plugins: [
     nitro({
       config: {
         handlers: [
@@ -31,7 +48,8 @@ const config = defineConfig({
     tailwindcss(),
     tanstackStart(),
     viteReact(),
-  ],
+    ],
+  }
 })
 
 export default config

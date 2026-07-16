@@ -23,6 +23,9 @@ describe('Resource authority', () => {
     expect(() => requireResourceBrowseAuthority({ kind: 'denied' })).toThrow(
       'Access denied',
     )
+    expect(() => requireResourceBrowseAuthority({ kind: 'anonymous' })).toThrow(
+      'Access denied',
+    )
   })
 
   it('limits Resource administration to Administrators and the Superuser', () => {
