@@ -1,14 +1,17 @@
 import {
   check,
   boolean,
+  date,
   jsonb,
   integer,
   pgEnum,
   pgTable,
   primaryKey,
   text,
+  time,
   timestamp,
   uuid,
+  unique,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
@@ -206,6 +209,48 @@ export const resources = pgTable(
       sql`length(btrim(${table.description})) > 0`,
     ),
     check('resources_url_https', sql`${table.url} ~ '^https://'`),
+  ],
+)
+
+export const shiftSlots = pgTable(
+  'shift_slots',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    startTime: time('start_time').notNull(),
+    endTime: time('end_time').notNull(),
+  },
+  (table) => [
+    unique('shift_slots_start_end_unique').on(table.startTime, table.endTime),
+    check(
+      'shift_slots_end_after_start',
+      sql`${table.endTime} > ${table.startTime}`,
+    ),
+  ],
+)
+
+export const bookings = pgTable(
+  'bookings',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    memberId: uuid('member_id')
+      .notNull()
+      .references(() => members.id, { onDelete: 'restrict' }),
+    date: date('date').notNull(),
+    shiftSlotId: uuid('shift_slot_id')
+      .notNull()
+      .references(() => shiftSlots.id, { onDelete: 'restrict' }),
+    displayName: text('display_name').notNull(),
+    boardPosition: text('board_position').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    unique('bookings_member_date_slot_unique').on(
+      table.memberId,
+      table.date,
+      table.shiftSlotId,
+    ),
   ],
 )
 

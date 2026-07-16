@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as OfficeHoursRouteImport } from './routes/office-hours'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AccountRouteImport } from './routes/account'
@@ -23,6 +24,11 @@ import { Route as AdminAuditHistoryRouteImport } from './routes/admin/audit-hist
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficeHoursRoute = OfficeHoursRouteImport.update({
+  id: '/office-hours',
+  path: '/office-hours',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventsRoute = EventsRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
+  '/office-hours': typeof OfficeHoursRoute
   '/resources': typeof ResourcesRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
@@ -88,6 +95,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
+  '/office-hours': typeof OfficeHoursRoute
   '/resources': typeof ResourcesRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
@@ -101,6 +109,7 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
+  '/office-hours': typeof OfficeHoursRoute
   '/resources': typeof ResourcesRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
@@ -115,6 +124,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/contact'
     | '/events'
+    | '/office-hours'
     | '/resources'
     | '/admin/audit-history'
     | '/admin/board-members'
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/contact'
     | '/events'
+    | '/office-hours'
     | '/resources'
     | '/admin/audit-history'
     | '/admin/board-members'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/contact'
     | '/events'
+    | '/office-hours'
     | '/resources'
     | '/admin/audit-history'
     | '/admin/board-members'
@@ -152,6 +164,7 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   ContactRoute: typeof ContactRoute
   EventsRoute: typeof EventsRoute
+  OfficeHoursRoute: typeof OfficeHoursRoute
   ResourcesRoute: typeof ResourcesRoute
   AdminAuditHistoryRoute: typeof AdminAuditHistoryRoute
   AdminBoardMembersRoute: typeof AdminBoardMembersRoute
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/office-hours': {
+      id: '/office-hours'
+      path: '/office-hours'
+      fullPath: '/office-hours'
+      preLoaderRoute: typeof OfficeHoursRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/events': {
@@ -240,6 +260,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   ContactRoute: ContactRoute,
   EventsRoute: EventsRoute,
+  OfficeHoursRoute: OfficeHoursRoute,
   ResourcesRoute: ResourcesRoute,
   AdminAuditHistoryRoute: AdminAuditHistoryRoute,
   AdminBoardMembersRoute: AdminBoardMembersRoute,
@@ -250,12 +271,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
