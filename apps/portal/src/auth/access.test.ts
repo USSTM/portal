@@ -22,6 +22,7 @@ describe('Portal admission', () => {
         key: publicKey,
         keyId: 'test-key',
         superuserEmail: 'ADMIN@example.com',
+        isActiveAdministrator: async () => false,
       }),
     ).resolves.toEqual({ email: 'admin@example.com', kind: 'superuser' })
   })
@@ -40,6 +41,7 @@ describe('Portal admission', () => {
       key: publicKey,
       keyId: 'test-key',
       superuserEmail: 'admin@example.com',
+      isActiveAdministrator: async () => false,
     }
 
     await expect(
@@ -48,5 +50,26 @@ describe('Portal admission', () => {
     await expect(admitPortalRequest(undefined, dependencies)).resolves.toEqual({
       kind: 'denied',
     })
+  })
+
+  it('admits an active Administrator without granting Superuser authority', async () => {
+    const { privateKey, publicKey } = await generateKeyPair('ES256')
+    const now = Math.floor(Date.now() / 1000)
+    const token = await signSession(
+      { audience: 'portal', email: 'admin@example.com', issuedAt: now },
+      { key: privateKey, keyId: 'test-key', now: () => now },
+    )
+
+    await expect(
+      admitPortalRequest(`__Host-portal-session=${token}`, {
+        audience: 'portal',
+        cookieName: '__Host-portal-session',
+        issuer: 'usstm-auth',
+        isActiveAdministrator: async (email) => email === 'admin@example.com',
+        key: publicKey,
+        keyId: 'test-key',
+        superuserEmail: 'superuser@example.com',
+      }),
+    ).resolves.toEqual({ email: 'admin@example.com', kind: 'administrator' })
   })
 })

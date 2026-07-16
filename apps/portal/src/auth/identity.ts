@@ -1,8 +1,11 @@
 import { importJWK } from 'jose'
+import { and, eq } from 'drizzle-orm'
 import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
 
 import { admitPortalRequest } from './access'
+import { getDb } from '../db/index.js'
+import { administrators, members } from '../db/schema.js'
 
 export const getPortalIdentity = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -18,6 +21,14 @@ export const getPortalIdentity = createServerFn({ method: 'GET' }).handler(
       key: publicKey,
       keyId: requiredEnvironment('PORTAL_AUTH_KEY_ID'),
       superuserEmail: requiredEnvironment('PORTAL_SUPERUSER_EMAIL'),
+      isActiveAdministrator: async (email) => {
+        const administratorsFound = await getDb()
+          .select({ memberId: administrators.memberId })
+          .from(administrators)
+          .innerJoin(members, eq(administrators.memberId, members.id))
+          .where(and(eq(members.email, email), eq(members.lifecycle, 'active')))
+        return administratorsFound.length > 0
+      },
     })
   },
 )

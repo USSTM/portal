@@ -2,6 +2,7 @@ import { verifySession } from '@usstm/auth-session'
 
 export type PortalIdentity =
   | { email: string; kind: 'superuser' }
+  | { email: string; kind: 'administrator' }
   | { kind: 'denied' }
 
 export async function admitPortalRequest(
@@ -13,6 +14,7 @@ export async function admitPortalRequest(
     key: CryptoKey
     keyId: string
     superuserEmail: string
+    isActiveAdministrator: (email: string) => Promise<boolean>
   },
 ): Promise<PortalIdentity> {
   const token = getCookie(cookieHeader, dependencies.cookieName)
@@ -27,6 +29,9 @@ export async function admitPortalRequest(
     })
     if (session.email === normalizeEmail(dependencies.superuserEmail)) {
       return { email: session.email, kind: 'superuser' }
+    }
+    if (await dependencies.isActiveAdministrator(session.email)) {
+      return { email: session.email, kind: 'administrator' }
     }
   } catch {
     // Deliberately indistinguishable from an unknown email or missing session.
