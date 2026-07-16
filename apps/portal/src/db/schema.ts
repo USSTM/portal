@@ -1,6 +1,8 @@
 import {
   check,
+  boolean,
   jsonb,
+  integer,
   pgEnum,
   pgTable,
   primaryKey,
@@ -16,6 +18,11 @@ export const memberLifecycle = pgEnum('member_lifecycle', [
 ])
 
 export const clubLifecycle = pgEnum('club_lifecycle', ['active', 'archived'])
+
+export const resourceCategory = pgEnum('resource_category', [
+  'finance',
+  'operations',
+])
 
 export const members = pgTable(
   'members',
@@ -173,6 +180,33 @@ export const eventOrganizers = pgTable(
       .references(() => clubs.id, { onDelete: 'restrict' }),
   },
   (table) => [primaryKey({ columns: [table.eventId, table.clubId] })],
+)
+
+export const resources = pgTable(
+  'resources',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    category: resourceCategory('category').notNull(),
+    title: text('title').notNull(),
+    description: text('description').notNull(),
+    url: text('url').notNull(),
+    displayOrder: integer('display_order').notNull(),
+    active: boolean('active').notNull().default(true),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    check('resources_title_nonblank', sql`length(btrim(${table.title})) > 0`),
+    check(
+      'resources_description_nonblank',
+      sql`length(btrim(${table.description})) > 0`,
+    ),
+    check('resources_url_https', sql`${table.url} ~ '^https://'`),
+  ],
 )
 
 export const auditEntries = pgTable('audit_entries', {

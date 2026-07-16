@@ -9,15 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminResourcesRouteImport } from './routes/admin/resources'
 import { Route as AdminMembersRouteImport } from './routes/admin/members'
 import { Route as AdminClubsRouteImport } from './routes/admin/clubs'
 import { Route as AdminBoardMembersRouteImport } from './routes/admin/board-members'
 import { Route as AdminAuditHistoryRouteImport } from './routes/admin/audit-history'
 
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
@@ -36,6 +43,11 @@ const AccountRoute = AccountRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminResourcesRoute = AdminResourcesRouteImport.update({
+  id: '/admin/resources',
+  path: '/admin/resources',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminMembersRoute = AdminMembersRouteImport.update({
@@ -64,20 +76,24 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
+  '/resources': typeof ResourcesRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/members': typeof AdminMembersRoute
+  '/admin/resources': typeof AdminResourcesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
+  '/resources': typeof ResourcesRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/members': typeof AdminMembersRoute
+  '/admin/resources': typeof AdminResourcesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -85,10 +101,12 @@ export interface FileRoutesById {
   '/account': typeof AccountRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
+  '/resources': typeof ResourcesRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/members': typeof AdminMembersRoute
+  '/admin/resources': typeof AdminResourcesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,30 +115,36 @@ export interface FileRouteTypes {
     | '/account'
     | '/contact'
     | '/events'
+    | '/resources'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
     | '/admin/members'
+    | '/admin/resources'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/account'
     | '/contact'
     | '/events'
+    | '/resources'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
     | '/admin/members'
+    | '/admin/resources'
   id:
     | '__root__'
     | '/'
     | '/account'
     | '/contact'
     | '/events'
+    | '/resources'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
     | '/admin/members'
+    | '/admin/resources'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -128,14 +152,23 @@ export interface RootRouteChildren {
   AccountRoute: typeof AccountRoute
   ContactRoute: typeof ContactRoute
   EventsRoute: typeof EventsRoute
+  ResourcesRoute: typeof ResourcesRoute
   AdminAuditHistoryRoute: typeof AdminAuditHistoryRoute
   AdminBoardMembersRoute: typeof AdminBoardMembersRoute
   AdminClubsRoute: typeof AdminClubsRoute
   AdminMembersRoute: typeof AdminMembersRoute
+  AdminResourcesRoute: typeof AdminResourcesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events': {
       id: '/events'
       path: '/events'
@@ -162,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/resources': {
+      id: '/admin/resources'
+      path: '/admin/resources'
+      fullPath: '/admin/resources'
+      preLoaderRoute: typeof AdminResourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/members': {
@@ -200,11 +240,22 @@ const rootRouteChildren: RootRouteChildren = {
   AccountRoute: AccountRoute,
   ContactRoute: ContactRoute,
   EventsRoute: EventsRoute,
+  ResourcesRoute: ResourcesRoute,
   AdminAuditHistoryRoute: AdminAuditHistoryRoute,
   AdminBoardMembersRoute: AdminBoardMembersRoute,
   AdminClubsRoute: AdminClubsRoute,
   AdminMembersRoute: AdminMembersRoute,
+  AdminResourcesRoute: AdminResourcesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

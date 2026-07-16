@@ -15,6 +15,7 @@ describe('navigationForCapabilities', () => {
       { label: 'Dashboard', to: '/' },
       { label: 'Account', to: '/account' },
       { label: 'Contact', to: '/contact' },
+      { label: 'Resources', to: '/resources' },
       { label: 'Events', to: '/events' },
       { label: 'Club Access', to: '/account', hash: 'clubs' },
     ])
@@ -32,6 +33,7 @@ describe('navigationForCapabilities', () => {
       { label: 'Dashboard', to: '/' },
       { label: 'Account', to: '/account' },
       { label: 'Contact', to: '/contact' },
+      { label: 'Resources', to: '/resources' },
       { label: 'Board Member', to: '/account', hash: 'board-position' },
     ])
   })
@@ -64,9 +66,11 @@ describe('navigationForCapabilities', () => {
       { label: 'Dashboard', to: '/' },
       { label: 'Account', to: '/account' },
       { label: 'Contact', to: '/contact' },
+      { label: 'Resources', to: '/resources' },
       { label: 'Events', to: '/events' },
       { label: 'Members', to: '/admin/members' },
       { label: 'Clubs', to: '/admin/clubs' },
+      { label: 'Resources', to: '/admin/resources' },
       { label: 'Board members', to: '/admin/board-members' },
       { label: 'Audit history', to: '/admin/audit-history' },
     ])

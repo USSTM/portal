@@ -6,12 +6,11 @@
 
 **Status:** ready-for-agent
 
-- [ ] A Resource has only category, title, plain-text description, HTTPS URL, integer display order, active state, and timestamps.
-- [ ] Categories are fixed to Finance and Operations.
-- [ ] Administrators and the Superuser can create, edit, reorder, activate, and deactivate Resources.
-- [ ] Active Members and the Superuser can browse active Resources in category and display order; inactive Resources remain visible only in Administration.
-- [ ] The five legacy Finance and four legacy Operations links are seeded as active records in their existing order.
-- [ ] Resource mutations create Audit Entries.
-- [ ] The feature has no hard delete, rich text, uploads, nested categories, scheduling, version history, drag-and-drop requirement, or Club scoping.
-- [ ] Unit and integration tests cover validation, ordering, visibility, authorization, seeding, and audit creation.
-
+- [x] A Resource has only category, title, plain-text description, HTTPS URL, integer display order, active state, and timestamps.
+- [x] Categories are fixed to Finance and Operations.
+- [x] Administrators and the Superuser can create, edit, reorder, activate, and deactivate Resources.
+- [x] Active Members and the Superuser can browse active Resources in category and display order; inactive Resources remain visible only in Administration.
+- [x] The five legacy Finance and four legacy Operations links are seeded as active records in their existing order.
+- [x] Resource mutations create Audit Entries.
+- [x] The feature has no hard delete, rich text, uploads, nested categories, scheduling, version history, drag-and-drop requirement, or Club scoping.
+- [x] Unit and integration tests cover validation, ordering, visibility, authorization, seeding, and audit creation.

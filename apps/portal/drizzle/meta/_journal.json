@@ -57,6 +57,13 @@
       "when": 1784174007608,
       "tag": "0007_flawless_raza",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1784176029084,
+      "tag": "0008_brave_avengers",
+      "breakpoints": true
     }
   ]
 }

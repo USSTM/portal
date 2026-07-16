@@ -18,6 +18,7 @@ export function navigationForCapabilities(
     { label: 'Dashboard', to: '/' },
     { label: 'Account', to: '/account' },
     { label: 'Contact', to: '/contact' },
+    { label: 'Resources', to: '/resources' },
   ]
 
   if (
@@ -44,6 +45,7 @@ export function navigationForCapabilities(
     navigation.push(
       { label: 'Members', to: '/admin/members' },
       { label: 'Clubs', to: '/admin/clubs' },
+      { label: 'Resources', to: '/admin/resources' },
       { label: 'Board members', to: '/admin/board-members' },
       { label: 'Audit history', to: '/admin/audit-history' },
     )
