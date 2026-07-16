@@ -1,4 +1,6 @@
 import { FlaskConical } from 'lucide-react'
+
+import { portalLogoutAction } from '../auth/logout'
 import { Button } from './ui/button'
 
 export function SignIn() {
@@ -58,7 +60,7 @@ export function AccessDenied() {
         Your Google account is not provisioned for this portal. Contact USSTM
         if you need access.
       </p>
-      <form action="/auth/logout?client=portal&returnTo=/" method="post">
+      <form action={portalLogoutAction} method="post">
         <Button type="submit" variant="outline">
           Sign out
         </Button>

@@ -20,7 +20,12 @@ const config = defineConfig(({ mode }) => {
     server: {
       proxy: {
         '/auth': {
-          target: `http://localhost:${process.env.AUTH_PORT ?? '3001'}`,
+          target: `http://127.0.0.1:${process.env.AUTH_PORT ?? '3001'}`,
+          bypass(request) {
+            return request.method === 'POST' && request.url?.startsWith('/auth/logout')
+              ? request.url
+              : undefined
+          },
         },
       },
     },
@@ -41,6 +46,11 @@ const config = defineConfig(({ mode }) => {
           {
             route: '/api/v1/events',
             handler: './server/public-events.ts',
+          },
+          {
+            route: '/auth/logout',
+            method: 'POST',
+            handler: './server/logout.ts',
           },
         ],
       },

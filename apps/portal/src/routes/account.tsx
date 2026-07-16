@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Mail, Shield, Users, Briefcase, LogOut } from 'lucide-react'
 
+import { portalLogoutAction } from '../auth/logout'
 import { getPortalShell } from '../auth/shell'
 import { AccessDenied, SignIn } from '../components/auth-state'
 
@@ -23,7 +24,7 @@ function Account() {
             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider mb-1">Account</p>
             <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight">Superuser</h1>
           </div>
-          <form action="/auth/sign-out" method="post">
+          <form action={portalLogoutAction} method="post">
             <button
               className="bg-secondary/50 hover:bg-secondary text-secondary-foreground border border-border px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
               type="submit"
@@ -79,7 +80,7 @@ function Account() {
           </h1>
         </div>
         
-        <form action="/auth/sign-out" method="post">
+        <form action={portalLogoutAction} method="post">
           <button
             className="bg-secondary/50 hover:bg-secondary text-secondary-foreground border border-border px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors shadow-sm"
             type="submit"

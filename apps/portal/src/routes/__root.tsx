@@ -9,6 +9,7 @@ import { Toaster } from 'sonner'
 import appCss from '../styles.css?url'
 
 import { navigationForCapabilities } from '../auth/capabilities'
+import { portalLogoutAction } from '../auth/logout'
 import { getPortalShell } from '../auth/shell'
 import { Button } from '../components/ui/button'
 import type { QueryClient } from '@tanstack/react-query'
@@ -151,7 +152,7 @@ function PortalLayout() {
             <User className="w-5 h-5" />
             Account
           </Link>
-          <form action="/auth/logout?client=portal&returnTo=/" method="post">
+          <form action={portalLogoutAction} method="post">
             <button
               type="submit"
               className="w-full flex items-center gap-3 px-4 py-2 border-l-4 border-transparent text-muted-foreground hover:bg-secondary transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
