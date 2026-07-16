@@ -1,11 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
 
-import { Button } from '../components/ui/button'
-import { getPortalIdentity } from '../auth/identity'
+import { navigationForCapabilities } from '../auth/capabilities'
+import { getPortalShell } from '../auth/shell'
+import { AccessDenied } from '../components/auth-state'
 
 export const Route = createFileRoute('/')({
   component: Home,
-  loader: () => getPortalIdentity(),
+  loader: () => getPortalShell(),
 })
 
 function Home() {
@@ -15,32 +16,42 @@ function Home() {
     return <AccessDenied />
   }
 
-  return (
-    <main className="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-16">
-      <section className="space-y-4">
-        <p className="text-sm font-medium text-muted-foreground">USSTM</p>
-        <h1 className="text-4xl font-semibold tracking-tight">Portal</h1>
-        <p className="max-w-xl text-muted-foreground">Signed in as {identity.email}.</p>
-        <form action="/auth/logout?client=portal&amp;returnTo=/" method="post">
-          <Button type="submit">Sign out</Button>
-        </form>
-      </section>
-    </main>
+  const navigation = navigationForCapabilities(identity.capabilities).filter(
+    (item) => item.to !== '/',
   )
-}
 
-function AccessDenied() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-16">
-      <section className="space-y-4">
+    <main className="mx-auto max-w-5xl space-y-8 px-6 py-12">
+      <section className="space-y-2">
         <p className="text-sm font-medium text-muted-foreground">USSTM</p>
-        <h1 className="text-4xl font-semibold tracking-tight">Access denied</h1>
-        <p className="max-w-xl text-muted-foreground">
-          You do not have access to this portal. Contact USSTM if you need help.
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Welcome
+          {identity.kind === 'member'
+            ? `, ${identity.account.displayName}`
+            : ''}
+        </h1>
+        <p className="text-muted-foreground">
+          Choose a portal area to continue.
         </p>
-        <Button asChild>
-          <a href="/auth/sign-in?client=portal">Sign in with Google</a>
-        </Button>
+      </section>
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {navigation.map((item) => (
+          <Link
+            className="rounded-lg border bg-card p-5 transition-colors hover:bg-secondary"
+            hash={item.hash}
+            key={`${item.to}-${item.hash ?? ''}`}
+            to={item.to}
+          >
+            <h2 className="font-medium">{item.label}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {item.label === 'Account'
+                ? 'View your identity and active grants.'
+                : item.label === 'Contact'
+                  ? 'Find USSTM contact details.'
+                  : `Open ${item.label.toLowerCase()}.`}
+            </p>
+          </Link>
+        ))}
       </section>
     </main>
   )

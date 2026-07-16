@@ -1,11 +1,11 @@
 import { importJWK } from 'jose'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, or } from 'drizzle-orm'
 import { createServerFn } from '@tanstack/react-start'
 import { getRequestHeaders } from '@tanstack/react-start/server'
 
 import { admitPortalRequest } from './access'
 import { getDb } from '../db/index.js'
-import { administrators, members } from '../db/schema.js'
+import { administrators, boardMembers, clubAccess, members } from '../db/schema.js'
 
 export const getPortalIdentity = createServerFn({ method: 'GET' }).handler(
   async () => {
@@ -28,6 +28,21 @@ export const getPortalIdentity = createServerFn({ method: 'GET' }).handler(
           .innerJoin(members, eq(administrators.memberId, members.id))
           .where(and(eq(members.email, email), eq(members.lifecycle, 'active')))
         return administratorsFound.length > 0
+      },
+      isActiveMember: async (email) => {
+        const activeMembers = await getDb()
+          .select({ memberId: members.id })
+          .from(members)
+          .leftJoin(clubAccess, eq(clubAccess.memberId, members.id))
+          .leftJoin(boardMembers, eq(boardMembers.memberId, members.id))
+          .where(
+            and(
+              eq(members.email, email),
+              eq(members.lifecycle, 'active'),
+              or(eq(clubAccess.memberId, members.id), eq(boardMembers.memberId, members.id)),
+            ),
+          )
+        return activeMembers.length > 0
       },
     })
   },

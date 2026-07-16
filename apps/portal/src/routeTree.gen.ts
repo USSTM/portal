@@ -9,38 +9,154 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as EventsRouteImport } from './routes/events'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminMembersRouteImport } from './routes/admin/members'
+import { Route as AdminClubsRouteImport } from './routes/admin/clubs'
+import { Route as AdminBoardMembersRouteImport } from './routes/admin/board-members'
+import { Route as AdminAuditHistoryRouteImport } from './routes/admin/audit-history'
 
+const EventsRoute = EventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminMembersRoute = AdminMembersRouteImport.update({
+  id: '/admin/members',
+  path: '/admin/members',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminClubsRoute = AdminClubsRouteImport.update({
+  id: '/admin/clubs',
+  path: '/admin/clubs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBoardMembersRoute = AdminBoardMembersRouteImport.update({
+  id: '/admin/board-members',
+  path: '/admin/board-members',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuditHistoryRoute = AdminAuditHistoryRouteImport.update({
+  id: '/admin/audit-history',
+  path: '/admin/audit-history',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/contact': typeof ContactRoute
+  '/events': typeof EventsRoute
+  '/admin/audit-history': typeof AdminAuditHistoryRoute
+  '/admin/board-members': typeof AdminBoardMembersRoute
+  '/admin/clubs': typeof AdminClubsRoute
+  '/admin/members': typeof AdminMembersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/contact': typeof ContactRoute
+  '/events': typeof EventsRoute
+  '/admin/audit-history': typeof AdminAuditHistoryRoute
+  '/admin/board-members': typeof AdminBoardMembersRoute
+  '/admin/clubs': typeof AdminClubsRoute
+  '/admin/members': typeof AdminMembersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
+  '/contact': typeof ContactRoute
+  '/events': typeof EventsRoute
+  '/admin/audit-history': typeof AdminAuditHistoryRoute
+  '/admin/board-members': typeof AdminBoardMembersRoute
+  '/admin/clubs': typeof AdminClubsRoute
+  '/admin/members': typeof AdminMembersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/account'
+    | '/contact'
+    | '/events'
+    | '/admin/audit-history'
+    | '/admin/board-members'
+    | '/admin/clubs'
+    | '/admin/members'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/account'
+    | '/contact'
+    | '/events'
+    | '/admin/audit-history'
+    | '/admin/board-members'
+    | '/admin/clubs'
+    | '/admin/members'
+  id:
+    | '__root__'
+    | '/'
+    | '/account'
+    | '/contact'
+    | '/events'
+    | '/admin/audit-history'
+    | '/admin/board-members'
+    | '/admin/clubs'
+    | '/admin/members'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
+  ContactRoute: typeof ContactRoute
+  EventsRoute: typeof EventsRoute
+  AdminAuditHistoryRoute: typeof AdminAuditHistoryRoute
+  AdminBoardMembersRoute: typeof AdminBoardMembersRoute
+  AdminClubsRoute: typeof AdminClubsRoute
+  AdminMembersRoute: typeof AdminMembersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/events': {
+      id: '/events'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +164,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/members': {
+      id: '/admin/members'
+      path: '/admin/members'
+      fullPath: '/admin/members'
+      preLoaderRoute: typeof AdminMembersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/clubs': {
+      id: '/admin/clubs'
+      path: '/admin/clubs'
+      fullPath: '/admin/clubs'
+      preLoaderRoute: typeof AdminClubsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/board-members': {
+      id: '/admin/board-members'
+      path: '/admin/board-members'
+      fullPath: '/admin/board-members'
+      preLoaderRoute: typeof AdminBoardMembersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/audit-history': {
+      id: '/admin/audit-history'
+      path: '/admin/audit-history'
+      fullPath: '/admin/audit-history'
+      preLoaderRoute: typeof AdminAuditHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
+  ContactRoute: ContactRoute,
+  EventsRoute: EventsRoute,
+  AdminAuditHistoryRoute: AdminAuditHistoryRoute,
+  AdminBoardMembersRoute: AdminBoardMembersRoute,
+  AdminClubsRoute: AdminClubsRoute,
+  AdminMembersRoute: AdminMembersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
