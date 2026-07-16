@@ -13,7 +13,10 @@
   },
   "dependencies": {
     "@hono/node-server": "1.19.14",
-    "hono": "4.12.30"
+    "@usstm/auth-session": "workspace:*",
+    "arctic": "^3.7.0",
+    "hono": "4.12.30",
+    "jose": "^6.2.3"
   },
   "devDependencies": {
     "@types/node": "24.13.3",
