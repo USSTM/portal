@@ -1,8 +1,25 @@
+import { eq } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
 
 import { getDb } from '../../db/index.js'
-import { boardMembers, members, shiftSlots } from '../../db/schema.js'
-import { cancelOwnBooking, createOwnBooking } from './bookings'
+import {
+  auditEntries,
+  boardMembers,
+  bookings,
+  members,
+  shiftSlots,
+} from '../../db/schema.js'
+import {
+  revokeBoardAuthority,
+  updateBoardMember,
+} from '../admin/board-members.js'
+import { deactivateMember } from '../admin/members.js'
+import {
+  cancelOwnBooking,
+  cancelOverrideBooking,
+  createOverrideBooking,
+  createOwnBooking,
+} from './bookings'
 
 const describeWithDatabase = process.env.DATABASE_URL ? describe : describe.skip
 const now = new Date('2030-01-07T14:00:00Z')
@@ -120,6 +137,102 @@ describeWithDatabase('Board Member Bookings', () => {
         now: new Date('2030-01-07T15:00:00Z'),
       }),
     ).rejects.toThrow('already started')
+  })
+
+  it('allows privileged future overrides beyond normal limits and audits them', async () => {
+    const { actor, slots } = await createBoardMember()
+    const booking = await createOverrideBooking({
+      actorEmail: 'admin@example.com',
+      date: '2040-01-02',
+      memberId: actor.id,
+      now,
+      shiftSlotId: slots[0].id,
+    })
+    await cancelOverrideBooking({
+      actorEmail: 'admin@example.com',
+      bookingId: booking.id,
+      now,
+    })
+    const audit = await getDb()
+      .select()
+      .from(auditEntries)
+      .where(eq(auditEntries.targetId, booking.id))
+    expect(audit.map((entry) => entry.action)).toEqual(
+      expect.arrayContaining([
+        'booking.override_created',
+        'booking.override_cancelled',
+      ]),
+    )
+  })
+
+  it('updates only future snapshots and removes future Bookings on grant revocation or deactivation', async () => {
+    const { actor, slots } = await createBoardMember()
+    const db = getDb()
+    const [past, future] = await db
+      .insert(bookings)
+      .values([
+        {
+          boardPosition: 'Treasurer',
+          date: '2020-01-06',
+          displayName: 'Booking Board Member',
+          memberId: actor.id,
+          shiftSlotId: slots[0].id,
+        },
+        {
+          boardPosition: 'Treasurer',
+          date: '2030-01-07',
+          displayName: 'Booking Board Member',
+          memberId: actor.id,
+          shiftSlotId: slots[1].id,
+        },
+      ])
+      .returning()
+    await updateBoardMember({
+      actorEmail: 'admin@example.com',
+      boardPosition: 'President',
+      displayName: 'Updated Board Member',
+      memberId: actor.id,
+    })
+    const snapshots = await db
+      .select()
+      .from(bookings)
+      .where(eq(bookings.memberId, actor.id))
+    expect(snapshots.find((booking) => booking.id === past.id)).toMatchObject({
+      boardPosition: 'Treasurer',
+      displayName: 'Booking Board Member',
+    })
+    expect(snapshots.find((booking) => booking.id === future.id)).toMatchObject(
+      {
+        boardPosition: 'President',
+        displayName: 'Updated Board Member',
+      },
+    )
+    await revokeBoardAuthority({
+      actorEmail: 'admin@example.com',
+      memberId: actor.id,
+    })
+    expect(
+      await db.select().from(bookings).where(eq(bookings.id, future.id)),
+    ).toHaveLength(0)
+    expect(
+      await db.select().from(bookings).where(eq(bookings.id, past.id)),
+    ).toHaveLength(1)
+
+    const another = await createBoardMember()
+    const futureBooking = await createOverrideBooking({
+      actorEmail: 'admin@example.com',
+      date: '2030-01-08',
+      memberId: another.actor.id,
+      now,
+      shiftSlotId: another.slots[0].id,
+    })
+    await deactivateMember({
+      actorEmail: 'admin@example.com',
+      memberId: another.actor.id,
+    })
+    expect(
+      await db.select().from(bookings).where(eq(bookings.id, futureBooking.id)),
+    ).toHaveLength(0)
   })
 })
 

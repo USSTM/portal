@@ -6,12 +6,11 @@
 
 **Status:** ready-for-agent
 
-- [ ] Administrators and the Superuser can create or cancel a future Booking for any Board Member.
-- [ ] Administrator-created Bookings may bypass the normal two-week window and five-per-week limit.
-- [ ] Overrides cannot book a non-Board Member or alter a Booking after its Shift starts.
-- [ ] Every Administrator or Superuser Booking override creates an Audit Entry.
-- [ ] Revoking Board Member authority or deactivating a Member cancels all future Bookings in the same transaction.
-- [ ] Changing display name or Board Position updates future Booking snapshots only.
-- [ ] Past Booking snapshots and Member references remain unchanged after profile, grant, or lifecycle changes.
-- [ ] Integration tests cover override authority, bypass behavior, immutable history, automatic cancellation, snapshot updates, and audit creation.
-
+- [x] Administrators and the Superuser can create or cancel a future Booking for any Board Member.
+- [x] Administrator-created Bookings may bypass the normal two-week window and five-per-week limit.
+- [x] Overrides cannot book a non-Board Member or alter a Booking after its Shift starts.
+- [x] Every Administrator or Superuser Booking override creates an Audit Entry.
+- [x] Revoking Board Member authority or deactivating a Member cancels all future Bookings in the same transaction.
+- [x] Changing display name or Board Position updates future Booking snapshots only.
+- [x] Past Booking snapshots and Member references remain unchanged after profile, grant, or lifecycle changes.
+- [x] Integration tests cover override authority, bypass behavior, immutable history, automatic cancellation, snapshot updates, and audit creation.

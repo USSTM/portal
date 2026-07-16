@@ -10,6 +10,10 @@ import {
   clubAccess,
   members,
 } from '../../db/schema.js'
+import {
+  cancelFutureBookingsForMember,
+  updateFutureBookingSnapshots,
+} from '../office-hours/bookings.js'
 
 type BoardMemberInput = { actorEmail: string; memberId: string }
 
@@ -57,10 +61,17 @@ export async function grantBoardAuthority(
         .set({ lifecycle: 'active', updatedAt: new Date() })
         .where(eq(members.id, input.memberId))
     }
-    await writeAudit(tx, input.actorEmail, 'board_member.granted', input.memberId, {
-      boardPosition: input.boardPosition.trim(),
-      lifecycle: member.lifecycle === 'deactivated' ? 'active' : member.lifecycle,
-    })
+    await writeAudit(
+      tx,
+      input.actorEmail,
+      'board_member.granted',
+      input.memberId,
+      {
+        boardPosition: input.boardPosition.trim(),
+        lifecycle:
+          member.lifecycle === 'deactivated' ? 'active' : member.lifecycle,
+      },
+    )
   })
 }
 
@@ -79,10 +90,21 @@ export async function updateBoardMember(
       .update(boardMembers)
       .set({ boardPosition: input.boardPosition.trim() })
       .where(eq(boardMembers.memberId, input.memberId))
-    await writeAudit(tx, input.actorEmail, 'board_member.updated', input.memberId, {
+    await updateFutureBookingSnapshots(tx, {
       boardPosition: input.boardPosition.trim(),
       displayName: input.displayName.trim(),
+      memberId: input.memberId,
     })
+    await writeAudit(
+      tx,
+      input.actorEmail,
+      'board_member.updated',
+      input.memberId,
+      {
+        boardPosition: input.boardPosition.trim(),
+        displayName: input.displayName.trim(),
+      },
+    )
   })
 }
 
@@ -91,7 +113,13 @@ export async function revokeBoardAuthority(input: BoardMemberInput) {
   return db.transaction(async (tx) => {
     await requireNonAdministratorMember(tx, input.memberId)
     await requireBoardMember(tx, input.memberId)
-    await tx.delete(boardMembers).where(eq(boardMembers.memberId, input.memberId))
+    const cancelledFutureBookings = await cancelFutureBookingsForMember(
+      tx,
+      input.memberId,
+    )
+    await tx
+      .delete(boardMembers)
+      .where(eq(boardMembers.memberId, input.memberId))
     const [{ total: clubGrantCount }] = await tx
       .select({ total: count() })
       .from(clubAccess)
@@ -102,9 +130,16 @@ export async function revokeBoardAuthority(input: BoardMemberInput) {
         .set({ lifecycle: 'deactivated', updatedAt: new Date() })
         .where(eq(members.id, input.memberId))
     }
-    await writeAudit(tx, input.actorEmail, 'board_member.revoked', input.memberId, {
-      deactivated: clubGrantCount === 0,
-    })
+    await writeAudit(
+      tx,
+      input.actorEmail,
+      'board_member.revoked',
+      input.memberId,
+      {
+        cancelledFutureBookings,
+        deactivated: clubGrantCount === 0,
+      },
+    )
   })
 }
 
@@ -123,7 +158,9 @@ export async function browseBoardMembers() {
     .orderBy(desc(members.updatedAt), desc(members.id))
 }
 
-export function requireBoardMemberAdministrationAuthority(identity: PortalIdentity) {
+export function requireBoardMemberAdministrationAuthority(
+  identity: PortalIdentity,
+) {
   if (identity.kind === 'administrator' || identity.kind === 'superuser') {
     return identity.email
   }
@@ -136,11 +173,18 @@ async function requireNonAdministratorMember(
   lifecycle?: 'active' | 'deactivated',
 ) {
   const found = await tx
-    .select({ administratorId: administrators.memberId, lifecycle: members.lifecycle })
+    .select({
+      administratorId: administrators.memberId,
+      lifecycle: members.lifecycle,
+    })
     .from(members)
     .leftJoin(administrators, eq(administrators.memberId, members.id))
     .where(eq(members.id, memberId))
-  if (found.length === 0 || found[0].administratorId || (lifecycle && found[0].lifecycle !== lifecycle)) {
+  if (
+    found.length === 0 ||
+    found[0].administratorId ||
+    (lifecycle && found[0].lifecycle !== lifecycle)
+  ) {
     throw new Error('Member not available for administration')
   }
   return found[0]
@@ -154,9 +198,9 @@ async function requireBoardMember(tx: Transaction, memberId: string) {
   if (grants.length === 0) throw new Error('Board Member not found')
 }
 
-type Transaction = Parameters<ReturnType<typeof getDb>['transaction']>[0] extends (
-  tx: infer InferredTransaction,
-) => unknown
+type Transaction = Parameters<
+  ReturnType<typeof getDb>['transaction']
+>[0] extends (tx: infer InferredTransaction) => unknown
   ? InferredTransaction
   : never
 

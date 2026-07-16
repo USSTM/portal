@@ -42,6 +42,7 @@ export async function getOfficeHoursCalendar(
   input: {
     now?: Date
     viewerMemberId?: string
+    viewerCanOverride?: boolean
     week?: string
   } = {},
 ) {
@@ -83,6 +84,7 @@ export async function getOfficeHoursCalendar(
             boardPosition,
             displayName,
             ownBookingId: memberId === input.viewerMemberId ? id : undefined,
+            overrideBookingId: input.viewerCanOverride ? id : undefined,
           })),
         endTime: slot.endTime,
         id: slot.id,

@@ -6,7 +6,9 @@ import { z } from 'zod'
 
 import {
   cancelOwnBookingAction,
+  cancelOverrideBookingAction,
   createOwnBookingAction,
+  createOverrideBookingAction,
   getOfficeHoursCalendarAction,
 } from '../features/office-hours/calendar-actions'
 import { addDays } from '../features/office-hours/calendar'
@@ -26,8 +28,11 @@ function OfficeHours() {
   const queryClient = useQueryClient()
   const createBooking = useServerFn(createOwnBookingAction)
   const cancelBooking = useServerFn(cancelOwnBookingAction)
+  const createOverrideBooking = useServerFn(createOverrideBookingAction)
+  const cancelOverrideBooking = useServerFn(cancelOverrideBookingAction)
   const [pending, setPending] = useState<string>()
   const [error, setError] = useState<string>()
+  const [overrideMemberId, setOverrideMemberId] = useState('')
   const previousWeek = addDays(calendar.week, -7)
   const nextWeek = addDays(calendar.week, 7)
 
@@ -51,6 +56,22 @@ function OfficeHours() {
           Next week
         </Link>
       </nav>
+      {calendar.canOverrideBookings ? (
+        <label className="grid max-w-md gap-1">
+          <span>Board Member for override</span>
+          <select
+            onChange={(event) => setOverrideMemberId(event.currentTarget.value)}
+            value={overrideMemberId}
+          >
+            <option value="">Select a Board Member</option>
+            {calendar.overrideMembers.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.displayName} · {member.boardPosition}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
       {error ? <p role="alert">{error}</p> : null}
       <div className="grid gap-4 md:grid-cols-5">
         {calendar.days.map((day) => (
@@ -140,6 +161,72 @@ function OfficeHours() {
                         {pending === shift.id ? 'Booking…' : 'Book this Shift'}
                       </button>
                     )
+                  ) : null}
+                  {calendar.canOverrideBookings ? (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <button
+                        disabled={
+                          pending === `${day.date}-${shift.id}` ||
+                          !overrideMemberId
+                        }
+                        onClick={async () => {
+                          const pendingKey = `${day.date}-${shift.id}`
+                          setPending(pendingKey)
+                          try {
+                            await createOverrideBooking({
+                              data: {
+                                date: day.date,
+                                memberId: overrideMemberId,
+                                shiftSlotId: shift.id,
+                              },
+                            })
+                            setError(undefined)
+                            await queryClient.invalidateQueries()
+                            await router.invalidate()
+                          } catch (caught) {
+                            setError(
+                              caught instanceof Error
+                                ? caught.message
+                                : 'Unable to create Booking override.',
+                            )
+                          } finally {
+                            setPending(undefined)
+                          }
+                        }}
+                        type="button"
+                      >
+                        Add override Booking
+                      </button>
+                      {shift.bookings
+                        .filter((booking) => booking.overrideBookingId)
+                        .map((booking) => (
+                          <button
+                            key={booking.overrideBookingId}
+                            onClick={async () => {
+                              if (!booking.overrideBookingId) return
+                              try {
+                                await cancelOverrideBooking({
+                                  data: {
+                                    bookingId: booking.overrideBookingId,
+                                  },
+                                })
+                                setError(undefined)
+                                await queryClient.invalidateQueries()
+                                await router.invalidate()
+                              } catch (caught) {
+                                setError(
+                                  caught instanceof Error
+                                    ? caught.message
+                                    : 'Unable to cancel Booking override.',
+                                )
+                              }
+                            }}
+                            type="button"
+                          >
+                            Cancel {booking.displayName}
+                          </button>
+                        ))}
+                    </div>
                   ) : null}
                 </li>
               ))}
