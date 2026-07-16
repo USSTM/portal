@@ -1,5 +1,8 @@
 node_modules
-.pnpm-store
-.git
+**/node_modules
 dist
-.turbo
+**/dist
+.git
+.env
+.env.local
+coverage

@@ -1,3 +1,0 @@
-# Centralize explicit cross-application authorization
-
-The auth service will admit only identities explicitly provisioned as a USSTM Administrator, Board Member, or holder of a Club Access Grant; email domain alone never grants access. Only USSTM Administrators may issue or revoke full-management Club Access Grants, grants apply across registered USSTM applications, and USSTM Administrators may manage every Club's content. This central control sacrifices Club self-service to keep shared organizational accounts, exceptional Member access, recovery, and future-app permissions consistent and auditable.

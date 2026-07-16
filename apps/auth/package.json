@@ -1,32 +1,24 @@
 {
-  "name": "auth",
-  "version": "0.0.1",
-  "type": "module",
+  "name": "@usstm/auth",
   "private": true,
+  "type": "module",
   "scripts": {
-    "bootstrap:usstm-administrators": "tsx src/bootstrap-administrators.ts",
-    "bootstrap:portal-client": "tsx src/bootstrap-portal-client.ts",
     "dev": "tsx watch src/server.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
-    "lint": "tsc --noEmit",
-    "migrate": "tsx src/migrate.ts",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:integration": "vitest run --passWithNoTests --config vitest.integration.config.ts",
+    "lint": "eslint src",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@better-auth/oauth-provider": "^1.6.23",
-    "@hono/node-server": "^1.19.9",
-    "better-auth": "^1.6.23",
-    "hono": "^4.11.9",
-    "pg": "^8.18.0"
+    "@hono/node-server": "1.19.14",
+    "hono": "4.12.30"
   },
   "devDependencies": {
-    "@types/node": "^22",
-    "@types/pg": "^8.18.0",
-    "tsx": "^4.21.0",
-    "typescript": "^6",
-    "vitest": "^4.0.18"
+    "@types/node": "24.13.3",
+    "tsx": "4.23.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.10"
   }
 }

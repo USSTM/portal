@@ -1,0 +1,3 @@
+# Control Administrators with an environment Superuser
+
+One Google-authenticated email configured in a required environment variable acts as the Superuser outside the Member database. It receives all Administrator authority and alone may create or modify an Administrator, including their identity, profile, grants, and activation status; neither the Superuser nor its email can be managed through the portal. This creates a deployment-controlled recovery and trust boundary while keeping ordinary Administrators unable to transfer or alter Administrator authority indirectly. Rotation requires changing deployment configuration and restarting the application, and Superuser actions remain attributable to its verified email.

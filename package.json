@@ -1,25 +1,28 @@
 {
   "name": "usstm-portal",
-  "version": "0.0.1",
   "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.11.0",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": ">=11 <12"
+  },
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "turbo format",
-    "typecheck": "turbo typecheck",
-    "test": "turbo test",
-    "test:integration": "node --test tests/health.test.mjs"
+    "dev": "pnpm --parallel --filter @usstm/auth --filter @usstm/portal dev",
+    "format": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "test:integration": "pnpm -r --if-present test:integration",
+    "db:migrate": "pnpm --filter @usstm/portal db:migrate",
+    "build": "pnpm -r --if-present build",
+    "ci": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm db:migrate && pnpm build"
   },
   "devDependencies": {
-    "prettier": "^3.8.3",
-    "prettier-plugin-tailwindcss": "^0.8.0",
-    "turbo": "^2.9.18",
-    "typescript": "^6",
-    "vitest": "^4.0.18"
-  },
-  "packageManager": "pnpm@10.33.4",
-  "engines": {
-    "node": ">=22.12"
+    "@eslint/js": "9.39.5",
+    "eslint": "9.39.5",
+    "prettier": "3.9.5",
+    "typescript-eslint": "8.64.0"
   }
 }

@@ -1,0 +1,9 @@
+node_modules
+.output
+.nitro
+dist
+coverage
+.scratch
+old-*.md
+apps/portal/.cta.json
+apps/portal/public
