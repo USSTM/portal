@@ -55,6 +55,9 @@ Invalid timestamps and invalid ranges return `400 Bad Request`:
 }
 ```
 
+An invalid `from` or `to` timestamp uses the same `invalid_date_range` code
+with a message identifying the invalid parameter.
+
 ## HTTP Behavior
 
 - `GET` and `HEAD` are supported.

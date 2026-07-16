@@ -21,6 +21,10 @@ const config = defineConfig({
             method: 'GET',
             handler: './server/health-ready.ts',
           },
+          {
+            route: '/api/v1/events',
+            handler: './server/public-events.ts',
+          },
         ],
       },
     }),
