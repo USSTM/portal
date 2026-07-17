@@ -1,0 +1,20 @@
+[
+  {
+    "id": "10000000-0000-4000-8000-000000000001",
+    "group_name": "Alpha Science Society",
+    "username": "Alpha",
+    "email": "alpha@example.com"
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000002",
+    "group_name": "Beta Science Society",
+    "username": "Beta",
+    "email": "beta@example.com"
+  },
+  {
+    "id": "10000000-0000-4000-8000-000000000003",
+    "group_name": "Gamma Science Society",
+    "username": "Gamma",
+    "email": "gamma@example.com"
+  }
+]

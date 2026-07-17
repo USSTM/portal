@@ -10,7 +10,7 @@ import {
   Tent,
   History,
   ArrowRight,
-  LayoutDashboard
+  LayoutDashboard,
 } from 'lucide-react'
 
 import { navigationForCapabilities } from '../auth/capabilities'
@@ -37,7 +37,7 @@ function NavIcon({ label, className }: { label: string; className?: string }) {
     case 'Account':
       return <User className={className} />
     case 'Members':
-    case 'Board members':
+    case 'Board Members':
       return <Users className={className} />
     case 'Clubs':
     case 'Club Access':
@@ -70,13 +70,17 @@ function Home() {
       {/* Page Header */}
       <header className="flex flex-col gap-2">
         <h2 className="text-3xl md:text-4xl font-bold text-primary tracking-tight">
-          Welcome{identity.kind === 'member' ? `, ${identity.account.displayName}` : ''}
+          Welcome
+          {identity.kind === 'member'
+            ? `, ${identity.account.displayName}`
+            : ''}
         </h2>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Access essential tools, manage activities, and connect with the Science Society network from your centralized portal.
+          Access essential tools, manage activities, and connect with the
+          Science Society network from your centralized portal.
         </p>
       </header>
-      
+
       {/* Module Grid */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {navigation.map((item) => (
@@ -90,13 +94,11 @@ function Home() {
             <div className="mb-4 w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
               <NavIcon label={item.label} className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">{item.label}</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">
+              {item.label}
+            </h3>
             <p className="text-sm text-muted-foreground flex-1">
-              {item.label === 'Account'
-                ? 'View your identity and active grants.'
-                : item.label === 'Contact'
-                  ? 'Find USSTM contact details.'
-                  : `Open ${item.label.toLowerCase()}.`}
+              {item.description}
             </p>
             <div className="mt-4 flex items-center text-primary text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0 duration-300">
               Access Module <ArrowRight className="w-4 h-4 ml-1" />

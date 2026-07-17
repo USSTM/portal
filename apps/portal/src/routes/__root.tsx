@@ -91,7 +91,7 @@ function NavIcon({ label, className }: { label: string; className?: string }) {
     case 'Clubs':
     case 'Club Access':
       return <Tent className={className} />
-    case 'Audit history':
+    case 'Audit History':
       return <History className={className} />
     case 'Board Member':
     default:

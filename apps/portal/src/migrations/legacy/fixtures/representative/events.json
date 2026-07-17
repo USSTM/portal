@@ -1,0 +1,22 @@
+[
+  {
+    "id": "20000000-0000-4000-8000-000000000001",
+    "title": "Past symposium",
+    "description": "Representative past legacy Event.",
+    "location": "Science Building",
+    "address": "1 Example Street",
+    "start_time": "2025-01-15 18:00:00-05",
+    "end_time": "2025-01-15 20:00:00-05",
+    "created_by": "10000000-0000-4000-8000-000000000001"
+  },
+  {
+    "id": "20000000-0000-4000-8000-000000000002",
+    "title": "Future workshop",
+    "description": "Representative future multi-Club Event.",
+    "location": "Online",
+    "address": "https://example.com/workshop",
+    "start_time": "2030-09-15 18:00:00-04",
+    "end_time": "2030-09-15 20:00:00-04",
+    "created_by": "10000000-0000-4000-8000-000000000001"
+  }
+]

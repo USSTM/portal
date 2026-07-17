@@ -22,7 +22,8 @@ const config = defineConfig(({ mode }) => {
         '/auth': {
           target: `http://127.0.0.1:${process.env.AUTH_PORT ?? '3001'}`,
           bypass(request) {
-            return request.method === 'POST' && request.url?.startsWith('/auth/logout')
+            return request.method === 'POST' &&
+              request.url?.startsWith('/auth/logout')
               ? request.url
               : undefined
           },
@@ -30,34 +31,34 @@ const config = defineConfig(({ mode }) => {
       },
     },
     plugins: [
-    nitro({
-      config: {
-        handlers: [
-          {
-            route: '/health/live',
-            method: 'GET',
-            handler: './server/health-live.ts',
-          },
-          {
-            route: '/health/ready',
-            method: 'GET',
-            handler: './server/health-ready.ts',
-          },
-          {
-            route: '/api/v1/events',
-            handler: './server/public-events.ts',
-          },
-          {
-            route: '/auth/logout',
-            method: 'POST',
-            handler: './server/logout.ts',
-          },
-        ],
-      },
-    }),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
+      tanstackStart(),
+      nitro({
+        config: {
+          handlers: [
+            {
+              route: '/health/live',
+              method: 'GET',
+              handler: './server/health-live.ts',
+            },
+            {
+              route: '/health/ready',
+              method: 'GET',
+              handler: './server/health-ready.ts',
+            },
+            {
+              route: '/api/v1/events',
+              handler: './server/public-events.ts',
+            },
+            {
+              route: '/auth/logout',
+              method: 'POST',
+              handler: './server/logout.ts',
+            },
+          ],
+        },
+      }),
+      tailwindcss(),
+      viteReact(),
     ],
   }
 })

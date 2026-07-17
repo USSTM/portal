@@ -10,3 +10,4 @@ playwright-report
 test-results
 apps/portal/routeTree.gen.ts
 .DS_Store
+.scratch/legacy-export/

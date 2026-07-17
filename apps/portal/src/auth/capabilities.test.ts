@@ -12,12 +12,37 @@ describe('navigationForCapabilities', () => {
         superuser: false,
       }),
     ).toEqual([
-      { label: 'Dashboard', to: '/' },
-      { label: 'Account', to: '/account' },
-      { label: 'Contact', to: '/contact' },
-      { label: 'Resources', to: '/resources' },
-      { label: 'Events', to: '/events' },
-      { label: 'Club Access', to: '/account', hash: 'clubs' },
+      {
+        label: 'Dashboard',
+        to: '/',
+        description: 'Open dashboard.',
+      },
+      {
+        label: 'Account',
+        to: '/account',
+        description: 'View your identity and active grants.',
+      },
+      {
+        label: 'Contact',
+        to: '/contact',
+        description: 'Find USSTM contact details.',
+      },
+      {
+        label: 'Resources',
+        to: '/resources',
+        description: 'Open resources.',
+      },
+      {
+        label: 'Events',
+        to: '/events',
+        description: 'Open events.',
+      },
+      {
+        label: 'Club Access',
+        to: '/account',
+        hash: 'clubs',
+        description: 'Open club access.',
+      },
     ])
   })
 
@@ -30,11 +55,32 @@ describe('navigationForCapabilities', () => {
         superuser: false,
       }),
     ).toEqual([
-      { label: 'Dashboard', to: '/' },
-      { label: 'Account', to: '/account' },
-      { label: 'Contact', to: '/contact' },
-      { label: 'Resources', to: '/resources' },
-      { label: 'Board Member', to: '/account', hash: 'board-position' },
+      {
+        label: 'Dashboard',
+        to: '/',
+        description: 'Open dashboard.',
+      },
+      {
+        label: 'Account',
+        to: '/account',
+        description: 'View your identity and active grants.',
+      },
+      {
+        label: 'Contact',
+        to: '/contact',
+        description: 'Find USSTM contact details.',
+      },
+      {
+        label: 'Resources',
+        to: '/resources',
+        description: 'Open resources.',
+      },
+      {
+        label: 'Board Member',
+        to: '/account',
+        hash: 'board-position',
+        description: 'Open board member.',
+      },
     ])
   })
 
@@ -48,8 +94,16 @@ describe('navigationForCapabilities', () => {
       }),
     ).toEqual(
       expect.arrayContaining([
-        { label: 'Members', to: '/admin/members' },
-        { label: 'Clubs', to: '/admin/clubs' },
+        {
+          label: 'Members',
+          to: '/admin/members',
+          description: 'Open members.',
+        },
+        {
+          label: 'Clubs',
+          to: '/admin/clubs',
+          description: 'Open clubs.',
+        },
       ]),
     )
   })
@@ -63,16 +117,56 @@ describe('navigationForCapabilities', () => {
         superuser: false,
       }),
     ).toEqual([
-      { label: 'Dashboard', to: '/' },
-      { label: 'Account', to: '/account' },
-      { label: 'Contact', to: '/contact' },
-      { label: 'Resources', to: '/resources' },
-      { label: 'Events', to: '/events' },
-      { label: 'Members', to: '/admin/members' },
-      { label: 'Clubs', to: '/admin/clubs' },
-      { label: 'Resources', to: '/admin/resources' },
-      { label: 'Board members', to: '/admin/board-members' },
-      { label: 'Audit history', to: '/admin/audit-history' },
+      {
+        label: 'Dashboard',
+        to: '/',
+        description: 'Open dashboard.',
+      },
+      {
+        label: 'Account',
+        to: '/account',
+        description: 'View your identity and active grants.',
+      },
+      {
+        label: 'Contact',
+        to: '/contact',
+        description: 'Find USSTM contact details.',
+      },
+      {
+        label: 'Resources',
+        to: '/resources',
+        description: 'Open resources.',
+      },
+      {
+        label: 'Events',
+        to: '/events',
+        description: 'Open events.',
+      },
+      {
+        label: 'Members',
+        to: '/admin/members',
+        description: 'Open members.',
+      },
+      {
+        label: 'Clubs',
+        to: '/admin/clubs',
+        description: 'Open clubs.',
+      },
+      {
+        label: 'Resources',
+        to: '/admin/resources',
+        description: 'Open resources.',
+      },
+      {
+        label: 'Board Members',
+        to: '/admin/board-members',
+        description: 'Open board members.',
+      },
+      {
+        label: 'Audit History',
+        to: '/admin/audit-history',
+        description: 'Open audit history.',
+      },
     ])
   })
 })

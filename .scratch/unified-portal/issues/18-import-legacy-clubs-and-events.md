@@ -6,13 +6,12 @@
 
 **Status:** ready-for-agent
 
-- [ ] The import accepts legacy Clubs, Events, and organizer relationships without depending on the live legacy application.
-- [ ] Legacy Club and Event UUIDs are preserved.
-- [ ] Legacy group-account records become Clubs, and `created_by` becomes the Owning Club relationship.
-- [ ] Organizer rows become additional Organizing Clubs after duplicate-owner relationships are removed.
-- [ ] All past and future Events, timestamps, public fields, and relationships are retained.
-- [ ] Credentials, authentication identities, password state, sessions, Board rosters, and Office Hours Bookings are excluded.
-- [ ] Re-running the same import is idempotent and does not duplicate data.
-- [ ] The command reports and verifies record counts, IDs, relationships, invalid references, and timestamp conversion.
-- [ ] Integration fixtures cover representative same-owner, multi-organizer, past, future, and invalid-source cases.
-
+- [x] The import accepts legacy Clubs, Events, and organizer relationships without depending on the live legacy application.
+- [x] Legacy Club and Event UUIDs are preserved.
+- [x] Legacy group-account records become Clubs, and `created_by` becomes the Owning Club relationship.
+- [x] Organizer rows become additional Organizing Clubs after duplicate-owner relationships are removed.
+- [x] All past and future Events, timestamps, public fields, and relationships are retained.
+- [x] Credentials, authentication identities, password state, sessions, Board rosters, and Office Hours Bookings are excluded.
+- [x] Re-running the same import is idempotent and does not duplicate data.
+- [x] The command reports and verifies record counts, IDs, relationships, invalid references, and timestamp conversion.
+- [x] Integration fixtures cover representative same-owner, multi-organizer, past, future, and invalid-source cases.
