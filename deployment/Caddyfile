@@ -1,0 +1,25 @@
+{
+	admin localhost:2019
+	log {
+		output stdout
+		format json
+	}
+}
+
+{$PORTAL_ADDRESS} {
+	log {
+		output stdout
+		format json
+	}
+
+	header X-Request-ID {http.request.uuid}
+
+	@auth path /auth/*
+	reverse_proxy @auth auth:3001 {
+		header_up X-Request-ID {http.request.uuid}
+	}
+
+	reverse_proxy portal:3000 {
+		header_up X-Request-ID {http.request.uuid}
+	}
+}

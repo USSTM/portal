@@ -4,7 +4,7 @@
 
 **Blocked by:** None — can start immediately
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The pnpm workspace contains independently runnable Portal and auth applications plus one narrowly scoped auth-session package.
 - [x] Node.js 24 and the pnpm version are pinned, with one committed lockfile and no Turborepo or Nx dependency.

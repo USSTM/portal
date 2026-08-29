@@ -4,7 +4,7 @@
 
 **Blocked by:** 07 — Designate Board Members; 15 — Show the public Office Hours calendar
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] A Board Member can book an eligible Shift in the current or immediately following Toronto week.
 - [x] A Board Member can hold at most five Bookings per Monday-Sunday week.

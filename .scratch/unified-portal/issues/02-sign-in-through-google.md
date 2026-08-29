@@ -4,15 +4,14 @@
 
 **Blocked by:** 01 — Bootstrap the runnable workspace
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] The Hono service performs Google's authorization-code flow with `state`, PKCE, and the user-info endpoint.
-- [ ] Only a verified email is extracted; Google profile fields and access or refresh tokens are discarded.
-- [ ] Email normalization trims and lowercases only, without alias, dot, or tag rewriting.
-- [ ] Allowlisted client configuration rejects unknown origins, audiences, callback paths, and non-relative return paths.
-- [ ] The auth service issues an asymmetric, audience-bound, host-only, secure, HTTP-only, `SameSite=Lax` cookie that expires after eight hours without renewal.
-- [ ] The Portal verifies the cookie and admits the configured Superuser while showing a generic denial for unknown emails.
-- [ ] Logout clears only the application's local session cookie.
-- [ ] The auth service has no database access and no fake-login endpoint.
-- [ ] Integration tests use a fake Google boundary and test keys without external network calls.
-
+- [x] The Hono service performs Google's authorization-code flow with `state`, PKCE, and the user-info endpoint.
+- [x] Only a verified email is extracted; Google profile fields and access or refresh tokens are discarded.
+- [x] Email normalization trims and lowercases only, without alias, dot, or tag rewriting.
+- [x] Allowlisted client configuration rejects unknown origins, audiences, callback paths, and non-relative return paths.
+- [x] The auth service issues an asymmetric, audience-bound, host-only, secure, HTTP-only, `SameSite=Lax` cookie that expires after eight hours without renewal.
+- [x] The Portal verifies the cookie and admits the configured Superuser while showing a generic denial for unknown emails.
+- [x] Logout clears only the application's local session cookie.
+- [x] The auth service has no database access and no fake-login endpoint.
+- [x] Integration tests use a fake Google boundary and test keys without external network calls.

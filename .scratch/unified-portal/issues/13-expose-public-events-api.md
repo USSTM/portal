@@ -4,7 +4,7 @@
 
 **Blocked by:** 11 — Attribute Organizing Clubs
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] `GET /api/v1/events` returns the documented camelCase Event, Owning Club, and Organizing Club representation ordered by start time.
 - [x] Omitting bounds returns all past and future Events.

@@ -4,7 +4,7 @@
 
 **Blocked by:** 03 — Let the Superuser provision Administrators; 16 — Let Board Members manage their Bookings
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] Administrators and the Superuser can create or cancel a future Booking for any Board Member.
 - [x] Administrator-created Bookings may bypass the normal two-week window and five-per-week limit.

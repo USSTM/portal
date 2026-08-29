@@ -4,7 +4,7 @@
 
 **Blocked by:** 03 — Let the Superuser provision Administrators; 06 — Provision Members with Club Access
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] A Resource has only category, title, plain-text description, HTTPS URL, integer display order, active state, and timestamps.
 - [x] Categories are fixed to Finance and Operations.

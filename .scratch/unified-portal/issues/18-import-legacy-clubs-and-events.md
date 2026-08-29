@@ -4,7 +4,7 @@
 
 **Blocked by:** 11 — Attribute Organizing Clubs
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The import accepts legacy Clubs, Events, and organizer relationships without depending on the live legacy application.
 - [x] Legacy Club and Event UUIDs are preserved.

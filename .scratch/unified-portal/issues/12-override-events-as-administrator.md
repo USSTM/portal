@@ -4,7 +4,7 @@
 
 **Blocked by:** 03 — Let the Superuser provision Administrators; 11 — Attribute Organizing Clubs
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] Administrators and the Superuser can create and edit Events for any active Club.
 - [x] They can transfer an Event to another active Owning Club without duplicating it in the organizer list.

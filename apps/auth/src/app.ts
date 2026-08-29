@@ -48,6 +48,21 @@ export function createAuthApp(dependencies: AuthDependencies) {
   const app = new Hono()
   const clients = new Map(dependencies.clients.map((client) => [client.audience, client]))
 
+  app.use('*', async (context, next) => {
+    await next()
+    console.log(
+      JSON.stringify({
+        level: 'info',
+        method: context.req.method,
+        path: new URL(context.req.url).pathname,
+        requestId: context.req.header('x-request-id') ?? crypto.randomUUID(),
+        service: 'auth',
+        status: context.res.status,
+        timestamp: new Date().toISOString(),
+      }),
+    )
+  })
+
   app.get('/auth/health/live', (context) =>
     context.json({ service: 'auth', status: 'ok' }),
   )

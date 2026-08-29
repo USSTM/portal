@@ -4,14 +4,13 @@
 
 **Blocked by:** 06 — Provision Members with Club Access
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Administrators and the Superuser can grant Board Member authority with one required plain-text Board Position.
-- [ ] A new Member may be provisioned with Board Member authority as their only initial grant.
-- [ ] Administrators can change a non-administrator Board Member's display name and Board Position.
-- [ ] Revoking Board Member authority removes that grant and deactivates the Member when it was their final grant.
-- [ ] Ordinary Administrators cannot change Board Member data belonging to an Administrator.
-- [ ] Board Member creation, profile changes, grant, and revocation create Audit Entries.
-- [ ] Google profile names and photos are never used as Board Member data.
-- [ ] Integration tests cover Board-only admission, required positions, final-grant deactivation, and authorization boundaries.
-
+- [x] Administrators and the Superuser can grant Board Member authority with one required plain-text Board Position.
+- [x] A new Member may be provisioned with Board Member authority as their only initial grant.
+- [x] Administrators can change a non-administrator Board Member's display name and Board Position.
+- [x] Revoking Board Member authority removes that grant and deactivates the Member when it was their final grant.
+- [x] Ordinary Administrators cannot change Board Member data belonging to an Administrator.
+- [x] Board Member creation, profile changes, grant, and revocation create Audit Entries.
+- [x] Google profile names and photos are never used as Board Member data.
+- [x] Integration tests cover Board-only admission, required positions, final-grant deactivation, and authorization boundaries.

@@ -34,6 +34,7 @@ const config = defineConfig(({ mode }) => {
       tanstackStart(),
       nitro({
         config: {
+          plugins: ['./server/request-logging.ts'],
           handlers: [
             {
               route: '/health/live',

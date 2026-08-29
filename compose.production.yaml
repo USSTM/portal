@@ -1,0 +1,162 @@
+name: usstm-portal-production
+
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    environment:
+      PORTAL_ADDRESS: ${PORTAL_ADDRESS:?PORTAL_ADDRESS is required}
+    ports:
+      - '${PORTAL_HTTP_PORT:-80}:80'
+      - '${PORTAL_HTTPS_PORT:-443}:443'
+    volumes:
+      - ./deployment/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - application
+    depends_on:
+      auth:
+        condition: service_healthy
+      portal:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'wget',
+          '--quiet',
+          '--output-document=-',
+          'http://127.0.0.1:2019/config/',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  portal:
+    build:
+      context: .
+      dockerfile: apps/portal/Dockerfile
+      target: runtime
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+      PORT: '3000'
+      PORTAL_AUTH_ISSUER: ${PORTAL_AUTH_ISSUER:?PORTAL_AUTH_ISSUER is required}
+      PORTAL_AUTH_KEY_ID: ${PORTAL_AUTH_KEY_ID:?PORTAL_AUTH_KEY_ID is required}
+      PORTAL_AUTH_PUBLIC_JWK: ${PORTAL_AUTH_PUBLIC_JWK:?PORTAL_AUTH_PUBLIC_JWK is required}
+      PORTAL_CONTACT_EMAIL: ${PORTAL_CONTACT_EMAIL:?PORTAL_CONTACT_EMAIL is required}
+      PORTAL_CONTACT_INSTAGRAM: ${PORTAL_CONTACT_INSTAGRAM:?PORTAL_CONTACT_INSTAGRAM is required}
+      PORTAL_CONTACT_LINKTREE: ${PORTAL_CONTACT_LINKTREE:?PORTAL_CONTACT_LINKTREE is required}
+      PORTAL_CONTACT_WEBSITE: ${PORTAL_CONTACT_WEBSITE:?PORTAL_CONTACT_WEBSITE is required}
+      PORTAL_SUPERUSER_EMAIL: ${PORTAL_SUPERUSER_EMAIL:?PORTAL_SUPERUSER_EMAIL is required}
+    networks:
+      - application
+      - database
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '--input-type=module',
+          '--eval',
+          "const response = await fetch('http://localhost:3000/health/ready'); if (!response.ok) process.exit(1)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth:
+    build:
+      context: .
+      dockerfile: apps/auth/Dockerfile
+    restart: unless-stopped
+    environment:
+      AUTH_CLIENTS: ${AUTH_CLIENTS:?AUTH_CLIENTS is required}
+      AUTH_PORT: '3001'
+      AUTH_SESSION_ISSUER: ${AUTH_SESSION_ISSUER:?AUTH_SESSION_ISSUER is required}
+      AUTH_SESSION_KEY_ID: ${AUTH_SESSION_KEY_ID:?AUTH_SESSION_KEY_ID is required}
+      AUTH_SESSION_PRIVATE_JWK: ${AUTH_SESSION_PRIVATE_JWK:?AUTH_SESSION_PRIVATE_JWK is required}
+    networks:
+      - application
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '--input-type=module',
+          '--eval',
+          "const response = await fetch('http://localhost:3001/auth/health/live'); if (!response.ok) process.exit(1)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:?DATABASE_NAME is required}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD is required}
+      POSTGRES_USER: ${DATABASE_USER:?DATABASE_USER is required}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - database
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backup:
+    build:
+      context: .
+      dockerfile: deployment/backup/Dockerfile
+    restart: unless-stopped
+    command: ['crond', '-f', '-l', '2']
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION:-}
+      DATABASE_NAME: ${DATABASE_NAME:?DATABASE_NAME is required}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:?DATABASE_PASSWORD is required}
+      DATABASE_USER: ${DATABASE_USER:?DATABASE_USER is required}
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD:?RESTIC_PASSWORD is required}
+      RESTIC_REPOSITORY: ${RESTIC_REPOSITORY:?RESTIC_REPOSITORY is required}
+    networks:
+      - backup-egress
+      - database
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  migrate:
+    profiles:
+      - operations
+    build:
+      context: .
+      dockerfile: apps/portal/Dockerfile
+      target: migrate
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
+    networks:
+      - database
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+networks:
+  application:
+  backup-egress:
+  database:
+    internal: true
+
+volumes:
+  caddy-config:
+  caddy-data:
+  postgres-data:

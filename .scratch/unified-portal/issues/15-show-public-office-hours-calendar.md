@@ -4,7 +4,7 @@
 
 **Blocked by:** 01 — Bootstrap the runnable workspace
 
-**Status:** ready-for-agent
+**Status:** resolved
 
 - [x] The four fixed daily Shift Slots are seeded for Monday through Friday with no configuration UI.
 - [x] `/office-hours` is public and defaults to the current Toronto week.
