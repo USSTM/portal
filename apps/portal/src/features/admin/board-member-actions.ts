@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { getPortalIdentity } from '../../auth/identity.js'
+import { resolvePortalIdentity } from '../../auth/identity.js'
 
 import {
   createMemberWithBoardAuthority,
@@ -24,32 +24,54 @@ export const createBoardMemberAction = createServerFn({ method: 'POST' })
     }),
   )
   .handler(async ({ data }) =>
-    createMemberWithBoardAuthority({ ...data, actorEmail: await requireBoardAdministrator() }),
+    createMemberWithBoardAuthority({
+      ...data,
+      actorEmail: await requireBoardAdministrator(),
+    }),
   )
 
 export const grantBoardAuthorityAction = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ boardPosition, memberId }))
   .handler(async ({ data }) =>
-    grantBoardAuthority({ ...data, actorEmail: await requireBoardAdministrator() }),
+    grantBoardAuthority({
+      ...data,
+      actorEmail: await requireBoardAdministrator(),
+    }),
   )
 
 export const updateBoardMemberAction = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ boardPosition, displayName: z.string().trim().min(1).max(200), memberId }))
+  .inputValidator(
+    z.object({
+      boardPosition,
+      displayName: z.string().trim().min(1).max(200),
+      memberId,
+    }),
+  )
   .handler(async ({ data }) =>
-    updateBoardMember({ ...data, actorEmail: await requireBoardAdministrator() }),
+    updateBoardMember({
+      ...data,
+      actorEmail: await requireBoardAdministrator(),
+    }),
   )
 
 export const revokeBoardAuthorityAction = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ memberId }))
   .handler(async ({ data }) =>
-    revokeBoardAuthority({ ...data, actorEmail: await requireBoardAdministrator() }),
+    revokeBoardAuthority({
+      ...data,
+      actorEmail: await requireBoardAdministrator(),
+    }),
   )
 
-export const getBoardMembers = createServerFn({ method: 'GET' }).handler(async () => {
-  requireBoardMemberAdministrationAuthority(await getPortalIdentity())
-  return browseBoardMembers()
-})
+export const getBoardMembers = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    requireBoardMemberAdministrationAuthority(await resolvePortalIdentity())
+    return browseBoardMembers()
+  },
+)
 
 async function requireBoardAdministrator() {
-  return requireBoardMemberAdministrationAuthority(await getPortalIdentity())
+  return requireBoardMemberAdministrationAuthority(
+    await resolvePortalIdentity(),
+  )
 }

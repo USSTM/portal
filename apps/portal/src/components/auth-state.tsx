@@ -88,7 +88,7 @@ export function AccessDenied() {
               Access Denied
             </h1>
             <p className="text-base text-muted-foreground">
-              Your Google account is not provisioned for this portal. Contact USSTM if you need access.
+              Unable to sign in. Contact USSTM if you need access.
             </p>
           </div>
         </div>

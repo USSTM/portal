@@ -2,7 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
 
-import { getPortalIdentity } from '../../auth/identity.js'
+import { resolvePortalIdentity } from '../../auth/identity.js'
 import { getDb } from '../../db/index.js'
 import { clubAccess, clubs, members } from '../../db/schema.js'
 
@@ -101,7 +101,7 @@ export const overrideReplaceEventOrganizersAction = createServerFn({
 
 export const getOrganizerClubs = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const identity = await getPortalIdentity()
+    const identity = await resolvePortalIdentity()
     if (identity.kind !== 'administrator' && identity.kind !== 'superuser') {
       await requireEventMember(identity)
     }
@@ -126,7 +126,7 @@ export const getEvents = createServerFn({ method: 'GET' })
     }),
   )
   .handler(async ({ data }) => {
-    const identity = await getPortalIdentity()
+    const identity = await resolvePortalIdentity()
     const isPrivileged =
       identity.kind === 'administrator' || identity.kind === 'superuser'
     const actorEmail = isPrivileged
@@ -155,7 +155,7 @@ export const getEvents = createServerFn({ method: 'GET' })
 
 export const getEventCreationClubs = createServerFn({ method: 'GET' }).handler(
   async () => {
-    const identity = await getPortalIdentity()
+    const identity = await resolvePortalIdentity()
     const isPrivileged =
       identity.kind === 'administrator' || identity.kind === 'superuser'
     if (isPrivileged) {
@@ -190,9 +190,9 @@ export const getEventCreationClubs = createServerFn({ method: 'GET' }).handler(
 )
 
 async function requireEventMember(
-  identity?: Awaited<ReturnType<typeof getPortalIdentity>>,
+  identity?: Awaited<ReturnType<typeof resolvePortalIdentity>>,
 ) {
-  identity ??= await getPortalIdentity()
+  identity ??= await resolvePortalIdentity()
   if (identity.kind !== 'member') throw new Error('Access denied')
   const activeClubAccess = await getDb()
     .select({ clubId: clubAccess.clubId })
@@ -211,7 +211,7 @@ async function requireEventMember(
 }
 
 async function requireEventAdministrator() {
-  const identity = await getPortalIdentity()
+  const identity = await resolvePortalIdentity()
   if (identity.kind === 'administrator' || identity.kind === 'superuser')
     return identity.email
   throw new Error('Access denied')

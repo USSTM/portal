@@ -12,12 +12,14 @@ describe('Administrator management authority', () => {
     ).toBe('superuser@example.com')
   })
 
-  it('denies an ordinary Administrator', () => {
-    expect(() =>
-      requireAdministratorManagementAuthority({
-        email: 'admin@example.com',
-        kind: 'administrator',
-      }),
-    ).toThrow('Access denied')
+  it.each([
+    { kind: 'anonymous' as const },
+    { email: 'member@example.com', kind: 'member' as const },
+    { email: 'admin@example.com', kind: 'administrator' as const },
+    { kind: 'denied' as const },
+  ])('denies $kind', (identity) => {
+    expect(() => requireAdministratorManagementAuthority(identity)).toThrow(
+      'Access denied',
+    )
   })
 })

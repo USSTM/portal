@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 import { generateKeyPair } from 'jose'
 
 import { createAuthApp, type GoogleBoundary } from './app.js'
@@ -76,6 +76,15 @@ describe('Google sign-in', () => {
     ).toBe(400)
   })
 
+  it('rejects an oversized post-login return path', async () => {
+    const returnTo = `/${'a'.repeat(2_048)}`
+    const response = await app().request(
+      `https://portal.test/auth/sign-in?client=portal&returnTo=${returnTo}`,
+    )
+
+    expect(response.status).toBe(400)
+  })
+
   it('rejects unverified Google email addresses', async () => {
     const google = fakeGoogle({ email: 'admin@example.com', emailVerified: false })
     const auth = app({ google })
@@ -97,7 +106,7 @@ describe('Google sign-in', () => {
   it('logout clears only the configured application session cookie', async () => {
     const response = await app().request(
       'https://portal.test/auth/logout?client=portal',
-      { method: 'POST' },
+      { headers: { origin: 'https://portal.test' }, method: 'POST' },
     )
 
     expect(response.status).toBe(204)
@@ -105,6 +114,56 @@ describe('Google sign-in', () => {
       '__Host-portal-session=; Max-Age=0',
     )
     expect(response.headers.get('set-cookie')).not.toContain('oauth-pending')
+  })
+
+  it('rejects logout from another Origin without clearing the session', async () => {
+    const response = await app().request(
+      'https://portal.test/auth/logout?client=portal',
+      { headers: { origin: 'https://evil.test' }, method: 'POST' },
+    )
+
+    expect(response.status).toBe(403)
+    expect(response.headers.get('set-cookie')).toBeNull()
+  })
+})
+
+describe('proxy trust for the public request URL', () => {
+  afterEach(() => {
+    delete process.env.AUTH_TRUST_PROXY
+  })
+
+  it('ignores forwarded-host headers unless the deployment explicitly trusts its proxy', async () => {
+    const response = await app().request(
+      'http://auth-service:3001/auth/logout?client=portal',
+      {
+        headers: {
+          origin: 'https://portal.test',
+          'x-forwarded-host': 'portal.test',
+          'x-forwarded-proto': 'https',
+        },
+        method: 'POST',
+      },
+    )
+
+    expect(response.status).toBe(400)
+  })
+
+  it('trusts forwarded-host headers once AUTH_TRUST_PROXY is enabled', async () => {
+    process.env.AUTH_TRUST_PROXY = 'true'
+
+    const response = await app().request(
+      'http://auth-service:3001/auth/logout?client=portal',
+      {
+        headers: {
+          origin: 'https://portal.test',
+          'x-forwarded-host': 'portal.test',
+          'x-forwarded-proto': 'https',
+        },
+        method: 'POST',
+      },
+    )
+
+    expect(response.status).toBe(204)
   })
 })
 

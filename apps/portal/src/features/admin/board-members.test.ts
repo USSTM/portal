@@ -3,21 +3,22 @@ import { describe, expect, it } from 'vitest'
 import { requireBoardMemberAdministrationAuthority } from './board-members.js'
 
 describe('Board Member administration authority', () => {
-  it('allows Administrators and the Superuser', () => {
-    expect(
-      requireBoardMemberAdministrationAuthority({
-        email: 'admin@example.com',
-        kind: 'administrator',
-      }),
-    ).toBe('admin@example.com')
+  it.each([
+    { email: 'admin@example.com', kind: 'administrator' as const },
+    { email: 'superuser@example.com', kind: 'superuser' as const },
+  ])('allows $kind', (identity) => {
+    expect(requireBoardMemberAdministrationAuthority(identity)).toBe(
+      identity.email,
+    )
   })
 
-  it('denies regular Members', () => {
-    expect(() =>
-      requireBoardMemberAdministrationAuthority({
-        email: 'member@example.com',
-        kind: 'member',
-      }),
-    ).toThrow('Access denied')
+  it.each([
+    { kind: 'anonymous' as const },
+    { email: 'member@example.com', kind: 'member' as const },
+    { kind: 'denied' as const },
+  ])('denies $kind', (identity) => {
+    expect(() => requireBoardMemberAdministrationAuthority(identity)).toThrow(
+      'Access denied',
+    )
   })
 })

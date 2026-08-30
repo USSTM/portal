@@ -18,7 +18,8 @@
     "arctic": "^3.7.0",
     "dotenv": "17.4.2",
     "hono": "4.12.30",
-    "jose": "^6.2.3"
+    "jose": "^6.2.3",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@types/node": "24.13.3",

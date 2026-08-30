@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { getPortalIdentity } from '../../auth/identity.js'
+import { resolvePortalIdentity } from '../../auth/identity.js'
 
 import {
   browseResources,
@@ -52,17 +52,17 @@ export const setResourceActiveAction = createServerFn({ method: 'POST' })
 export const getResourcesForAdministration = createServerFn({
   method: 'GET',
 }).handler(async () => {
-  requireResourceAdministrationAuthority(await getPortalIdentity())
+  requireResourceAdministrationAuthority(await resolvePortalIdentity())
   return browseResources()
 })
 
 export const getActiveResources = createServerFn({ method: 'GET' }).handler(
   async () => {
-    requireResourceBrowseAuthority(await getPortalIdentity())
+    requireResourceBrowseAuthority(await resolvePortalIdentity())
     return browseResources({ active: true })
   },
 )
 
 async function requireResourceAdministrator() {
-  return requireResourceAdministrationAuthority(await getPortalIdentity())
+  return requireResourceAdministrationAuthority(await resolvePortalIdentity())
 }

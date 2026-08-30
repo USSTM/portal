@@ -63,6 +63,9 @@ export async function verifySession(
   if (claims.issuedAt > now) {
     throw new Error('Session issued-at time is in the future')
   }
+  if (claims.expiresAt - claims.issuedAt !== sessionLifetimeSeconds) {
+    throw new Error('Session lifetime must be exactly eight hours')
+  }
 
   return claims
 }

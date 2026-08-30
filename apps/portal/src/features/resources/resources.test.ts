@@ -7,40 +7,40 @@ import {
 } from './resources'
 
 describe('Resource authority', () => {
-  it('allows every admitted identity to browse Resources', () => {
-    expect(
-      requireResourceBrowseAuthority({
-        email: 'member@example.com',
-        kind: 'member',
-      }),
-    ).toBe('member@example.com')
-    expect(
-      requireResourceBrowseAuthority({
-        email: 'root@example.com',
-        kind: 'superuser',
-      }),
-    ).toBe('root@example.com')
-    expect(() => requireResourceBrowseAuthority({ kind: 'denied' })).toThrow(
-      'Access denied',
-    )
-    expect(() => requireResourceBrowseAuthority({ kind: 'anonymous' })).toThrow(
-      'Access denied',
+  it.each([
+    { email: 'member@example.com', kind: 'member' as const },
+    { email: 'admin@example.com', kind: 'administrator' as const },
+    { email: 'root@example.com', kind: 'superuser' as const },
+  ])('allows $kind to browse Resources', (identity) => {
+    expect(requireResourceBrowseAuthority(identity)).toBe(identity.email)
+  })
+
+  it.each([{ kind: 'anonymous' as const }, { kind: 'denied' as const }])(
+    'denies $kind from browsing Resources',
+    (identity) => {
+      expect(() => requireResourceBrowseAuthority(identity)).toThrow(
+        'Access denied',
+      )
+    },
+  )
+
+  it.each([
+    { email: 'admin@example.com', kind: 'administrator' as const },
+    { email: 'superuser@example.com', kind: 'superuser' as const },
+  ])('allows $kind to administer Resources', (identity) => {
+    expect(requireResourceAdministrationAuthority(identity)).toBe(
+      identity.email,
     )
   })
 
-  it('limits Resource administration to Administrators and the Superuser', () => {
-    expect(
-      requireResourceAdministrationAuthority({
-        email: 'admin@example.com',
-        kind: 'administrator',
-      }),
-    ).toBe('admin@example.com')
-    expect(() =>
-      requireResourceAdministrationAuthority({
-        email: 'member@example.com',
-        kind: 'member',
-      }),
-    ).toThrow('Access denied')
+  it.each([
+    { kind: 'anonymous' as const },
+    { email: 'member@example.com', kind: 'member' as const },
+    { kind: 'denied' as const },
+  ])('denies $kind from administering Resources', (identity) => {
+    expect(() => requireResourceAdministrationAuthority(identity)).toThrow(
+      'Access denied',
+    )
   })
 })
 

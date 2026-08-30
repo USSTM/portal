@@ -19,13 +19,18 @@
     "test:integration": "pnpm -r --if-present test:integration",
     "db:up": "docker compose --env-file .env.local up -d postgres",
     "db:migrate": "pnpm --filter @usstm/portal db:migrate",
+    "db:test:up": "docker compose --env-file .env.test up -d postgres-test",
+    "db:test:migrate": "bash -c 'set -a && source .env.test && set +a && pnpm --filter @usstm/portal db:migrate'",
+    "db:test:reset": "bash -c 'set -a && source .env.test && set +a && pnpm --filter @usstm/portal db:test:reset'",
     "build": "pnpm -r --if-present build",
-    "ci": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm db:migrate && pnpm build"
+    "deploy:production": "./deployment/deploy.sh",
+    "ci": "pnpm format && pnpm lint && pnpm typecheck && pnpm db:migrate && pnpm test && pnpm test:integration && pnpm build"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",
     "eslint": "9.39.5",
     "prettier": "3.9.5",
+    "seroval": "1.5.5",
     "typescript-eslint": "8.64.0"
   }
 }

@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie'
+import { z } from 'zod'
 
 import { signSession } from '@usstm/auth-session'
 
@@ -43,6 +44,16 @@ type AuthDependencies = {
 
 type PendingSignIn = { returnTo: string; state: string; verifier: string }
 
+const signInQuerySchema = z.object({
+  client: z.string().min(1).max(100),
+  returnTo: z
+    .string()
+    .min(1)
+    .max(2_048)
+    .refine(isRelativePath)
+    .default('/'),
+})
+
 export function createAuthApp(dependencies: AuthDependencies) {
   assertClientsAreValid(dependencies.clients)
   const app = new Hono()
@@ -68,9 +79,11 @@ export function createAuthApp(dependencies: AuthDependencies) {
   )
 
   app.get('/auth/sign-in', (context) => {
-    const client = getClient(context.req.query('client'), clients)
-    const returnTo = context.req.query('returnTo') ?? '/'
-    if (!client || !hasExpectedOrigin(context.req.url, client) || !isRelativePath(returnTo)) {
+    const query = signInQuerySchema.safeParse(context.req.query())
+    if (!query.success) return context.text('Invalid sign-in request', 400)
+    const client = getClient(query.data.client, clients)
+    const returnTo = query.data.returnTo
+    if (!client || !hasExpectedOrigin(context.req.raw, client)) {
       return context.text('Invalid sign-in request', 400)
     }
 
@@ -99,7 +112,7 @@ export function createAuthApp(dependencies: AuthDependencies) {
   })
 
   app.get('/auth/*', async (context) => {
-    const client = getCallbackClient(context.req.url, dependencies.clients)
+    const client = getCallbackClient(context.req.raw, dependencies.clients)
     const code = context.req.query('code')
     const state = context.req.query('state')
     if (!client || !code || !state) {
@@ -150,10 +163,13 @@ export function createAuthApp(dependencies: AuthDependencies) {
     const returnTo = context.req.query('returnTo')
     if (
       !client ||
-      !hasExpectedOrigin(context.req.url, client) ||
+      !hasExpectedOrigin(context.req.raw, client) ||
       (returnTo !== undefined && !isRelativePath(returnTo))
     ) {
       return context.text('Invalid logout request', 400)
+    }
+    if (context.req.header('origin') !== client.origin) {
+      return context.text('Invalid logout request', 403)
     }
     deleteCookie(context, client.cookieName, {
       path: '/',
@@ -191,16 +207,25 @@ function getClient(clientId: string | undefined, clients: Map<string, AuthClient
   return clientId ? clients.get(clientId) : undefined
 }
 
-function getCallbackClient(requestUrl: string, clients: AuthClient[]) {
-  const url = new URL(requestUrl)
+function getCallbackClient(request: Request, clients: AuthClient[]) {
+  const url = getPublicRequestUrl(request)
   return clients.find(
     (client) =>
       client.origin === url.origin && client.callbackPath === url.pathname,
   )
 }
 
-function hasExpectedOrigin(requestUrl: string, client: AuthClient) {
-  return new URL(requestUrl).origin === client.origin
+function hasExpectedOrigin(request: Request, client: AuthClient) {
+  return getPublicRequestUrl(request).origin === client.origin
+}
+
+function getPublicRequestUrl(request: Request) {
+  const url = new URL(request.url)
+  if (process.env.AUTH_TRUST_PROXY !== 'true') return url
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const forwardedProto = request.headers.get('x-forwarded-proto')
+  if (!forwardedHost || !forwardedProto) return url
+  return new URL(`${forwardedProto}://${forwardedHost}${url.pathname}${url.search}`)
 }
 
 function isRelativePath(value: string) {

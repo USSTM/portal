@@ -1,8 +1,11 @@
+import { hasTrustedOrigin } from '../src/security/request-origin.js'
+
 export default function logout(request: Request) {
   const url = new URL(request.url)
   const returnTo = url.searchParams.get('returnTo')
   if (
     request.method !== 'POST' ||
+    !hasTrustedOrigin(request) ||
     url.searchParams.get('client') !== 'portal' ||
     (returnTo !== null && !isRelativePath(returnTo))
   ) {
@@ -19,5 +22,7 @@ export default function logout(request: Request) {
 }
 
 function isRelativePath(value: string) {
-  return value.startsWith('/') && !value.startsWith('//') && !value.includes('\\')
+  return (
+    value.startsWith('/') && !value.startsWith('//') && !value.includes('\\')
+  )
 }

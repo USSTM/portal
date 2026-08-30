@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { getPortalIdentity } from '../../auth/identity.js'
+import { resolvePortalIdentity } from '../../auth/identity.js'
 
 import {
   browseMembers,
@@ -26,7 +26,10 @@ export const createMemberAction = createServerFn({ method: 'POST' })
     }),
   )
   .handler(async ({ data }) =>
-    createMemberWithClubAccess({ ...data, actorEmail: await requireMemberAdministrator() }),
+    createMemberWithClubAccess({
+      ...data,
+      actorEmail: await requireMemberAdministrator(),
+    }),
   )
 
 export const editMemberAction = createServerFn({ method: 'POST' })
@@ -48,13 +51,19 @@ export const revokeClubAccessAction = clubAccessAction(revokeClubAccess)
 export const deactivateMemberAction = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ memberId }))
   .handler(async ({ data }) =>
-    deactivateMember({ ...data, actorEmail: await requireMemberAdministrator() }),
+    deactivateMember({
+      ...data,
+      actorEmail: await requireMemberAdministrator(),
+    }),
   )
 
 export const reactivateMemberAction = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ clubIds, memberId }))
   .handler(async ({ data }) =>
-    reactivateMember({ ...data, actorEmail: await requireMemberAdministrator() }),
+    reactivateMember({
+      ...data,
+      actorEmail: await requireMemberAdministrator(),
+    }),
   )
 
 export const getMembers = createServerFn({ method: 'GET' })
@@ -66,18 +75,24 @@ export const getMembers = createServerFn({ method: 'GET' })
     }),
   )
   .handler(async ({ data }) => {
-    requireMemberAdministrationAuthority(await getPortalIdentity())
+    requireMemberAdministrationAuthority(await resolvePortalIdentity())
     return browseMembers(data)
   })
 
 function clubAccessAction(
-  action: (input: { actorEmail: string; clubId: string; memberId: string }) => Promise<void>,
+  action: (input: {
+    actorEmail: string
+    clubId: string
+    memberId: string
+  }) => Promise<void>,
 ) {
   return createServerFn({ method: 'POST' })
     .inputValidator(z.object({ clubId: memberId, memberId }))
-    .handler(async ({ data }) => action({ ...data, actorEmail: await requireMemberAdministrator() }))
+    .handler(async ({ data }) =>
+      action({ ...data, actorEmail: await requireMemberAdministrator() }),
+    )
 }
 
 async function requireMemberAdministrator() {
-  return requireMemberAdministrationAuthority(await getPortalIdentity())
+  return requireMemberAdministrationAuthority(await resolvePortalIdentity())
 }

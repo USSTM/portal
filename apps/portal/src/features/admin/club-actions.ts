@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { getPortalIdentity } from '../../auth/identity.js'
+import { resolvePortalIdentity } from '../../auth/identity.js'
 
 import {
   archiveClub,
@@ -48,7 +48,7 @@ export const getClubs = createServerFn({ method: 'GET' })
     }),
   )
   .handler(async ({ data }) => {
-    requireClubAdministrationAuthority(await getPortalIdentity())
+    requireClubAdministrationAuthority(await resolvePortalIdentity())
     return browseClubs(data)
   })
 
@@ -57,9 +57,11 @@ function clubLifecycleAction(
 ) {
   return createServerFn({ method: 'POST' })
     .inputValidator(clubIdInput)
-    .handler(async ({ data }) => action({ ...data, actorEmail: await requireClubAdministrator() }))
+    .handler(async ({ data }) =>
+      action({ ...data, actorEmail: await requireClubAdministrator() }),
+    )
 }
 
 async function requireClubAdministrator() {
-  return requireClubAdministrationAuthority(await getPortalIdentity())
+  return requireClubAdministrationAuthority(await resolvePortalIdentity())
 }

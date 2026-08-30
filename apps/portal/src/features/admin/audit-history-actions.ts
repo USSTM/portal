@@ -1,9 +1,12 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { getPortalIdentity } from '../../auth/identity.js'
+import { resolvePortalIdentity } from '../../auth/identity.js'
 
-import { browseAuditHistory, requireAuditHistoryAuthority } from './audit-history.js'
+import {
+  browseAuditHistory,
+  requireAuditHistoryAuthority,
+} from './audit-history.js'
 
 const auditHistoryInput = z.object({
   action: z.string().trim().max(100).optional(),
@@ -15,6 +18,6 @@ const auditHistoryInput = z.object({
 export const getAuditHistory = createServerFn({ method: 'GET' })
   .inputValidator(auditHistoryInput)
   .handler(async ({ data }) => {
-    requireAuditHistoryAuthority(await getPortalIdentity())
+    requireAuditHistoryAuthority(await resolvePortalIdentity())
     return browseAuditHistory(data)
   })

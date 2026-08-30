@@ -1,32 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
-import { browseAuditHistory, requireAuditHistoryAuthority } from './audit-history.js'
+import {
+  browseAuditHistory,
+  requireAuditHistoryAuthority,
+} from './audit-history.js'
 
 describe('Audit History authority', () => {
-  it('allows the Superuser and Administrators', () => {
-    expect(
-      requireAuditHistoryAuthority({
-        email: 'superuser@example.com',
-        kind: 'superuser',
-      }),
-    ).toBe('superuser@example.com')
-    expect(
-      requireAuditHistoryAuthority({
-        email: 'admin@example.com',
-        kind: 'administrator',
-      }),
-    ).toBe('admin@example.com')
+  it.each([
+    { email: 'superuser@example.com', kind: 'superuser' as const },
+    { email: 'admin@example.com', kind: 'administrator' as const },
+  ])('allows $kind', (identity) => {
+    expect(requireAuditHistoryAuthority(identity)).toBe(identity.email)
   })
 
-  it('denies anonymous and non-administrator Members', () => {
-    expect(() => requireAuditHistoryAuthority({ kind: 'denied' })).toThrow(
+  it.each([
+    { kind: 'anonymous' as const },
+    { email: 'member@example.com', kind: 'member' as const },
+    { kind: 'denied' as const },
+  ])('denies $kind', (identity) => {
+    expect(() => requireAuditHistoryAuthority(identity)).toThrow(
       'Access denied',
     )
   })
 
   it('rejects invalid pagination before querying Audit Entries', async () => {
-    await expect(
-      browseAuditHistory({ page: 0, pageSize: 25 }),
-    ).rejects.toThrow('Invalid Audit History page')
+    await expect(browseAuditHistory({ page: 0, pageSize: 25 })).rejects.toThrow(
+      'Invalid Audit History page',
+    )
   })
 })

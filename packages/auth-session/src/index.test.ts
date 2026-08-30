@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { generateKeyPair } from 'jose'
+import { generateKeyPair, SignJWT } from 'jose'
 
 import {
   sessionClaimsSchema,
@@ -107,5 +107,27 @@ describe('session claims', () => {
         now: () => 1_800_000_001,
       }),
     ).rejects.toThrow('key ID')
+  })
+
+  it('rejects a correctly signed session with a lifetime longer than eight hours', async () => {
+    const { privateKey, publicKey } = await generateKeyPair('ES256')
+    const now = 1_800_000_000
+    const session = await new SignJWT({ email: 'admin@example.com' })
+      .setProtectedHeader({ alg: 'ES256', kid: 'test-key' })
+      .setIssuer('usstm-auth')
+      .setAudience('portal')
+      .setIssuedAt(now)
+      .setExpirationTime(now + 9 * 60 * 60)
+      .sign(privateKey)
+
+    await expect(
+      verifySession(session, {
+        audience: 'portal',
+        issuer: 'usstm-auth',
+        key: publicKey,
+        keyId: 'test-key',
+        now: () => now + 1,
+      }),
+    ).rejects.toThrow('lifetime')
   })
 })

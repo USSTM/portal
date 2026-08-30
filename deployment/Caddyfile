@@ -9,17 +9,41 @@
 {$PORTAL_ADDRESS} {
 	log {
 		output stdout
-		format json
+		format filter {
+			request>uri query {
+				replace code REDACTED
+				replace state REDACTED
+			}
+			wrap json
+		}
 	}
 
 	header X-Request-ID {http.request.uuid}
+	header {
+		Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+		Cross-Origin-Opener-Policy "same-origin"
+		Permissions-Policy "camera=(), geolocation=(), microphone=()"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+	}
+	request_body {
+		max_size 1MB
+	}
 
 	@auth path /auth/*
 	reverse_proxy @auth auth:3001 {
+		header_up Host {http.request.host}
 		header_up X-Request-ID {http.request.uuid}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
 	}
 
 	reverse_proxy portal:3000 {
+		header_up Host {http.request.host}
 		header_up X-Request-ID {http.request.uuid}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
 	}
 }

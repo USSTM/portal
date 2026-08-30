@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { getPortalIdentity } from '../../auth/identity.js'
+import { resolvePortalIdentity } from '../../auth/identity.js'
 
 import {
   cancelOwnBooking,
@@ -16,7 +16,7 @@ import { getOfficeHoursCalendar } from './calendar.js'
 export const getOfficeHoursCalendarAction = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ week: z.string().optional() }))
   .handler(async ({ data }) => {
-    const identity = await getPortalIdentity()
+    const identity = await resolvePortalIdentity()
     const viewerMemberId =
       identity.kind === 'member'
         ? await findBoardMemberId(identity.email)
@@ -74,7 +74,7 @@ export const cancelOverrideBookingAction = createServerFn({ method: 'POST' })
   )
 
 async function requireBoardMember() {
-  const identity = await getPortalIdentity()
+  const identity = await resolvePortalIdentity()
   if (
     identity.kind !== 'member' ||
     !(await findBoardMemberId(identity.email))
@@ -85,7 +85,7 @@ async function requireBoardMember() {
 }
 
 async function requireBookingAdministrator() {
-  const identity = await getPortalIdentity()
+  const identity = await resolvePortalIdentity()
   if (identity.kind === 'administrator' || identity.kind === 'superuser') {
     return identity.email
   }

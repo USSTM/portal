@@ -2,7 +2,7 @@ import { asc, eq } from 'drizzle-orm'
 import { createServerFn } from '@tanstack/react-start'
 
 import type { PortalCapabilities } from './capabilities'
-import { getPortalIdentity } from './identity'
+import { resolvePortalIdentity } from './identity'
 import { getDb } from '../db/index.js'
 import {
   administrators,
@@ -61,7 +61,7 @@ export function projectMemberAccount(input: MemberAccountInput): MemberAccount {
 
 export const getPortalShell = createServerFn({ method: 'GET' }).handler(() =>
   withRequestId(async () => {
-    const identity = await getPortalIdentity()
+    const identity = await resolvePortalIdentity()
     if (identity.kind === 'anonymous') return { kind: 'anonymous' } as const
     if (identity.kind === 'denied') return { kind: 'denied' } as const
 
@@ -157,7 +157,10 @@ async function withRequestId<T>(operation: () => Promise<T>) {
     return await operation()
   } catch (error) {
     const requestId = crypto.randomUUID()
-    console.error('Portal request failed', { error, requestId })
+    console.error('Portal request failed', {
+      error: error instanceof Error ? error.message : String(error),
+      requestId,
+    })
     throw new Error(`Unexpected portal error. Request ID: ${requestId}`)
   }
 }

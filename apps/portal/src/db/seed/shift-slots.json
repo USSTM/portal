@@ -1,0 +1,22 @@
+[
+  {
+    "id": "64e81ecf-47b1-46e7-b45e-ba1f7b4dbfc2",
+    "startTime": "10:00:00",
+    "endTime": "12:00:00"
+  },
+  {
+    "id": "c7f0e948-09e4-4f13-b24b-d6f9dcba2a15",
+    "startTime": "12:00:00",
+    "endTime": "14:00:00"
+  },
+  {
+    "id": "057e4b99-fd27-41a1-aa50-a39b2c745761",
+    "startTime": "14:00:00",
+    "endTime": "16:00:00"
+  },
+  {
+    "id": "ab1453e9-2746-405f-9469-4385c6ba06d0",
+    "startTime": "16:00:00",
+    "endTime": "18:00:00"
+  }
+]

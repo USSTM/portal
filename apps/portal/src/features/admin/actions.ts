@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
-import { getPortalIdentity } from '../../auth/identity.js'
+import { resolvePortalIdentity } from '../../auth/identity.js'
 import {
   createAdministrator,
   deactivateAdministrator,
@@ -46,10 +46,12 @@ function actionFor(
 ) {
   return createServerFn({ method: 'POST' })
     .inputValidator(administratorInput)
-    .handler(async ({ data }) => action({ ...data, actorEmail: await requireSuperuser() }))
+    .handler(async ({ data }) =>
+      action({ ...data, actorEmail: await requireSuperuser() }),
+    )
 }
 
 async function requireSuperuser() {
-  const identity = await getPortalIdentity()
+  const identity = await resolvePortalIdentity()
   return requireAdministratorManagementAuthority(identity)
 }

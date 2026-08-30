@@ -15,14 +15,22 @@ Copy `deployment/production.env.example` to a host-only file such as `/etc/usstm
 
 ## Validate, start, and migrate
 
-Run all commands from the repository root, replacing the environment path if needed:
+You can run the full deployment pipeline with the included automation script (which defaults to `.env.production` or `.env` in the repository root, or accepts an explicit env file path / `ENV_FILE` variable):
 
 ```sh
-docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml config --quiet
-docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml build
-docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml up -d postgres
-docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml --profile operations run --rm migrate
-docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml up -d --wait
+./deployment/deploy.sh
+# or
+pnpm deploy:production
+```
+
+Alternatively, run the individual commands directly from the repository root:
+
+```sh
+docker compose --env-file .env.production -f compose.production.yaml config --quiet
+docker compose --env-file .env.production -f compose.production.yaml build
+docker compose --env-file .env.production -f compose.production.yaml up -d postgres
+docker compose --env-file .env.production -f compose.production.yaml --profile operations run --rm migrate
+docker compose --env-file .env.production -f compose.production.yaml up -d --wait
 ```
 
 Compose rejects missing required configuration before creating containers. Auth also validates its client allowlist and signing key when it starts. Runtime secrets are injected into server containers; they are neither build arguments nor client-side Vite variables.
