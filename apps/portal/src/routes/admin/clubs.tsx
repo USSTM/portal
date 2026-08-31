@@ -48,7 +48,8 @@ function Clubs() {
 
   async function create(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const form = new FormData(event.currentTarget)
+    const formElement = event.currentTarget
+    const form = new FormData(formElement)
     try {
       await createClub({
         data: {
@@ -57,11 +58,11 @@ function Clubs() {
           shortName: String(form.get('shortName') ?? ''),
         },
       })
-      event.currentTarget.reset()
+      formElement.reset()
       setError(undefined)
       await refresh()
       toast.success('Club created.')
-      event.currentTarget.closest('details')?.removeAttribute('open')
+      formElement.closest('details')?.removeAttribute('open')
     } catch {
       setError('Unable to create Club.')
     }
@@ -240,7 +241,8 @@ function Clubs() {
                           className="space-y-3 mb-4 border-b border-border pb-4"
                           onSubmit={async (event) => {
                             event.preventDefault()
-                            const form = new FormData(event.currentTarget)
+                            const formElement = event.currentTarget
+                            const form = new FormData(formElement)
                             await editClub({
                               data: {
                                 clubId: club.id,
@@ -253,7 +255,7 @@ function Clubs() {
                             })
                             await refresh()
                             toast.success('Club updated.')
-                            event.currentTarget
+                            formElement
                               .closest('details')
                               ?.removeAttribute('open')
                           }}

@@ -29,7 +29,8 @@ function AdminResources() {
     resourceId?: string,
   ) {
     event.preventDefault()
-    const form = new FormData(event.currentTarget)
+    const formElement = event.currentTarget
+    const form = new FormData(formElement)
     const data = {
       category: String(form.get('category') ?? '') as 'finance' | 'operations',
       description: String(form.get('description') ?? ''),
@@ -41,10 +42,10 @@ function AdminResources() {
       if (resourceId) await editResource({ data: { ...data, resourceId } })
       else await createResource({ data })
       setError(undefined)
-      event.currentTarget.reset()
+      formElement.reset()
       await router.invalidate()
       toast.success(resourceId ? 'Resource updated.' : 'Resource created.')
-      event.currentTarget.closest('details')?.removeAttribute('open')
+      formElement.closest('details')?.removeAttribute('open')
     } catch {
       setError('Unable to save Resource. Use a complete HTTPS URL.')
     }

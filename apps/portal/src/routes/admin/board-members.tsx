@@ -56,7 +56,8 @@ function BoardMembers() {
               className="space-y-3 mb-6"
               onSubmit={async (event) => {
                 event.preventDefault()
-                const form = new FormData(event.currentTarget)
+                const formElement = event.currentTarget
+                const form = new FormData(formElement)
                 await createBoardMember({
                   data: {
                     boardPosition: String(form.get('boardPosition') ?? ''),
@@ -64,10 +65,10 @@ function BoardMembers() {
                     email: String(form.get('email') ?? ''),
                   },
                 })
-                event.currentTarget.reset()
+                formElement.reset()
                 await refresh()
                 toast.success('Board Member created.')
-                event.currentTarget.closest('details')?.removeAttribute('open')
+                formElement.closest('details')?.removeAttribute('open')
               }}
             >
               <input name="displayName" placeholder="Display name" required className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" />
@@ -92,17 +93,18 @@ function BoardMembers() {
               className="space-y-3"
               onSubmit={async (event) => {
                 event.preventDefault()
-                const form = new FormData(event.currentTarget)
+                const formElement = event.currentTarget
+                const form = new FormData(formElement)
                 await grantBoardAuthority({
                   data: {
                     boardPosition: String(form.get('boardPosition') ?? ''),
                     memberId: String(form.get('memberId') ?? ''),
                   },
                 })
-                event.currentTarget.reset()
+                formElement.reset()
                 await refresh()
                 toast.success('Board authority granted.')
-                event.currentTarget.closest('details')?.removeAttribute('open')
+                formElement.closest('details')?.removeAttribute('open')
               }}
             >
               <select name="memberId" required className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
@@ -166,7 +168,8 @@ function BoardMembers() {
                           className="space-y-3 mb-4 border-b border-border pb-4"
                           onSubmit={async (event) => {
                             event.preventDefault()
-                            const form = new FormData(event.currentTarget)
+                            const formElement = event.currentTarget
+                            const form = new FormData(formElement)
                             await updateBoardMember({
                               data: {
                                 boardPosition: String(form.get('boardPosition') ?? ''),
@@ -176,7 +179,7 @@ function BoardMembers() {
                             })
                             await refresh()
                             toast.success('Board Position updated.')
-                            event.currentTarget.closest('details')?.removeAttribute('open')
+                            formElement.closest('details')?.removeAttribute('open')
                           }}
                         >
                           <input className="flex h-8 w-full rounded-md border border-input bg-transparent px-2 py-1 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" defaultValue={boardMember.displayName} name="displayName" required placeholder="Display Name" />

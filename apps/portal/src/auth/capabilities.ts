@@ -10,6 +10,7 @@ export interface PortalNavigationItem {
   to: string
   hash?: string
   description: string
+  section?: 'admin'
 }
 
 export function navigationForCapabilities(
@@ -74,26 +75,31 @@ export function navigationForCapabilities(
         label: 'Members',
         to: '/admin/members',
         description: 'Manage USSTM members.',
+        section: 'admin',
       },
       {
         label: 'Clubs',
         to: '/admin/clubs',
         description: 'Manage USSTM clubs.',
+        section: 'admin',
       },
       {
-        label: 'Resources',
+        label: 'Manage Resources',
         to: '/admin/resources',
         description: 'Manage resources.',
+        section: 'admin',
       },
       {
         label: 'Board Members',
         to: '/admin/board-members',
         description: 'Manage board members.',
+        section: 'admin',
       },
       {
         label: 'Audit History',
         to: '/admin/audit-history',
         description: 'View audit history.',
+        section: 'admin',
       },
     )
   }

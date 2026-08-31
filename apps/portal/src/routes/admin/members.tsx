@@ -50,20 +50,26 @@ function Members() {
 
   async function create(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const form = new FormData(event.currentTarget)
+    const formElement = event.currentTarget
+    const form = new FormData(formElement)
+    const clubIds = form.getAll('clubIds').map(String)
+    if (clubIds.length === 0) {
+      setError('At least one Club Access grant is required.')
+      return
+    }
     try {
       await createMember({
         data: {
-          clubIds: form.getAll('clubIds').map(String),
+          clubIds,
           displayName: String(form.get('displayName') ?? ''),
           email: String(form.get('email') ?? ''),
         },
       })
-      event.currentTarget.reset()
+      formElement.reset()
       setError(undefined)
       await refresh()
       toast.success('Member provisioned.')
-      event.currentTarget.closest('details')?.removeAttribute('open')
+      formElement.closest('details')?.removeAttribute('open')
     } catch {
       setError('Unable to provision Member.')
     }
@@ -99,6 +105,9 @@ function Members() {
                   ))}
                 </div>
               </fieldset>
+              {error && (
+                <p className="text-sm font-medium text-destructive">{error}</p>
+              )}
               <button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors">
                 Provision Member
               </button>
@@ -203,11 +212,12 @@ function Members() {
                         <h4 className="font-semibold text-sm mb-3 border-b border-border pb-2">Manage Member</h4>
                         
                         {/* Edit Form */}
-                        <form
+                         <form
                           className="space-y-3 mb-4 border-b border-border pb-4"
                           onSubmit={async (event) => {
                             event.preventDefault()
-                            const form = new FormData(event.currentTarget)
+                            const formElement = event.currentTarget
+                            const form = new FormData(formElement)
                             await editMember({
                               data: {
                                 confirmed: form.get('confirmed') === 'on',
@@ -218,7 +228,7 @@ function Members() {
                             })
                             await refresh()
                             toast.success('Member updated.')
-                            event.currentTarget.closest('details')?.removeAttribute('open')
+                            formElement.closest('details')?.removeAttribute('open')
                           }}
                         >
                           <input className="flex h-8 w-full rounded-md border border-input bg-transparent px-2 py-1 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" defaultValue={member.displayName} name="displayName" required placeholder="Display Name" />
@@ -238,7 +248,8 @@ function Members() {
                               className="flex gap-2"
                               onSubmit={async (event) => {
                                 event.preventDefault()
-                                const form = new FormData(event.currentTarget)
+                                const formElement = event.currentTarget
+                                const form = new FormData(formElement)
                                 await grantAccess({
                                   data: {
                                     clubId: String(form.get('clubId')),
@@ -247,7 +258,7 @@ function Members() {
                                 })
                                 await refresh()
                                 toast.success('Club Access granted.')
-                                event.currentTarget.closest('details')?.removeAttribute('open')
+                                formElement.closest('details')?.removeAttribute('open')
                               }}
                             >
                               <select aria-label="Grant Club Access" defaultValue="" name="clubId" required className="flex-1 h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
@@ -311,7 +322,8 @@ function Members() {
                             </fieldset>
                             <button
                               onClick={async (event) => {
-                                const parent = event.currentTarget.previousElementSibling
+                                const buttonElement = event.currentTarget
+                                const parent = buttonElement.previousElementSibling
                                 const clubIds = parent
                                   ? Array.from(
                                       parent.querySelectorAll<HTMLInputElement>('input:checked'),
@@ -320,7 +332,7 @@ function Members() {
                                 await reactivate({ data: { clubIds, memberId: member.id } })
                                 await refresh()
                                 toast.success('Member reactivated.')
-                                event.currentTarget.closest('details')?.removeAttribute('open')
+                                buttonElement.closest('details')?.removeAttribute('open')
                               }}
                               type="button"
                               className="w-full flex items-center justify-center gap-2 bg-primary/10 text-primary hover:bg-primary/20 px-2 py-1.5 rounded-md text-xs font-medium transition-colors"

@@ -1,3 +1,4 @@
+import { Fragment, useState } from 'react'
 import {
   HeadContent,
   Link,
@@ -23,9 +24,11 @@ import {
   User,
   LogOut,
   Menu,
+  X,
   Users,
   Tent,
   History,
+  Settings,
 } from 'lucide-react'
 
 interface MyRouterContext {
@@ -79,6 +82,8 @@ function NavIcon({ label, className }: { label: string; className?: string }) {
       return <Clock className={className} />
     case 'Resources':
       return <Book className={className} />
+    case 'Manage Resources':
+      return <Settings className={className} />
     case 'Contact':
       return <Mail className={className} />
     case 'Events':
@@ -101,6 +106,7 @@ function NavIcon({ label, className }: { label: string; className?: string }) {
 
 function PortalLayout() {
   const shell = Route.useLoaderData()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   if (shell.kind === 'anonymous' || shell.kind === 'denied') return <Outlet />
 
@@ -108,6 +114,7 @@ function PortalLayout() {
   const mainNav = navigation.filter(
     (n) => n.label !== 'Account' && n.label !== 'Sign Out',
   )
+  const firstAdminIndex = mainNav.findIndex((n) => n.section === 'admin')
 
   return (
     <div className="bg-background text-foreground min-h-screen flex flex-col md:flex-row antialiased">
@@ -121,10 +128,73 @@ function PortalLayout() {
           />
           USSTM Portal
         </div>
-        <button className="p-2 text-muted-foreground hover:text-primary transition-colors">
-          <Menu className="w-6 h-6" />
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 text-muted-foreground hover:text-primary transition-colors"
+          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+        >
+          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </nav>
+
+      {/* Mobile Navigation Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-x-0 top-16 bg-card border-b border-border shadow-lg z-50 flex flex-col p-4 gap-1">
+          {mainNav.map((item, index) => (
+            <Fragment key={item.to + (item.hash || '')}>
+              {index === firstAdminIndex && (
+                <div className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground border-t border-border mt-2">
+                  Admin
+                </div>
+              )}
+              <Link
+                activeProps={{
+                  className:
+                    'border-l-4 border-primary bg-primary/10 text-primary font-semibold',
+                }}
+                inactiveProps={{
+                  className:
+                    'border-l-4 border-transparent text-muted-foreground hover:bg-secondary',
+                }}
+                className="flex items-center gap-3 px-4 py-2 transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
+                hash={item.hash}
+                to={item.to}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <NavIcon label={item.label} className="w-5 h-5" />
+                {item.label}
+              </Link>
+            </Fragment>
+          ))}
+          <div className="border-t border-border mt-2 pt-2 flex flex-col gap-1">
+            <Link
+              to="/account"
+              activeProps={{
+                className:
+                  'border-l-4 border-primary bg-primary/10 text-primary font-semibold',
+              }}
+              inactiveProps={{
+                className:
+                  'border-l-4 border-transparent text-muted-foreground hover:bg-secondary',
+              }}
+              className="flex items-center gap-3 px-4 py-2 transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <User className="w-5 h-5" />
+              Account
+            </Link>
+            <form action={portalLogoutAction} method="post" onSubmit={() => setIsMobileMenuOpen(false)}>
+              <button
+                type="submit"
+                className="w-full flex items-center gap-3 px-4 py-2 border-l-4 border-transparent text-muted-foreground hover:bg-secondary transition-all duration-200 active:scale-95 rounded-r cursor-pointer text-left"
+              >
+                <LogOut className="w-5 h-5" />
+                Sign Out
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Navigation Sidebar (Hidden on Mobile) */}
       <aside className="hidden md:flex flex-col h-screen py-6 gap-2 bg-card text-primary text-sm border-r border-border shadow-sm fixed left-0 top-0 w-72 z-40">
@@ -146,24 +216,30 @@ function PortalLayout() {
 
         {/* Main Navigation Links */}
         <nav className="flex-1 overflow-y-auto px-4 flex flex-col gap-1">
-          {mainNav.map((item) => (
-            <Link
-              activeProps={{
-                className:
-                  'border-l-4 border-primary bg-primary/10 text-primary font-semibold',
-              }}
-              inactiveProps={{
-                className:
-                  'border-l-4 border-transparent text-muted-foreground hover:bg-secondary',
-              }}
-              className="flex items-center gap-3 px-4 py-2 transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
-              key={item.to + (item.hash || '')}
-              hash={item.hash}
-              to={item.to}
-            >
-              <NavIcon label={item.label} className="w-5 h-5" />
-              {item.label}
-            </Link>
+          {mainNav.map((item, index) => (
+            <Fragment key={item.to + (item.hash || '')}>
+              {index === firstAdminIndex && (
+                <div className="px-4 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground border-t border-border mt-2">
+                  Admin
+                </div>
+              )}
+              <Link
+                activeProps={{
+                  className:
+                    'border-l-4 border-primary bg-primary/10 text-primary font-semibold',
+                }}
+                inactiveProps={{
+                  className:
+                    'border-l-4 border-transparent text-muted-foreground hover:bg-secondary',
+                }}
+                className="flex items-center gap-3 px-4 py-2 transition-all duration-200 active:scale-95 rounded-r cursor-pointer"
+                hash={item.hash}
+                to={item.to}
+              >
+                <NavIcon label={item.label} className="w-5 h-5" />
+                {item.label}
+              </Link>
+            </Fragment>
           ))}
         </nav>
 

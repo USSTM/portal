@@ -20,7 +20,7 @@ describe('navigationForCapabilities', () => {
       {
         label: 'Account',
         to: '/account',
-        description: 'View your identity and active grants.',
+        description: 'View your account and permissions.',
       },
       {
         label: 'Contact',
@@ -30,18 +30,18 @@ describe('navigationForCapabilities', () => {
       {
         label: 'Resources',
         to: '/resources',
-        description: 'Open resources.',
+        description: 'Useful links and resources.',
       },
       {
         label: 'Events',
         to: '/events',
-        description: 'Open events.',
+        description: 'Create and manage events for your club.',
       },
       {
         label: 'Club Access',
         to: '/account',
         hash: 'clubs',
-        description: 'Open club access.',
+        description: 'Manage club access.',
       },
     ])
   })
@@ -63,7 +63,7 @@ describe('navigationForCapabilities', () => {
       {
         label: 'Account',
         to: '/account',
-        description: 'View your identity and active grants.',
+        description: 'View your account and permissions.',
       },
       {
         label: 'Contact',
@@ -73,13 +73,13 @@ describe('navigationForCapabilities', () => {
       {
         label: 'Resources',
         to: '/resources',
-        description: 'Open resources.',
+        description: 'Useful links and resources.',
       },
       {
         label: 'Board Member',
         to: '/account',
         hash: 'board-position',
-        description: 'Open board member.',
+        description: 'Manage USSTM board member details.',
       },
     ])
   })
@@ -97,12 +97,14 @@ describe('navigationForCapabilities', () => {
         {
           label: 'Members',
           to: '/admin/members',
-          description: 'Open members.',
+          description: 'Manage USSTM members.',
+          section: 'admin',
         },
         {
           label: 'Clubs',
           to: '/admin/clubs',
-          description: 'Open clubs.',
+          description: 'Manage USSTM clubs.',
+          section: 'admin',
         },
       ]),
     )
@@ -125,7 +127,7 @@ describe('navigationForCapabilities', () => {
       {
         label: 'Account',
         to: '/account',
-        description: 'View your identity and active grants.',
+        description: 'View your account and permissions.',
       },
       {
         label: 'Contact',
@@ -135,37 +137,42 @@ describe('navigationForCapabilities', () => {
       {
         label: 'Resources',
         to: '/resources',
-        description: 'Open resources.',
+        description: 'Useful links and resources.',
       },
       {
         label: 'Events',
         to: '/events',
-        description: 'Open events.',
+        description: 'Create and manage events for your club.',
       },
       {
         label: 'Members',
         to: '/admin/members',
-        description: 'Open members.',
+        description: 'Manage USSTM members.',
+        section: 'admin',
       },
       {
         label: 'Clubs',
         to: '/admin/clubs',
-        description: 'Open clubs.',
+        description: 'Manage USSTM clubs.',
+        section: 'admin',
       },
       {
-        label: 'Resources',
+        label: 'Manage Resources',
         to: '/admin/resources',
-        description: 'Open resources.',
+        description: 'Manage resources.',
+        section: 'admin',
       },
       {
         label: 'Board Members',
         to: '/admin/board-members',
-        description: 'Open board members.',
+        description: 'Manage board members.',
+        section: 'admin',
       },
       {
         label: 'Audit History',
         to: '/admin/audit-history',
-        description: 'Open audit history.',
+        description: 'View audit history.',
+        section: 'admin',
       },
     ])
   })
