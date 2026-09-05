@@ -12,6 +12,7 @@ import {
   importShiftSlotsSeed,
   loadShiftSlotsSeed,
 } from './import-shift-slots.ts'
+import { ensureUsstmClub } from './usstm-club.ts'
 
 const representativeFixturesPath = fileURLToPath(
   new URL('../../migrations/legacy/fixtures/representative/', import.meta.url),
@@ -65,6 +66,8 @@ export async function resetDatabaseToBaseline(): Promise<BaselineReport> {
       `TRUNCATE TABLE ${MUTABLE_TABLES.join(', ')} RESTART IDENTITY CASCADE;`,
     ),
   )
+
+  await ensureUsstmClub()
 
   const legacyExport = await loadLegacyExport(representativeFixturesPath)
   const legacyReport = await importLegacyExport(legacyExport)

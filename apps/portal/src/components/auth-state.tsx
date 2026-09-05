@@ -1,4 +1,4 @@
-import { ShieldAlert } from 'lucide-react'
+import { Calendar, ShieldAlert } from 'lucide-react'
 import { portalLogoutAction } from '../auth/logout'
 import { Button } from './ui/button'
 
@@ -30,7 +30,7 @@ export function SignIn() {
         <div className="w-full h-px bg-border my-8 opacity-50" />
 
         {/* Action Area */}
-        <div className="w-full flex flex-col items-center gap-6">
+        <div className="w-full flex flex-col items-center gap-4">
           <Button
             asChild
             variant="outline"
@@ -62,6 +62,35 @@ export function SignIn() {
               Sign in with Google
             </a>
           </Button>
+
+          <Button
+            asChild
+            variant="outline"
+            className="w-full h-12 flex items-center justify-center gap-3 bg-secondary/30 hover:bg-secondary/60 text-foreground font-medium text-sm transition-all duration-200 active:scale-[0.98]"
+          >
+            <a href="/office-hours">
+              <Calendar className="w-5 h-5" />
+              View Office Hours Calendar
+            </a>
+          </Button>
+
+          <div className="mt-2 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <span>© 2026 USSTM</span>
+            <span>·</span>
+            <a
+              href="/privacy"
+              className="hover:text-primary transition-colors underline-offset-4 hover:underline"
+            >
+              Privacy Policy
+            </a>
+            <span>·</span>
+            <a
+              href="/terms"
+              className="hover:text-primary transition-colors underline-offset-4 hover:underline"
+            >
+              Terms of Service
+            </a>
+          </div>
         </div>
       </main>
     </div>
@@ -106,6 +135,24 @@ export function AccessDenied() {
               Sign out
             </Button>
           </form>
+
+          <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+            <span>© 2026 USSTM</span>
+            <span>·</span>
+            <a
+              href="/privacy"
+              className="hover:text-primary transition-colors underline-offset-4 hover:underline"
+            >
+              Privacy Policy
+            </a>
+            <span>·</span>
+            <a
+              href="/terms"
+              className="hover:text-primary transition-colors underline-offset-4 hover:underline"
+            >
+              Terms of Service
+            </a>
+          </div>
         </div>
       </main>
     </div>

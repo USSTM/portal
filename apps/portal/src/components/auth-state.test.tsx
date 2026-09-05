@@ -1,7 +1,17 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 
-import { AccessDenied } from './auth-state.js'
+import { AccessDenied, SignIn } from './auth-state.js'
+
+describe('authentication sign in', () => {
+  it('renders Google sign in button and office hours calendar link', () => {
+    const page = renderToStaticMarkup(<SignIn />)
+
+    expect(page).toContain('Sign in with Google')
+    expect(page).toContain('View Office Hours Calendar')
+    expect(page).toContain('/office-hours')
+  })
+})
 
 describe('authentication denial', () => {
   it('does not reveal whether the email is provisioned', () => {

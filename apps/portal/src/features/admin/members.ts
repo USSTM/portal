@@ -6,6 +6,7 @@ import {
   exists,
   ilike,
   inArray,
+  isNotNull,
   isNull,
 } from 'drizzle-orm'
 
@@ -24,34 +25,55 @@ import {
   cancelFutureBookingsForMember,
   updateFutureBookingSnapshots,
 } from '../office-hours/bookings.js'
+import { requireUsstmClub } from './clubs.js'
+import { wasEverAdministrator } from './administrator-history.js'
 
 type MemberInput = { actorEmail: string; memberId: string }
 
 export async function createMemberWithClubAccess(input: {
   actorEmail: string
+  administrator?: boolean
   clubIds: string[]
   displayName: string
   email: string
 }) {
   const db = getDb()
+  const administrator = input.administrator ?? false
   return db.transaction(async (tx) => {
-    const clubIds = await requireActiveClubs(tx, input.clubIds)
+    const email = normalizeEmail(input.email)
+    await requireEmailAvailable(tx, email, administrator)
+    const requestedClubIds = [...input.clubIds]
+    if (administrator) {
+      const usstm = await requireUsstmClub(tx)
+      if (!requestedClubIds.includes(usstm.id)) requestedClubIds.push(usstm.id)
+    }
+    const clubIds = await requireActiveClubs(tx, requestedClubIds)
     const [member] = await tx
       .insert(members)
       .values({
         displayName: input.displayName.trim(),
-        email: normalizeEmail(input.email),
+        email,
       })
       .returning()
     await tx
       .insert(clubAccess)
       .values(clubIds.map((clubId) => ({ clubId, memberId: member.id })))
-    await writeAudit(tx, input.actorEmail, 'member.created', member.id, {
-      clubIds,
-      displayName: member.displayName,
-      email: member.email,
-      lifecycle: member.lifecycle,
-    })
+    if (administrator) {
+      await tx.insert(administrators).values({ memberId: member.id })
+    }
+    await writeAudit(
+      tx,
+      input.actorEmail,
+      administrator ? 'administrator.created' : 'member.created',
+      member.id,
+      {
+        administratorGrant: administrator,
+        clubIds,
+        displayName: member.displayName,
+        email: member.email,
+        lifecycle: member.lifecycle,
+      },
+    )
     return member
   })
 }
@@ -153,6 +175,9 @@ export async function reactivateMember(
   const db = getDb()
   return db.transaction(async (tx) => {
     await requireNonAdministratorMember(tx, input.memberId, 'deactivated')
+    if (await wasEverAdministrator(tx, input.memberId)) {
+      throw new Error('Access denied')
+    }
     const clubIds = await requireActiveClubs(tx, input.clubIds)
     await tx
       .update(members)
@@ -222,12 +247,19 @@ export async function editMember(
 }
 
 export async function browseMembers(input: {
+  administratorOnly?: boolean
   clubId?: string
+  includeAdministrators?: boolean
   lifecycle?: 'active' | 'deactivated'
   search?: string
 }) {
   const db = getDb()
   const filters = [
+    input.administratorOnly
+      ? isNotNull(administrators.memberId)
+      : input.includeAdministrators
+        ? undefined
+        : isNull(administrators.memberId),
     input.lifecycle ? eq(members.lifecycle, input.lifecycle) : undefined,
     input.search ? ilike(members.email, `%${input.search.trim()}%`) : undefined,
     input.clubId
@@ -249,16 +281,17 @@ export async function browseMembers(input: {
   const where = filters.length > 0 ? and(...filters) : undefined
   const memberEntries = await db
     .select({
+      boardPosition: boardMembers.boardPosition,
       displayName: members.displayName,
       email: members.email,
       id: members.id,
-      isBoardMember: boardMembers.memberId,
+      isAdministrator: administrators.memberId,
       lifecycle: members.lifecycle,
     })
     .from(members)
     .leftJoin(administrators, eq(administrators.memberId, members.id))
     .leftJoin(boardMembers, eq(boardMembers.memberId, members.id))
-    .where(and(isNull(administrators.memberId), where))
+    .where(where)
     .orderBy(desc(members.updatedAt), desc(members.id))
   const memberIds = memberEntries.map((member) => member.id)
   const grants = memberIds.length
@@ -274,7 +307,8 @@ export async function browseMembers(input: {
     : []
   return memberEntries.map((member) => ({
     ...member,
-    isBoardMember: member.isBoardMember !== null,
+    isAdministrator: member.isAdministrator !== null,
+    isBoardMember: member.boardPosition !== null,
     grants: grants.filter((grant) => grant.memberId === member.id),
   }))
 }
@@ -284,6 +318,24 @@ export function requireMemberAdministrationAuthority(identity: PortalIdentity) {
     return identity.email
   }
   throw new Error('Access denied')
+}
+
+async function requireEmailAvailable(
+  tx: Transaction,
+  email: string,
+  administrator: boolean,
+) {
+  const existing = await tx
+    .select({ id: members.id })
+    .from(members)
+    .where(eq(members.email, email))
+  if (existing.length > 0) {
+    throw new Error(
+      administrator
+        ? 'A Member with that email already exists. Use their row menu to grant Administrator.'
+        : 'A Member with that email already exists.',
+    )
+  }
 }
 
 async function requireActiveClubs(tx: Transaction, clubIds: string[]) {

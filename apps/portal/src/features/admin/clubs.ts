@@ -41,6 +41,7 @@ export async function editClub(
 ) {
   const db = getDb()
   return db.transaction(async (tx) => {
+    await requireUnprotectedClub(tx, input.clubId)
     const [club] = await tx
       .update(clubs)
       .set({
@@ -63,6 +64,7 @@ export async function editClub(
 export async function archiveClub(input: ClubInput) {
   const db = getDb()
   return db.transaction(async (tx) => {
+    await requireUnprotectedClub(tx, input.clubId)
     const [club] = await tx
       .update(clubs)
       .set({ lifecycle: 'archived', updatedAt: new Date() })
@@ -122,12 +124,29 @@ export function requireClubAdministrationAuthority(identity: PortalIdentity) {
   throw new Error('Access denied')
 }
 
+export async function requireUsstmClub(tx: Transaction) {
+  const found = await tx.select().from(clubs).where(eq(clubs.protected, true))
+  if (found.length === 0) throw new Error('The USSTM Club is not configured')
+  return found[0]
+}
+
+async function requireUnprotectedClub(tx: Transaction, clubId: string) {
+  const found = await tx
+    .select({ protected: clubs.protected })
+    .from(clubs)
+    .where(eq(clubs.id, clubId))
+  if (found.length === 0) throw new Error('Club not found')
+  if (found[0].protected) throw new Error('The USSTM Club cannot be edited or archived')
+}
+
+type Transaction = Parameters<
+  ReturnType<typeof getDb>['transaction']
+>[0] extends (tx: infer InferredTransaction) => unknown
+  ? InferredTransaction
+  : never
+
 async function writeAudit(
-  tx: Parameters<ReturnType<typeof getDb>['transaction']>[0] extends (
-    tx: infer Transaction,
-  ) => unknown
-    ? Transaction
-    : never,
+  tx: Transaction,
   actorEmail: string,
   action: string,
   targetId: string,

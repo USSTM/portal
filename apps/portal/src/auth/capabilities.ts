@@ -69,6 +69,12 @@ export function navigationForCapabilities(
     })
   }
 
+  navigation.push({
+    label: 'Office Hours',
+    to: '/office-hours',
+    description: 'View and book Office Hours shifts.',
+  })
+
   if (capabilities.administrator || capabilities.superuser) {
     navigation.push(
       {

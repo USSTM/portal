@@ -83,21 +83,21 @@ function AuditHistory() {
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex-1 flex flex-col">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[800px]">
-            <thead className="bg-secondary/30 border-b border-border">
+            <thead className="bg-secondary border-b border-border">
               <tr>
-                <th className="px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="bg-secondary px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Action
                 </th>
-                <th className="px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="bg-secondary px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Actor
                 </th>
-                <th className="px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="bg-secondary px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Target
                 </th>
-                <th className="px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <th className="bg-secondary px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Timestamp
                 </th>
-                <th className="px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider text-right">
+                <th className="bg-secondary px-6 py-4 text-xs font-medium text-muted-foreground uppercase tracking-wider text-right">
                   Details
                 </th>
               </tr>

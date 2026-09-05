@@ -17,8 +17,12 @@ A Member who can no longer sign in or hold grants but whose historical activity 
 _Avoid_: Deleted user, removed account
 
 **Club**:
-An organization associated with USSTM whose events and other portal records may be managed by authorized Members.
+An organization associated with USSTM whose events and other portal records may be managed by authorized Members. One Club, the USSTM Club, represents USSTM itself rather than an associated organization.
 _Avoid_: User, group account
+
+**USSTM Club**:
+The single protected Club representing USSTM. It cannot be archived or renamed, always holds Owning Club and Organizing Club eligibility, and is the Club Access every Administrator holds while they remain an Administrator.
+_Avoid_: Root club, default club
 
 **Archived Club**:
 A Club that cannot receive Club Access or participate in new Events but remains attached to its historical records.
@@ -37,7 +41,7 @@ The Administrator-managed organizational title displayed with a Board Member's n
 _Avoid_: Role, permission
 
 **Administrator**:
-A Member authorized to manage non-administrator Members, grants, Clubs, Events, Resources, and Bookings. Only the Superuser may create or modify an Administrator or any of their grants.
+A Member authorized to manage non-administrator Members, grants, Clubs, Events, Resources, and Bookings, and who holds USSTM Club Access for as long as they remain an Administrator. Only the Superuser may create or modify an Administrator or any grant belonging to one. An Administrator may also hold other Club Access or Board Member authority.
 _Avoid_: Superuser, root user
 
 **Superuser**:

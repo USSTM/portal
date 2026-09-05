@@ -192,6 +192,25 @@ function PortalLayout() {
                 Sign Out
               </button>
             </form>
+            <div className="pt-2 pb-1 border-t border-border/50 text-[11px] text-muted-foreground flex items-center justify-center gap-1.5">
+              <span>© 2026 USSTM</span>
+              <span>·</span>
+              <Link
+                to="/privacy"
+                className="hover:text-foreground transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Privacy
+              </Link>
+              <span>·</span>
+              <Link
+                to="/terms"
+                className="hover:text-foreground transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Terms
+              </Link>
+            </div>
           </div>
         </div>
       )}
@@ -269,6 +288,23 @@ function PortalLayout() {
               Sign Out
             </button>
           </form>
+          <div className="pt-3 pb-1 border-t border-border/50 text-[11px] text-muted-foreground flex items-center justify-center gap-1.5">
+            <span>© 2026 USSTM</span>
+            <span>·</span>
+            <Link
+              to="/privacy"
+              className="hover:text-foreground transition-colors"
+            >
+              Privacy
+            </Link>
+            <span>·</span>
+            <Link
+              to="/terms"
+              className="hover:text-foreground transition-colors"
+            >
+              Terms
+            </Link>
+          </div>
         </div>
       </aside>
 

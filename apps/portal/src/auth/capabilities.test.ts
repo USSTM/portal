@@ -43,6 +43,11 @@ describe('navigationForCapabilities', () => {
         hash: 'clubs',
         description: 'Manage club access.',
       },
+      {
+        label: 'Office Hours',
+        to: '/office-hours',
+        description: 'View and book Office Hours shifts.',
+      },
     ])
   })
 
@@ -80,6 +85,11 @@ describe('navigationForCapabilities', () => {
         to: '/account',
         hash: 'board-position',
         description: 'Manage USSTM board member details.',
+      },
+      {
+        label: 'Office Hours',
+        to: '/office-hours',
+        description: 'View and book Office Hours shifts.',
       },
     ])
   })
@@ -143,6 +153,11 @@ describe('navigationForCapabilities', () => {
         label: 'Events',
         to: '/events',
         description: 'Create and manage events for your club.',
+      },
+      {
+        label: 'Office Hours',
+        to: '/office-hours',
+        description: 'View and book Office Hours shifts.',
       },
       {
         label: 'Members',

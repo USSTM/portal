@@ -89,6 +89,7 @@ export const clubs = pgTable(
     fullName: text('full_name').notNull(),
     contactEmail: text('contact_email'),
     lifecycle: clubLifecycle('lifecycle').notNull().default('active'),
+    protected: boolean('protected').notNull().default(false),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),

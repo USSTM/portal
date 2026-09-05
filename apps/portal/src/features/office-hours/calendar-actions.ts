@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 
+import type { PortalIdentity } from '../../auth/access.js'
 import { resolvePortalIdentity } from '../../auth/identity.js'
 
 import {
@@ -17,10 +18,7 @@ export const getOfficeHoursCalendarAction = createServerFn({ method: 'GET' })
   .inputValidator(z.object({ week: z.string().optional() }))
   .handler(async ({ data }) => {
     const identity = await resolvePortalIdentity()
-    const viewerMemberId =
-      identity.kind === 'member'
-        ? await findBoardMemberId(identity.email)
-        : undefined
+    const viewerMemberId = await boardMemberIdForIdentity(identity)
     const canOverride =
       identity.kind === 'administrator' || identity.kind === 'superuser'
     return {
@@ -40,13 +38,19 @@ export const createOwnBookingAction = createServerFn({ method: 'POST' })
     z.object({ date: z.string(), shiftSlotId: z.string().uuid() }),
   )
   .handler(async ({ data }) =>
-    createOwnBooking({ ...data, actorEmail: await requireBoardMember() }),
+    createOwnBooking({
+      ...data,
+      actorEmail: await requireBoardMember(await resolvePortalIdentity()),
+    }),
   )
 
 export const cancelOwnBookingAction = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ bookingId: z.string().uuid() }))
   .handler(async ({ data }) =>
-    cancelOwnBooking({ ...data, actorEmail: await requireBoardMember() }),
+    cancelOwnBooking({
+      ...data,
+      actorEmail: await requireBoardMember(await resolvePortalIdentity()),
+    }),
   )
 
 export const createOverrideBookingAction = createServerFn({ method: 'POST' })
@@ -60,7 +64,7 @@ export const createOverrideBookingAction = createServerFn({ method: 'POST' })
   .handler(async ({ data }) =>
     createOverrideBooking({
       ...data,
-      actorEmail: await requireBookingAdministrator(),
+      actorEmail: requireBookingAdministrator(await resolvePortalIdentity()),
     }),
   )
 
@@ -69,23 +73,34 @@ export const cancelOverrideBookingAction = createServerFn({ method: 'POST' })
   .handler(async ({ data }) =>
     cancelOverrideBooking({
       ...data,
-      actorEmail: await requireBookingAdministrator(),
+      actorEmail: requireBookingAdministrator(await resolvePortalIdentity()),
     }),
   )
 
-async function requireBoardMember() {
-  const identity = await resolvePortalIdentity()
+/**
+ * A Member's Board Member authority does not depend on their highest
+ * identity kind: an Administrator or the Superuser may also hold Board
+ * Member authority and must still resolve to their own booking eligibility.
+ */
+export async function boardMemberIdForIdentity(identity: PortalIdentity) {
+  if (identity.kind === 'anonymous' || identity.kind === 'denied') {
+    return undefined
+  }
+  return findBoardMemberId(identity.email)
+}
+
+export async function requireBoardMember(identity: PortalIdentity) {
   if (
-    identity.kind !== 'member' ||
-    !(await findBoardMemberId(identity.email))
+    identity.kind === 'anonymous' ||
+    identity.kind === 'denied' ||
+    !(await boardMemberIdForIdentity(identity))
   ) {
     throw new Error('Board Member authority is required')
   }
   return identity.email
 }
 
-async function requireBookingAdministrator() {
-  const identity = await resolvePortalIdentity()
+export function requireBookingAdministrator(identity: PortalIdentity) {
   if (identity.kind === 'administrator' || identity.kind === 'superuser') {
     return identity.email
   }

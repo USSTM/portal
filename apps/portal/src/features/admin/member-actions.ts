@@ -13,6 +13,7 @@ import {
   requireMemberAdministrationAuthority,
   revokeClubAccess,
 } from './members.js'
+import { requireAdministratorManagementAuthority } from './authorization.js'
 
 const memberId = z.string().uuid()
 const clubIds = z.array(z.string().uuid()).min(1)
@@ -20,17 +21,19 @@ const clubIds = z.array(z.string().uuid()).min(1)
 export const createMemberAction = createServerFn({ method: 'POST' })
   .inputValidator(
     z.object({
-      clubIds,
+      administrator: z.boolean().optional(),
+      clubIds: z.array(z.string().uuid()),
       displayName: z.string().trim().min(1).max(200),
       email: z.string().email(),
     }),
   )
-  .handler(async ({ data }) =>
-    createMemberWithClubAccess({
-      ...data,
-      actorEmail: await requireMemberAdministrator(),
-    }),
-  )
+  .handler(async ({ data }) => {
+    const identity = await resolvePortalIdentity()
+    const actorEmail = data.administrator
+      ? requireAdministratorManagementAuthority(identity)
+      : requireMemberAdministrationAuthority(identity)
+    return createMemberWithClubAccess({ ...data, actorEmail })
+  })
 
 export const editMemberAction = createServerFn({ method: 'POST' })
   .inputValidator(
@@ -69,7 +72,9 @@ export const reactivateMemberAction = createServerFn({ method: 'POST' })
 export const getMembers = createServerFn({ method: 'GET' })
   .inputValidator(
     z.object({
+      administratorOnly: z.boolean().optional(),
       clubId: memberId.optional(),
+      includeAdministrators: z.boolean().optional(),
       lifecycle: z.enum(['active', 'deactivated']).optional(),
       search: z.string().trim().max(320).optional(),
     }),

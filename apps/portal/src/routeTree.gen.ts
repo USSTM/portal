@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfficeHoursRouteImport } from './routes/office-hours'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -21,9 +23,19 @@ import { Route as AdminClubsRouteImport } from './routes/admin/clubs'
 import { Route as AdminBoardMembersRouteImport } from './routes/admin/board-members'
 import { Route as AdminAuditHistoryRouteImport } from './routes/admin/audit-history'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OfficeHoursRoute = OfficeHoursRouteImport.update({
@@ -83,7 +95,9 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/office-hours': typeof OfficeHoursRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/terms': typeof TermsRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
@@ -96,7 +110,9 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/office-hours': typeof OfficeHoursRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/terms': typeof TermsRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
@@ -110,7 +126,9 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/office-hours': typeof OfficeHoursRoute
+  '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/terms': typeof TermsRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
@@ -125,7 +143,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/events'
     | '/office-hours'
+    | '/privacy'
     | '/resources'
+    | '/terms'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
@@ -138,7 +158,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/events'
     | '/office-hours'
+    | '/privacy'
     | '/resources'
+    | '/terms'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
@@ -151,7 +173,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/events'
     | '/office-hours'
+    | '/privacy'
     | '/resources'
+    | '/terms'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
@@ -165,7 +189,9 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   EventsRoute: typeof EventsRoute
   OfficeHoursRoute: typeof OfficeHoursRoute
+  PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
+  TermsRoute: typeof TermsRoute
   AdminAuditHistoryRoute: typeof AdminAuditHistoryRoute
   AdminBoardMembersRoute: typeof AdminBoardMembersRoute
   AdminClubsRoute: typeof AdminClubsRoute
@@ -175,11 +201,25 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/resources': {
       id: '/resources'
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/office-hours': {
@@ -261,7 +301,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   EventsRoute: EventsRoute,
   OfficeHoursRoute: OfficeHoursRoute,
+  PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
+  TermsRoute: TermsRoute,
   AdminAuditHistoryRoute: AdminAuditHistoryRoute,
   AdminBoardMembersRoute: AdminBoardMembersRoute,
   AdminClubsRoute: AdminClubsRoute,
