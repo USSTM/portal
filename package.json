@@ -14,7 +14,7 @@
     "lint": "pnpm -r --if-present lint",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --if-present test",
-    "test:deployment": "node --test tests/deployment/production-stack.test.mjs tests/deployment/ssr-self-request.test.mjs",
+    "test:deployment": "node --test --test-concurrency=1 tests/deployment/production-stack.test.mjs tests/deployment/ssr-self-request.test.mjs tests/deployment/pg-externalization.test.mjs",
     "test:deployment:integration": "node --test tests/deployment/live-stack.integration.test.mjs",
     "test:integration": "pnpm -r --if-present test:integration",
     "db:up": "docker compose --env-file .env.local up -d postgres",

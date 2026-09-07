@@ -17,6 +17,7 @@ const config = defineConfig(({ mode }) => {
   return {
     envDir: repoRoot,
     resolve: { tsconfigPaths: true },
+    ssr: { external: ['pg'] },
     server: {
       proxy: {
         '/auth': {
