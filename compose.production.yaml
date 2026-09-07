@@ -39,9 +39,7 @@ services:
       dockerfile: apps/portal/Dockerfile
       target: runtime
     restart: unless-stopped
-    command: ['node', '--max-http-header-size=131072', 'server/index.mjs']
     environment:
-      NODE_OPTIONS: '--max-old-space-size=2048'
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
       PORT: '3000'
       PORTAL_AUTH_ISSUER: ${PORTAL_AUTH_ISSUER:?PORTAL_AUTH_ISSUER is required}
