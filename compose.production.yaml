@@ -40,7 +40,6 @@ services:
       target: runtime
     restart: unless-stopped
     environment:
-      NITRO_ORIGIN: 'http://portal:3000'
       DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
       PORT: '3000'
       PORTAL_AUTH_ISSUER: ${PORTAL_AUTH_ISSUER:?PORTAL_AUTH_ISSUER is required}

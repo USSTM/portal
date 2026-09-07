@@ -40,6 +40,17 @@
 		header_up X-Forwarded-Proto {http.request.scheme}
 	}
 
+	@serverFn path /_serverFn/*
+	header @serverFn {
+		-Content-Security-Policy
+		-Cross-Origin-Opener-Policy
+		-Permissions-Policy
+		-Referrer-Policy
+		-Strict-Transport-Security
+		-X-Content-Type-Options
+		-X-Frame-Options
+	}
+
 	reverse_proxy portal:3000 {
 		header_up Host {http.request.host}
 		header_up X-Request-ID {http.request.uuid}
