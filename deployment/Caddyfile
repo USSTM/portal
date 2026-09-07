@@ -41,9 +41,9 @@
 	}
 
 	reverse_proxy portal:3000 {
-		header_up Host portal:3000
+		header_up Host {http.request.host}
 		header_up X-Request-ID {http.request.uuid}
-		header_up -X-Forwarded-Host
-		header_up -X-Forwarded-Proto
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
 	}
 }
