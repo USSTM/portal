@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  nitro-nightly@4.0.0-20251010-091516-7cafddba: c0e352eced6eb316e2de259a3cfa6b92e072b6b110953611069874864e5debeb
+
 importers:
 
   .:
@@ -110,7 +113,7 @@ importers:
         version: 0.577.0(react@19.2.7)
       nitro:
         specifier: npm:nitro-nightly@4.0.0-20251010-091516-7cafddba
-        version: nitro-nightly@4.0.0-20251010-091516-7cafddba(drizzle-orm@0.45.2(@types/pg@8.20.0)(pg@8.22.0))(lru-cache@11.5.2)(rolldown@1.1.5)(vite@8.1.4(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1))
+        version: nitro-nightly@4.0.0-20251010-091516-7cafddba(patch_hash=c0e352eced6eb316e2de259a3cfa6b92e072b6b110953611069874864e5debeb)(drizzle-orm@0.45.2(@types/pg@8.20.0)(pg@8.22.0))(lru-cache@11.5.2)(rolldown@1.1.5)(vite@8.1.4(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1))
       pg:
         specifier: 8.22.0
         version: 8.22.0
@@ -6860,7 +6863,7 @@ snapshots:
 
   nf3@0.1.12: {}
 
-  nitro-nightly@4.0.0-20251010-091516-7cafddba(drizzle-orm@0.45.2(@types/pg@8.20.0)(pg@8.22.0))(lru-cache@11.5.2)(rolldown@1.1.5)(vite@8.1.4(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)):
+  nitro-nightly@4.0.0-20251010-091516-7cafddba(patch_hash=c0e352eced6eb316e2de259a3cfa6b92e072b6b110953611069874864e5debeb)(drizzle-orm@0.45.2(@types/pg@8.20.0)(pg@8.22.0))(lru-cache@11.5.2)(rolldown@1.1.5)(vite@8.1.4(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)):
     dependencies:
       consola: 3.4.2
       cookie-es: 2.0.1

@@ -288,6 +288,26 @@ test('Caddy serves Portal health and proxies auth with one request ID', async ()
   assert.match(auth.headers['x-request-id'], /^[0-9a-f-]{36}$/)
 })
 
+test(
+  'Caddy serves the Portal home page over SSR',
+  async () => {
+    // Regression guard: a Nitro production-build defect (see
+    // patches/nitro-nightly@4.0.0-20251010-091516-7cafddba.patch) made every
+    // document route recursively self-fetch its own URL through Caddy with
+    // no bound, until the process ran out of memory or hit undici's header
+    // size limit. None of the tests above request a document route, so this
+    // previously shipped with a fully green suite. A 30s budget is well
+    // past a healthy render and comfortably inside where the loop used to
+    // fail with UND_ERR_HEADERS_OVERFLOW.
+    const response = await request('/')
+
+    assert.equal(response.status, 200)
+    assert.match(response.headers['content-type'], /text\/html/)
+    assert.match(response.body, /<!doctype html>/i)
+  },
+  { timeout: 30_000 },
+)
+
 test('auth rejects a state-changing request from another Origin', async () => {
   const sameOrigin = await request('/auth/logout?client=portal', {
     headers: { host: 'localhost', origin: 'https://localhost' },

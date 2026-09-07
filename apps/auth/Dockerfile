@@ -4,6 +4,7 @@ RUN corepack enable
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY patches patches
 COPY apps/auth/package.json apps/auth/package.json
 COPY apps/portal/package.json apps/portal/package.json
 COPY packages/auth-session/package.json packages/auth-session/package.json

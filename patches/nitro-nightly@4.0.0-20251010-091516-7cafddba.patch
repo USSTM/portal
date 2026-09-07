@@ -1,0 +1,13 @@
+diff --git a/dist/_chunks/info.mjs b/dist/_chunks/info.mjs
+index b32194de970ac9f96159b41dfaef87cb5aeaf214..ed0dea60ed83f3c93a6afad5a011f9fb3f7a2409 100644
+--- a/dist/_chunks/info.mjs
++++ b/dist/_chunks/info.mjs
+@@ -10240,7 +10240,7 @@ function virtual(modules, cache = {}) {
+     name: "virtual",
+     resolveId(id, importer) {
+       if (id in modules) {
+-        return PREFIX + id;
++        return { id: PREFIX + id, moduleSideEffects: true };
+       }
+       if (importer) {
+         const importerNoPrefix = importer.startsWith(PREFIX) ? importer.slice(PREFIX.length) : importer;
