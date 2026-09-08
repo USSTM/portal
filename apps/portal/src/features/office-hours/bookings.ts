@@ -47,7 +47,7 @@ export async function createOwnBooking(input: {
           lte(bookings.date, addDays(week, 6)),
         ),
       )
-    if (total >= 5) throw new Error('You can book at most five Shifts per week')
+    if (total >= 10) throw new Error('You can book at most ten Shifts per week')
     const [booking] = await tx
       .insert(bookings)
       .values({

@@ -60,7 +60,12 @@ describeWithDatabase('Board Member Bookings', () => {
       ['2030-01-07', slots[1]],
       ['2030-01-07', slots[2]],
       ['2030-01-07', slots[3]],
+      ['2030-01-07', slots[4]],
+      ['2030-01-07', slots[5]],
+      ['2030-01-07', slots[6]],
+      ['2030-01-07', slots[7]],
       ['2030-01-08', slots[0]],
+      ['2030-01-08', slots[1]],
     ] as const) {
       await createOwnBooking({
         actorEmail: actor.email,
@@ -74,9 +79,9 @@ describeWithDatabase('Board Member Bookings', () => {
         actorEmail: actor.email,
         date: '2030-01-08',
         now,
-        shiftSlotId: slots[1].id,
+        shiftSlotId: slots[2].id,
       }),
-    ).rejects.toThrow('at most five')
+    ).rejects.toThrow('at most ten')
     await expect(
       createOwnBooking({
         actorEmail: actor.email,
@@ -99,15 +104,20 @@ describeWithDatabase('Board Member Bookings', () => {
     ).rejects.toThrow('Booking not found')
   })
 
-  it('serializes concurrent requests so a Board Member cannot exceed five weekly Bookings', async () => {
+  it('serializes concurrent requests so a Board Member cannot exceed ten weekly Bookings', async () => {
     const { actor, slots } = await createBoardMember()
     const attempts = [
       ['2030-01-07', slots[0]],
       ['2030-01-07', slots[1]],
       ['2030-01-07', slots[2]],
       ['2030-01-07', slots[3]],
+      ['2030-01-07', slots[4]],
+      ['2030-01-07', slots[5]],
+      ['2030-01-07', slots[6]],
+      ['2030-01-07', slots[7]],
       ['2030-01-08', slots[0]],
       ['2030-01-08', slots[1]],
+      ['2030-01-08', slots[2]],
     ].map(([date, slot]) =>
       createOwnBooking({
         actorEmail: actor.email,
@@ -119,7 +129,7 @@ describeWithDatabase('Board Member Bookings', () => {
     const results = await Promise.allSettled(attempts)
     expect(
       results.filter((result) => result.status === 'fulfilled'),
-    ).toHaveLength(5)
+    ).toHaveLength(10)
   })
 
   it('does not allow cancellation after a Shift has started', async () => {

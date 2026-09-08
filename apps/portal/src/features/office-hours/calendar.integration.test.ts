@@ -8,17 +8,21 @@ import { getOfficeHoursCalendar } from './calendar'
 const describeWithDatabase = process.env.DATABASE_URL ? describe : describe.skip
 
 describeWithDatabase('public Office Hours calendar', () => {
-  it('uses the four seeded Slots and shows public booking snapshots for any week', async () => {
+  it('uses the eight seeded Slots and shows public booking snapshots for any week', async () => {
     const db = getDb()
     const slots = await db
       .select()
       .from(shiftSlots)
       .orderBy(shiftSlots.startTime)
     expect(slots.map((slot) => [slot.startTime, slot.endTime])).toEqual([
-      ['10:00:00', '12:00:00'],
-      ['12:00:00', '14:00:00'],
-      ['14:00:00', '16:00:00'],
-      ['16:00:00', '18:00:00'],
+      ['10:00:00', '11:00:00'],
+      ['11:00:00', '12:00:00'],
+      ['12:00:00', '13:00:00'],
+      ['13:00:00', '14:00:00'],
+      ['14:00:00', '15:00:00'],
+      ['15:00:00', '16:00:00'],
+      ['16:00:00', '17:00:00'],
+      ['17:00:00', '18:00:00'],
     ])
     const [member] = await db
       .insert(members)
@@ -38,7 +42,7 @@ describeWithDatabase('public Office Hours calendar', () => {
     const calendar = await getOfficeHoursCalendar({ week: '2030-01-11' })
     expect(calendar.week).toBe('2030-01-07')
     expect(calendar.days).toHaveLength(5)
-    expect(calendar.days[0].shifts).toHaveLength(4)
+    expect(calendar.days[0].shifts).toHaveLength(8)
     expect(calendar.days[0].shifts[0].bookings).toEqual([
       { boardPosition: 'President', displayName: 'Calendar Board Member' },
     ])

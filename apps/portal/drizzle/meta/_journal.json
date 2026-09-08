@@ -99,6 +99,13 @@
       "when": 1788574640000,
       "tag": "0013_seed-board-members",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1788574655000,
+      "tag": "0014_shorten-shift-slots",
+      "breakpoints": true
     }
   ]
 }
