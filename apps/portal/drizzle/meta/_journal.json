@@ -92,6 +92,13 @@
       "when": 1788574625000,
       "tag": "0012_seed-clubs",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1788574640000,
+      "tag": "0013_seed-board-members",
+      "breakpoints": true
     }
   ]
 }
