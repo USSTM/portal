@@ -1,53 +1,69 @@
 -- Seeds the Board Members and grants Board authority in USSTM Portal.
--- Includes both TMU (@torontomu.ca) and USSTM (@usstm.ca) email addresses for members who possess both,
--- ensuring seamless Single Sign-On regardless of which account they use to authenticate.
 
-WITH member_data (email, display_name, board_position) AS (
-  VALUES
-    -- Executive Board
-    ('president@usstm.ca', 'Muhammad Hanan', 'President'),
-    ('vp.operations@usstm.ca', 'Sanjana Bhandari', 'VP Operations'),
-    ('vp.finance@usstm.ca', 'Kayra Shivdat', 'VP Finance'),
-    ('vp.communications@usstm.ca', 'Karman Khehra', 'VP Communications'),
-    ('vp.events@usstm.ca', 'Sudar Thirumugam', 'VP Student Life'),
-    ('vp.academic@usstm.ca', 'Saba Shahidi Kasmaei', 'VP Academic'),
-    ('vp.external@usstm.ca', 'Tasneem Al-Qazli', 'VP External'),
-    ('vp.equity@usstm.ca', 'Vivek Dev Bishal', 'VP Equity'),
+-- 1. Insert or update members
+INSERT INTO "members" ("email", "display_name", "lifecycle")
+VALUES
+  -- Executive Board
+  ('president@usstm.ca', 'Muhammad Hanan', 'active'),
+  ('vp.operations@usstm.ca', 'Sanjana Bhandari', 'active'),
+  ('vp.finance@usstm.ca', 'Kayra Shivdat', 'active'),
+  ('vp.communications@usstm.ca', 'Karman Khehra', 'active'),
+  ('vp.events@usstm.ca', 'Sudar Thirumugam', 'active'),
+  ('vp.academic@usstm.ca', 'Saba Shahidi Kasmaei', 'active'),
+  ('vp.external@usstm.ca', 'Tasneem Al-Qazli', 'active'),
+  ('vp.equity@usstm.ca', 'Vivek Dev Bishal', 'active'),
 
-    -- Program Directors
-    ('ava.currie@torontomu.ca', 'Ava Currie', 'Biomedical Sciences Director'),
-    ('zainab.kashif@torontomu.ca', 'Zainab Kashif', 'Biomedical Sciences Director'),
-    ('rameen1.hussain@torontomu.ca', 'Rameen Hussain', 'Biology Director'),
-    ('tashmia.iftakhar@torontomu.ca', 'Tashmia Iftakhar', 'Chemistry Director'),
-    ('amitoz.banga@torontomu.ca', 'Amitoz Banga', 'Computer Science Director'),
-    ('ayu.gupta@torontomu.ca', 'Ayu Gupta', 'Computer Science Director'),
-    ('nabaha.syed@torontomu.ca', 'Nabaha Syed', 'Computer Science Director'),
-    ('pranavi.landeri@torontomu.ca', 'Pranavi Landeri', 'Computer Science Director'),
-    ('avitiello@torontomu.ca', 'Alyssa Vitiello', 'Math & Its Applications Director'),
-    ('morty.sadeh@torontomu.ca', 'Hermeus Salehi', 'Financial Math Director'),
-    ('umaima.khan@torontomu.ca', 'Umaima Khan', 'Medical Physics Director'),
+  -- Program Directors
+  ('ava.currie@torontomu.ca', 'Ava Currie', 'active'),
+  ('zainab.kashif@torontomu.ca', 'Zainab Kashif', 'active'),
+  ('rameen1.hussain@torontomu.ca', 'Rameen Hussain', 'active'),
+  ('tashmia.iftakhar@torontomu.ca', 'Tashmia Iftakhar', 'active'),
+  ('amitoz.banga@torontomu.ca', 'Amitoz Banga', 'active'),
+  ('ayu.gupta@torontomu.ca', 'Ayu Gupta', 'active'),
+  ('nabaha.syed@torontomu.ca', 'Nabaha Syed', 'active'),
+  ('pranavi.landeri@torontomu.ca', 'Pranavi Landeri', 'active'),
+  ('avitiello@torontomu.ca', 'Alyssa Vitiello', 'active'),
+  ('morty.sadeh@torontomu.ca', 'Hermeus Salehi', 'active'),
+  ('umaima.khan@torontomu.ca', 'Umaima Khan', 'active'),
 
-    -- Non-Voting Board Members
-    ('pwettlaufer@torontomu.ca', 'Pamela Wettlaufer', 'Manager'),
-    ('dgavrusenko@torontomu.ca', 'Damian Gavrusenko', 'Chairperson'),
-    ('iman.memon@torontomu.ca', 'Iman Memon', 'Secretary'),
-    ('secretary@usstm.ca', 'Iman Memon', 'Secretary'),
-    ('khansa.sayyada@torontomu.ca', 'Khansa Mahia Sayyada', 'International Commissioner'),
-    ('maruf.ahmed@torontomu.ca', 'Maruf Ahmed', 'Tech Manager')
-),
-upserted_members AS (
-  INSERT INTO "members" ("email", "display_name", "lifecycle")
-  SELECT lower(btrim(email)), display_name, 'active'::member_lifecycle
-  FROM member_data
-  ON CONFLICT ("email") DO UPDATE SET
-    "display_name" = EXCLUDED."display_name",
-    "lifecycle" = 'active'::member_lifecycle,
-    "updated_at" = NOW()
-  RETURNING id, email
-)
+  -- Non-Voting Board Members
+  ('pwettlaufer@torontomu.ca', 'Pamela Wettlaufer', 'active'),
+  ('dgavrusenko@torontomu.ca', 'Damian Gavrusenko', 'active'),
+  ('iman.memon@torontomu.ca', 'Iman Memon', 'active'),
+  ('secretary@usstm.ca', 'Iman Memon', 'active'),
+  ('khansa.sayyada@torontomu.ca', 'Khansa Mahia Sayyada', 'active'),
+  ('maruf.ahmed@torontomu.ca', 'Maruf Ahmed', 'active')
+ON CONFLICT ("email") DO UPDATE SET
+  "display_name" = EXCLUDED."display_name",
+  "lifecycle" = 'active',
+  "updated_at" = NOW();
+
+-- 2. Insert or update board_members mapping by looking up member IDs directly
 INSERT INTO "board_members" ("member_id", "board_position")
-SELECT um.id, md.board_position
-FROM upserted_members um
-JOIN member_data md ON lower(btrim(md.email)) = um.email
+SELECT id, 'President' FROM "members" WHERE email = 'president@usstm.ca'
+UNION ALL SELECT id, 'VP Operations' FROM "members" WHERE email = 'vp.operations@usstm.ca'
+UNION ALL SELECT id, 'VP Finance' FROM "members" WHERE email = 'vp.finance@usstm.ca'
+UNION ALL SELECT id, 'VP Communications' FROM "members" WHERE email = 'vp.communications@usstm.ca'
+UNION ALL SELECT id, 'VP Student Life' FROM "members" WHERE email = 'vp.events@usstm.ca'
+UNION ALL SELECT id, 'VP Academic' FROM "members" WHERE email = 'vp.academic@usstm.ca'
+UNION ALL SELECT id, 'VP External' FROM "members" WHERE email = 'vp.external@usstm.ca'
+UNION ALL SELECT id, 'VP Equity' FROM "members" WHERE email = 'vp.equity@usstm.ca'
+UNION ALL SELECT id, 'Biomedical Sciences Director' FROM "members" WHERE email = 'ava.currie@torontomu.ca'
+UNION ALL SELECT id, 'Biomedical Sciences Director' FROM "members" WHERE email = 'zainab.kashif@torontomu.ca'
+UNION ALL SELECT id, 'Biology Director' FROM "members" WHERE email = 'rameen1.hussain@torontomu.ca'
+UNION ALL SELECT id, 'Chemistry Director' FROM "members" WHERE email = 'tashmia.iftakhar@torontomu.ca'
+UNION ALL SELECT id, 'Computer Science Director' FROM "members" WHERE email = 'amitoz.banga@torontomu.ca'
+UNION ALL SELECT id, 'Computer Science Director' FROM "members" WHERE email = 'ayu.gupta@torontomu.ca'
+UNION ALL SELECT id, 'Computer Science Director' FROM "members" WHERE email = 'nabaha.syed@torontomu.ca'
+UNION ALL SELECT id, 'Computer Science Director' FROM "members" WHERE email = 'pranavi.landeri@torontomu.ca'
+UNION ALL SELECT id, 'Math & Its Applications Director' FROM "members" WHERE email = 'avitiello@torontomu.ca'
+UNION ALL SELECT id, 'Financial Math Director' FROM "members" WHERE email = 'morty.sadeh@torontomu.ca'
+UNION ALL SELECT id, 'Medical Physics Director' FROM "members" WHERE email = 'umaima.khan@torontomu.ca'
+UNION ALL SELECT id, 'Manager' FROM "members" WHERE email = 'pwettlaufer@torontomu.ca'
+UNION ALL SELECT id, 'Chairperson' FROM "members" WHERE email = 'dgavrusenko@torontomu.ca'
+UNION ALL SELECT id, 'Secretary' FROM "members" WHERE email = 'iman.memon@torontomu.ca'
+UNION ALL SELECT id, 'Secretary' FROM "members" WHERE email = 'secretary@usstm.ca'
+UNION ALL SELECT id, 'International Commissioner' FROM "members" WHERE email = 'khansa.sayyada@torontomu.ca'
+UNION ALL SELECT id, 'Tech Manager' FROM "members" WHERE email = 'maruf.ahmed@torontomu.ca'
 ON CONFLICT ("member_id") DO UPDATE SET
   "board_position" = EXCLUDED."board_position";
