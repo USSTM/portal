@@ -27,9 +27,9 @@ Alternatively, run the individual commands directly from the repository root:
 
 ```sh
 docker compose --env-file .env.production -f compose.production.yaml config --quiet
-docker compose --env-file .env.production -f compose.production.yaml build
+docker compose --env-file .env.production -f compose.production.yaml --profile operations build
 docker compose --env-file .env.production -f compose.production.yaml up -d postgres
-docker compose --env-file .env.production -f compose.production.yaml --profile operations run --rm migrate
+docker compose --env-file .env.production -f compose.production.yaml --profile operations run --rm --build migrate
 docker compose --env-file .env.production -f compose.production.yaml up -d --wait
 ```
 

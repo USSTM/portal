@@ -242,8 +242,8 @@ For future code updates:
 ```bash
 cd /opt/portal
 git pull
-docker compose --env-file .env.production -f compose.production.yaml build
-docker compose --env-file .env.production -f compose.production.yaml --profile operations run --rm migrate
+docker compose --env-file .env.production -f compose.production.yaml --profile operations build
+docker compose --env-file .env.production -f compose.production.yaml --profile operations run --rm --build migrate
 docker compose --env-file .env.production -f compose.production.yaml up -d --wait postgres auth portal caddy
 ```
 

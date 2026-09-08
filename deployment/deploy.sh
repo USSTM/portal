@@ -99,14 +99,14 @@ case "${COMMAND}" in
     echo "==> 1. Validating Compose configuration..."
     compose config --quiet
 
-    echo "==> 2. Building production images..."
-    compose build
+    echo "==> 2. Building production images (including operations profile)..."
+    compose --profile operations build
 
     echo "==> 3. Starting PostgreSQL..."
     compose up -d postgres
 
     echo "==> 4. Applying database schema migrations..."
-    compose --profile operations run --rm migrate
+    compose --profile operations run --rm --build migrate
 
     echo "==> 5. Starting full application stack..."
     compose up -d --wait
@@ -118,13 +118,13 @@ case "${COMMAND}" in
   build)
     echo "==> Validating configuration and building images..."
     compose config --quiet
-    compose build
+    compose --profile operations build
     ;;
 
   migrate)
     echo "==> Starting database and applying migrations..."
     compose up -d postgres
-    compose --profile operations run --rm migrate
+    compose --profile operations run --rm --build migrate
     ;;
 
   restart)
