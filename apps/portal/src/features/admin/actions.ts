@@ -31,12 +31,34 @@ export const editAdministratorAction = createServerFn({ method: 'POST' })
     editAdministrator({ ...data, actorEmail: await requireSuperuser() }),
   )
 
-export const deactivateAdministratorAction = actionFor(deactivateAdministrator)
-export const grantAdministratorAction = actionFor(grantAdministrator)
-export const revokeAdministratorAction = actionFor(revokeAdministrator)
-export const revokeBoardPositionFromAdministratorAction = actionFor(
-  revokeBoardPositionFromAdministrator,
-)
+export const deactivateAdministratorAction = createServerFn({ method: 'POST' })
+  .inputValidator(administratorInput)
+  .handler(async ({ data }) =>
+    deactivateAdministrator({ ...data, actorEmail: await requireSuperuser() }),
+  )
+
+export const grantAdministratorAction = createServerFn({ method: 'POST' })
+  .inputValidator(administratorInput)
+  .handler(async ({ data }) =>
+    grantAdministrator({ ...data, actorEmail: await requireSuperuser() }),
+  )
+
+export const revokeAdministratorAction = createServerFn({ method: 'POST' })
+  .inputValidator(administratorInput)
+  .handler(async ({ data }) =>
+    revokeAdministrator({ ...data, actorEmail: await requireSuperuser() }),
+  )
+
+export const revokeBoardPositionFromAdministratorAction = createServerFn({
+  method: 'POST',
+})
+  .inputValidator(administratorInput)
+  .handler(async ({ data }) =>
+    revokeBoardPositionFromAdministrator({
+      ...data,
+      actorEmail: await requireSuperuser(),
+    }),
+  )
 
 export const reactivateAdministratorAction = createServerFn({ method: 'POST' })
   .inputValidator(
@@ -97,16 +119,6 @@ export const updateAdministratorBoardPositionAction = createServerFn({
       actorEmail: await requireSuperuser(),
     }),
   )
-
-function actionFor(
-  action: (input: { actorEmail: string; memberId: string }) => Promise<void>,
-) {
-  return createServerFn({ method: 'POST' })
-    .inputValidator(administratorInput)
-    .handler(async ({ data }) =>
-      action({ ...data, actorEmail: await requireSuperuser() }),
-    )
-}
 
 async function requireSuperuser() {
   const identity = await resolvePortalIdentity()

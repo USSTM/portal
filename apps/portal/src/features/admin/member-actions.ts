@@ -48,8 +48,23 @@ export const editMemberAction = createServerFn({ method: 'POST' })
     editMember({ ...data, actorEmail: await requireMemberAdministrator() }),
   )
 
-export const grantClubAccessAction = clubAccessAction(grantClubAccess)
-export const revokeClubAccessAction = clubAccessAction(revokeClubAccess)
+export const grantClubAccessAction = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({ clubId: memberId, memberId }))
+  .handler(async ({ data }) =>
+    grantClubAccess({
+      ...data,
+      actorEmail: await requireMemberAdministrator(),
+    }),
+  )
+
+export const revokeClubAccessAction = createServerFn({ method: 'POST' })
+  .inputValidator(z.object({ clubId: memberId, memberId }))
+  .handler(async ({ data }) =>
+    revokeClubAccess({
+      ...data,
+      actorEmail: await requireMemberAdministrator(),
+    }),
+  )
 
 export const deactivateMemberAction = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ memberId }))
@@ -83,20 +98,6 @@ export const getMembers = createServerFn({ method: 'GET' })
     requireMemberAdministrationAuthority(await resolvePortalIdentity())
     return browseMembers(data)
   })
-
-function clubAccessAction(
-  action: (input: {
-    actorEmail: string
-    clubId: string
-    memberId: string
-  }) => Promise<void>,
-) {
-  return createServerFn({ method: 'POST' })
-    .inputValidator(z.object({ clubId: memberId, memberId }))
-    .handler(async ({ data }) =>
-      action({ ...data, actorEmail: await requireMemberAdministrator() }),
-    )
-}
 
 async function requireMemberAdministrator() {
   return requireMemberAdministrationAuthority(await resolvePortalIdentity())

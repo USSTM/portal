@@ -37,8 +37,17 @@ export const editClubAction = createServerFn({ method: 'POST' })
     editClub({ ...data, actorEmail: await requireClubAdministrator() }),
   )
 
-export const archiveClubAction = clubLifecycleAction(archiveClub)
-export const reactivateClubAction = clubLifecycleAction(reactivateClub)
+export const archiveClubAction = createServerFn({ method: 'POST' })
+  .inputValidator(clubIdInput)
+  .handler(async ({ data }) =>
+    archiveClub({ ...data, actorEmail: await requireClubAdministrator() }),
+  )
+
+export const reactivateClubAction = createServerFn({ method: 'POST' })
+  .inputValidator(clubIdInput)
+  .handler(async ({ data }) =>
+    reactivateClub({ ...data, actorEmail: await requireClubAdministrator() }),
+  )
 
 export const getClubs = createServerFn({ method: 'GET' })
   .inputValidator(
@@ -51,16 +60,6 @@ export const getClubs = createServerFn({ method: 'GET' })
     requireClubAdministrationAuthority(await resolvePortalIdentity())
     return browseClubs(data)
   })
-
-function clubLifecycleAction(
-  action: (input: { actorEmail: string; clubId: string }) => Promise<void>,
-) {
-  return createServerFn({ method: 'POST' })
-    .inputValidator(clubIdInput)
-    .handler(async ({ data }) =>
-      action({ ...data, actorEmail: await requireClubAdministrator() }),
-    )
-}
 
 async function requireClubAdministrator() {
   return requireClubAdministrationAuthority(await resolvePortalIdentity())
