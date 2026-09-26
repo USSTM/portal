@@ -53,3 +53,60 @@
 		header_up X-Forwarded-Proto {http.request.scheme}
 	}
 }
+
+api.inventory.usstm.ca {
+	log {
+		output stdout
+		format json
+	}
+
+	@loop header_regexp Via Caddy
+	respond @loop "Proxy loop detected" 508
+
+	header X-Request-ID {http.request.uuid}
+	header {
+		>Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
+		>Cross-Origin-Opener-Policy "same-origin"
+		>Permissions-Policy "camera=(), geolocation=(), microphone=()"
+		>Referrer-Policy "strict-origin-when-cross-origin"
+		>Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		>X-Content-Type-Options "nosniff"
+		>X-Frame-Options "DENY"
+	}
+	request_body {
+		max_size 1MB
+	}
+
+	reverse_proxy cv-backend-app:8080 {
+		header_up X-Request-ID {http.request.uuid}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
+	}
+}
+
+inventory.usstm.ca {
+	log {
+		output stdout
+		format json
+	}
+
+	@loop header_regexp Via Caddy
+	respond @loop "Proxy loop detected" 508
+
+	header X-Request-ID {http.request.uuid}
+	header {
+		>Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cv-backend-prod-bucket.s3.ca-central-1.amazonaws.com; connect-src 'self' https://api.inventory.usstm.ca; base-uri 'self'; object-src 'none'; frame-ancestors 'none'"
+		>Cross-Origin-Opener-Policy "same-origin"
+		>Permissions-Policy "camera=(), geolocation=(), microphone=()"
+		>Referrer-Policy "strict-origin-when-cross-origin"
+		>Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		>X-Content-Type-Options "nosniff"
+		>X-Frame-Options "DENY"
+	}
+
+	reverse_proxy cv-frontend-app:3000 {
+		header_up X-Request-ID {http.request.uuid}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
+	}
+}
