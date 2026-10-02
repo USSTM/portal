@@ -12,13 +12,21 @@ _Avoid_: User, account, club account
 A Member with at least one current grant who may sign in to the portal.
 _Avoid_: Enabled user, registered user
 
+**Member Profile**:
+The optional photo and short bio a Member maintains about themselves. It is public only while the Member is a Board Member, when the Website shows it on the current board, and private otherwise.
+_Avoid_: Person, exec profile, bio page
+
 **Deactivated Member**:
 A Member who can no longer sign in or hold grants but whose historical activity remains attributed to them.
 _Avoid_: Deleted user, removed account
 
 **Club**:
-An organization associated with USSTM whose events and other portal records may be managed by authorized Members. One Club, the USSTM Club, represents USSTM itself rather than an associated organization.
-_Avoid_: User, group account
+An organization associated with USSTM whose events and other portal records may be managed by authorized Members, and which is listed publicly on the Website. One Club, the USSTM Club, represents USSTM itself rather than an associated organization.
+_Avoid_: User, group account, student group
+
+**Club Profile**:
+The public image, description, type, and links shown for a Club on the Website. Members with that Club's Club Access and Administrators maintain it. Archived Clubs are not shown.
+_Avoid_: Student group page
 
 **USSTM Club**:
 The single protected Club representing USSTM. It cannot be archived or renamed, always holds Owning Club and Organizing Club eligibility, and is the Club Access every Administrator holds while they remain an Administrator.
@@ -40,8 +48,16 @@ _Avoid_: Board user, office-hours user
 The Administrator-managed organizational title displayed with a Board Member's name on the public Office Hours calendar.
 _Avoid_: Role, permission
 
+**Board Archive**:
+A frozen record of one academic year's board, listing each person's name and Board Position, kept only for public viewing on the Website. It refers to no Members, so past boards can be imported in the same form.
+_Avoid_: Board history, past members
+
+**Content Manager**:
+A Member authorized by an Administrator to build and edit Website Pages. It confers no authority over Members, Clubs, or other Portal records. Every Administrator holds Content Manager authority while they remain an Administrator.
+_Avoid_: Website editor, CMS user
+
 **Administrator**:
-A Member authorized to manage non-administrator Members, grants, Clubs, Events, Resources, and Bookings, and who holds USSTM Club Access for as long as they remain an Administrator. Only the Superuser may create or modify an Administrator or any grant belonging to one. An Administrator may also hold other Club Access or Board Member authority.
+A Member authorized to manage non-administrator Members, grants, Clubs, Events, Resources, Bookings, and Content Managers, and who holds USSTM Club Access for as long as they remain an Administrator. Only the Superuser may create or modify an Administrator or any grant belonging to one. An Administrator may also hold other Club Access or Board Member authority.
 _Avoid_: Superuser, root user
 
 **Superuser**:
@@ -85,3 +101,12 @@ _Avoid_: Document, content page
 **Audit Entry**:
 An immutable record attributing one privileged administrative change to an authenticated Member or the Superuser.
 _Avoid_: Activity, event, application log
+
+## Website
+
+**Website**:
+The public USSTM site, whose content Administrators edit. It shows Portal Events and Clubs without keeping its own copy of them.
+
+**Page**:
+A Website page made of content blocks and published at its slug.
+_Avoid_: Resource, content page
