@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# USSTM Portal - Production Deployment & Management Script
+# USSTM Portal & Website - Production Deployment & Management Script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
@@ -107,6 +107,7 @@ case "${COMMAND}" in
 
     echo "==> 4. Applying database schema migrations..."
     compose --profile operations run --rm --build migrate
+    compose --profile operations run --rm --build website-migrate
 
     echo "==> 5. Starting full application stack..."
     compose up -d --wait
@@ -125,6 +126,7 @@ case "${COMMAND}" in
     echo "==> Starting database and applying migrations..."
     compose up -d postgres
     compose --profile operations run --rm --build migrate
+    compose --profile operations run --rm --build website-migrate
     ;;
 
   restart)

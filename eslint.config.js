@@ -9,6 +9,8 @@ export default tseslint.config(
       '**/dist/**',
       '**/.output/**',
       '**/.nitro/**',
+      '**/.next/**',
+      'apps/website/**',
       '**/node_modules/**',
       'apps/portal/src/routeTree.gen.ts',
     ],

@@ -50,6 +50,18 @@ const environment = {
   PORTAL_SUPERUSER_EMAIL: 'admin@example.test',
   RESTIC_PASSWORD: 'deployment-test-encryption-key',
   RESTIC_REPOSITORY: '/test-repository',
+  PAYLOAD_SECRET: 'deployment-test-payload-secret',
+  S3_ACCESS_KEY_ID: 'deployment-test',
+  S3_BUCKET: 'usstm-website-media',
+  S3_ENDPOINT: 'https://s3.example.test',
+  S3_REGION: 'ca-central-1',
+  S3_SECRET_ACCESS_KEY: 'deployment-test',
+  WEBSITE_ADDRESS: 'https://website.localhost',
+  WEBSITE_DATABASE_NAME: 'usstm_website',
+  WEBSITE_DATABASE_PASSWORD: 'deployment-test-website',
+  WEBSITE_DATABASE_URI:
+    'postgresql://usstm_website:deployment-test-website@postgres:5432/usstm_website',
+  WEBSITE_DATABASE_USER: 'usstm_website',
 }
 
 const actors = {
@@ -424,6 +436,16 @@ test('operator command applies production database migrations', () => {
   assert.doesNotThrow(() =>
     compose('--profile', 'operations', 'run', '--rm', '--build', 'migrate'),
   )
+  assert.doesNotThrow(() =>
+    compose(
+      '--profile',
+      'operations',
+      'run',
+      '--rm',
+      '--build',
+      'website-migrate',
+    ),
+  )
 })
 
 test('every protected feature denies each actor without its current authority', async () => {
@@ -614,8 +636,13 @@ test('operator command writes an encrypted PostgreSQL backup to configured stora
     ),
   )
 
-  assert.equal(snapshots.length, 1)
-  assert.match(snapshots[0].paths[0], /^\/usstm-portal-.*\.dump$/)
+  assert.deepEqual(snapshots.map((snapshot) => snapshot.tags).sort(), [
+    ['usstm-portal'],
+    ['usstm-website'],
+  ])
+  const paths = snapshots.map((snapshot) => snapshot.paths[0]).sort()
+  assert.match(paths[0], /^\/usstm-portal-.*\.dump$/)
+  assert.match(paths[1], /^\/usstm-website-.*\.dump$/)
 })
 
 function structuredLogs(service) {

@@ -20,13 +20,14 @@ The USSTM Portal gives individuals explicit authority to act for USSTM and its a
 
 ## Repository Structure
 
-This repository is organized as a lightweight `pnpm` workspace:
+This repository is a `pnpm` workspace whose tasks are orchestrated by [Turborepo](https://turborepo.com) (see ADR-0019):
 
 ```text
 usstm-portal/
 ├── apps/
 │   ├── portal/            # Main web application (TanStack Start, React 19, Vite, Tailwind CSS v4, Drizzle ORM)
-│   └── auth/              # Dedicated authentication service (Hono, Arctic, Google OAuth)
+│   ├── auth/              # Dedicated authentication service (Hono, Arctic, Google OAuth)
+│   └── website/           # Public USSTM website (Next.js, Payload CMS); reads Events from the portal
 ├── packages/
 │   └── auth-session/      # Shared session token schemas and cryptographic verification routines
 ├── deployment/            # Production deployment tooling (Caddyfile, Docker Compose, Restic backups, deploy.sh)
@@ -94,7 +95,7 @@ Start the local PostgreSQL 17 container:
 pnpm db:up
 ```
 
-Run Drizzle database schema migrations:
+Run the Portal (Drizzle) and website (Payload) schema migrations:
 
 ```sh
 pnpm db:migrate
@@ -102,7 +103,7 @@ pnpm db:migrate
 
 ### 4. Start Development Servers
 
-Start both `@usstm/portal` and `@usstm/auth` concurrently in development mode:
+Copy `apps/website/.env.example` to `apps/website/.env` (set `DATABASE_URI` to your `POSTGRES_PORT` and fill `PAYLOAD_SECRET`). Then start `@usstm/portal`, `@usstm/auth`, and `@usstm/website` concurrently in development mode:
 
 ```sh
 pnpm dev
@@ -110,6 +111,7 @@ pnpm dev
 
 - **Portal Web App**: [http://localhost:3000](http://localhost:3000)
 - **Auth Service**: [http://localhost:3001](http://localhost:3001)
+- **Website**: [http://localhost:3002](http://localhost:3002) (Payload admin at `/admin`)
 
 ---
 
@@ -119,7 +121,7 @@ The root `package.json` provides scripts to manage all workspace packages:
 
 | Command                  | Description                                                                                   |
 | :----------------------- | :-------------------------------------------------------------------------------------------- |
-| `pnpm dev`               | Run `@usstm/portal` and `@usstm/auth` in parallel development mode                            |
+| `pnpm dev`               | Run `@usstm/portal`, `@usstm/auth`, and `@usstm/website` in parallel development mode         |
 | `pnpm build`             | Build all workspace applications for production                                               |
 | `pnpm lint`              | Lint code across all workspaces with ESLint                                                   |
 | `pnpm format`            | Check code formatting with Prettier                                                           |
@@ -128,7 +130,7 @@ The root `package.json` provides scripts to manage all workspace packages:
 | `pnpm test`              | Run unit tests across all workspaces with Vitest                                              |
 | `pnpm test:integration`  | Run workspace integration test suites                                                         |
 | `pnpm db:up`             | Spin up local PostgreSQL container via Docker Compose                                         |
-| `pnpm db:migrate`        | Apply pending Drizzle migrations to local database                                            |
+| `pnpm db:migrate`        | Apply pending Portal (Drizzle) and website (Payload) migrations                               |
 | `pnpm db:test:up`        | Spin up dedicated test database container                                                     |
 | `pnpm db:test:reset`     | Reset and re-seed the test database                                                           |
 | `pnpm ci`                | Run the complete CI verification pipeline (format, lint, typecheck, migrations, tests, build) |
@@ -165,7 +167,7 @@ This project enforces strict domain boundaries. Please refer to [`CONTEXT.md`](C
 
 ## Production Deployment
 
-The production stack runs Caddy (automated TLS reverse proxy), Portal (Nitro), Auth (Hono), PostgreSQL 17, and an automated restic nightly backup service on a single Docker host.
+The production stack runs Caddy (automated TLS reverse proxy), Portal (Nitro), Auth (Hono), Website (Next.js + Payload), PostgreSQL 17, and an automated restic nightly backup service on a single Docker host.
 
 To deploy or update production:
 

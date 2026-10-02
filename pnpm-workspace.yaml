@@ -3,6 +3,7 @@ packages:
   - packages/*
 allowBuilds:
   esbuild: true
+  sharp: true
   unrs-resolver: true
 patchedDependencies:
   nitro-nightly@4.0.0-20251010-091516-7cafddba: patches/nitro-nightly@4.0.0-20251010-091516-7cafddba.patch

@@ -1,12 +1,13 @@
 # Production deployment
 
-The production stack runs Caddy, the Portal, reusable auth, PostgreSQL, and the backup scheduler on one Docker host. Only Caddy publishes host ports. Caddy obtains and renews TLS certificates, sends `/auth/*` to auth, and sends all other traffic to the Portal.
+The production stack runs Caddy, the Portal, reusable auth, the public website (Payload CMS), PostgreSQL, and the backup scheduler on one Docker host. Only Caddy publishes host ports. Caddy obtains and renews TLS certificates. On `PORTAL_ADDRESS` it sends `/auth/*` to auth and all other traffic to the Portal. All of `WEBSITE_ADDRESS` goes to the website.
 
 ## Host prerequisites
 
 - A Linux host with Docker Engine and Docker Compose v2
 - TCP ports 80 and 443 reachable from the internet
-- A DNS A/AAAA record for the Portal pointing to the host
+- DNS A/AAAA records for the Portal and the website pointing to the host
+- An S3-compatible bucket for website media
 - An S3-compatible bucket or another [restic repository](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html) located off the host
 
 Copy `deployment/production.env.example` to a host-only file such as `/etc/usstm-portal/production.env`, fill every required value, and restrict it to the deployment operator. Do not commit that file. Generate the auth signing pair with `pnpm --filter @usstm/auth generate:session-key`; put the private JWK only in `AUTH_SESSION_PRIVATE_JWK` and the public JWK in `PORTAL_AUTH_PUBLIC_JWK`.
@@ -30,12 +31,33 @@ docker compose --env-file .env.production -f compose.production.yaml config --qu
 docker compose --env-file .env.production -f compose.production.yaml --profile operations build
 docker compose --env-file .env.production -f compose.production.yaml up -d postgres
 docker compose --env-file .env.production -f compose.production.yaml --profile operations run --rm --build migrate
+docker compose --env-file .env.production -f compose.production.yaml --profile operations run --rm --build website-migrate
 docker compose --env-file .env.production -f compose.production.yaml up -d --wait
 ```
 
 Compose rejects missing required configuration before creating containers. Auth also validates its client allowlist and signing key when it starts. Runtime secrets are injected into server containers; they are neither build arguments nor client-side Vite variables.
 
 Apply migrations before starting a new application release. The migration command is safe to rerun and reaches PostgreSQL only over the private database network.
+
+## Website database
+
+`deployment/postgres/init/01-website.sh` creates the `usstm_website` role and database, but only the first time PostgreSQL initialises an empty volume. On a host whose volume already exists, create them once by hand before the first website deploy:
+
+```sh
+docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml exec postgres \
+  psql -U "$DATABASE_USER" -d "$DATABASE_NAME" -v ON_ERROR_STOP=1 \
+  -c "CREATE ROLE usstm_website LOGIN PASSWORD '<WEBSITE_DATABASE_PASSWORD>'" \
+  -c "CREATE DATABASE usstm_website OWNER usstm_website"
+```
+
+To move existing content off Supabase:
+
+1. Restore a `pg_dump --no-owner --no-acl` of the old database into `usstm_website` as `usstm_website`.
+2. Run `website-migrate`, then confirm `pnpm --filter @usstm/website payload migrate:status` is clean.
+3. Point the `S3_*` variables at the media bucket.
+4. After cutover, rotate the old Supabase credentials.
+
+The old database still contains `events` tables; drop them once you have confirmed the website reads Events from the Portal.
 
 ## Health and logs
 
@@ -45,6 +67,7 @@ Check the public endpoints and container state:
 curl --fail https://portal.example.com/health/live
 curl --fail https://portal.example.com/health/ready
 curl --fail https://portal.example.com/auth/health/live
+curl --fail https://example.com/health/live
 docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml ps
 docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml logs --since 10m caddy portal auth
 ```
@@ -61,7 +84,7 @@ For a routine full-stack restart, use `docker compose ... restart`. PostgreSQL d
 
 ## Backups
 
-At 02:00 UTC every night, the backup container streams a custom-format `pg_dump` directly into restic. Restic encrypts and authenticates the snapshot before writing it to `RESTIC_REPOSITORY`. The repository password should be independent of the database password and stored in a separate secrets backup.
+At 02:00 UTC every night, the backup container streams a custom-format `pg_dump` of each database directly into restic, tagged `usstm-portal` and `usstm-website`. Restic encrypts and authenticates the snapshot before writing it to `RESTIC_REPOSITORY`. The repository password should be independent of the database password and stored in a separate secrets backup.
 
 Run a backup immediately and list snapshots with:
 

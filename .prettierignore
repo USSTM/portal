@@ -7,3 +7,9 @@ coverage
 old-*.md
 apps/portal/.cta.json
 apps/portal/public
+.turbo
+.next
+apps/website/src/payload-types.ts
+apps/website/src/migrations
+apps/website/src/app/(payload)
+apps/website/public

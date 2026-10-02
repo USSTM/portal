@@ -6,7 +6,7 @@
 	}
 }
 
-{$PORTAL_ADDRESS} {
+(common) {
 	log {
 		output stdout
 		format filter {
@@ -28,13 +28,20 @@
 	# Deferred (>) so these are the last word on the response, not stacked
 	# on top of whatever the upstream already set.
 	header {
-		>Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
 		>Cross-Origin-Opener-Policy "same-origin"
 		>Permissions-Policy "camera=(), geolocation=(), microphone=()"
 		>Referrer-Policy "strict-origin-when-cross-origin"
 		>Strict-Transport-Security "max-age=31536000; includeSubDomains"
 		>X-Content-Type-Options "nosniff"
 		>X-Frame-Options "DENY"
+	}
+}
+
+{$PORTAL_ADDRESS} {
+	import common
+
+	header {
+		>Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
 	}
 	request_body {
 		max_size 1MB
@@ -48,6 +55,26 @@
 	}
 
 	reverse_proxy portal:3000 {
+		header_up X-Request-ID {http.request.uuid}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
+	}
+}
+
+{$WEBSITE_ADDRESS} {
+	import common
+
+	# Payload serves media from the bucket through /api/media/file, so images
+	# stay same-origin. frame-src covers the hosts the Embed block is used with.
+	header {
+		>Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; frame-src https://www.youtube.com https://www.google.com; img-src 'self' data: blob:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+	}
+	# Admin media uploads.
+	request_body {
+		max_size 25MB
+	}
+
+	reverse_proxy website:3000 {
 		header_up X-Request-ID {http.request.uuid}
 		header_up X-Forwarded-Host {http.request.host}
 		header_up X-Forwarded-Proto {http.request.scheme}

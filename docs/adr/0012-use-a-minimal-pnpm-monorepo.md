@@ -5,3 +5,5 @@ The repository will use a plain pnpm workspace with `apps/portal` for TanStack S
 Within the portal, code is grouped into concrete feature folders for Events, Office Hours, Resources, administration, Account, and Contact, alongside small database, authentication, route, and shared-component areas. Features call Drizzle directly from authorized server functions. The design excludes controller-service-repository layering, dependency injection, command buses, generic CRUD frameworks, and speculative shared abstractions.
 
 Local development, CI, and production containers use Node.js 24 LTS. The root `packageManager` field pins pnpm, and the workspace commits one lockfile.
+
+_Amended by ADR-0019: Turborepo now coordinates workspace tasks. ADR-0018 adds `apps/website`._

@@ -8,29 +8,30 @@
     "pnpm": ">=11 <12"
   },
   "scripts": {
-    "dev": "pnpm --parallel --filter @usstm/auth --filter @usstm/portal dev",
+    "dev": "turbo run dev --filter=@usstm/auth --filter=@usstm/portal --filter=@usstm/website",
     "format": "prettier --check .",
     "format:write": "prettier --write .",
-    "lint": "pnpm -r --if-present lint",
-    "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
     "test:deployment": "node --test --test-concurrency=1 tests/deployment/production-stack.test.mjs tests/deployment/ssr-self-request.test.mjs tests/deployment/pg-externalization.test.mjs",
     "test:deployment:integration": "node --test tests/deployment/live-stack.integration.test.mjs",
-    "test:integration": "pnpm -r --if-present test:integration",
+    "test:integration": "turbo run test:integration",
     "db:up": "docker compose --env-file .env.local up -d postgres",
-    "db:migrate": "pnpm --filter @usstm/portal db:migrate",
+    "db:migrate": "pnpm --filter @usstm/portal db:migrate && pnpm --filter @usstm/website migrate",
     "db:test:up": "docker compose --env-file .env.test up -d postgres-test",
     "db:test:migrate": "bash -c 'set -a && source .env.test && set +a && pnpm --filter @usstm/portal db:migrate'",
     "db:test:reset": "bash -c 'set -a && source .env.test && set +a && pnpm --filter @usstm/portal db:test:reset'",
-    "build": "pnpm -r --if-present build",
+    "build": "turbo run build",
     "deploy:production": "./deployment/deploy.sh",
-    "ci": "pnpm format && pnpm lint && pnpm typecheck && pnpm db:migrate && pnpm test && pnpm test:integration && pnpm build && pnpm test:deployment && pnpm test:deployment:integration"
+    "ci": "pnpm format && turbo run lint typecheck test && pnpm db:migrate && turbo run test:integration build && pnpm test:deployment && pnpm test:deployment:integration"
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",
     "eslint": "9.39.5",
     "prettier": "3.9.5",
     "seroval": "1.5.5",
+    "turbo": "2.11.5",
     "typescript-eslint": "8.64.0"
   }
 }

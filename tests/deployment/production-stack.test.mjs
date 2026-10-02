@@ -5,6 +5,21 @@ import { fileURLToPath } from 'node:url'
 
 const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
 
+const websiteEnvironment = {
+  PAYLOAD_SECRET: 'deployment-test-payload-secret',
+  S3_ACCESS_KEY_ID: 'deployment-test',
+  S3_BUCKET: 'usstm-website-media',
+  S3_ENDPOINT: 'https://s3.example.test',
+  S3_REGION: 'ca-central-1',
+  S3_SECRET_ACCESS_KEY: 'deployment-test',
+  WEBSITE_ADDRESS: 'example.test',
+  WEBSITE_DATABASE_NAME: 'usstm_website',
+  WEBSITE_DATABASE_PASSWORD: 'secret',
+  WEBSITE_DATABASE_URI:
+    'postgresql://usstm_website:secret@postgres:5432/usstm_website',
+  WEBSITE_DATABASE_USER: 'usstm_website',
+}
+
 function productionConfig() {
   const output = execFileSync(
     'docker',
@@ -42,6 +57,7 @@ function productionConfig() {
         PORTAL_SUPERUSER_EMAIL: 'admin@example.test',
         RESTIC_PASSWORD: 'deployment-test-encryption-key',
         RESTIC_REPOSITORY: 's3:s3.example.test/usstm-backups',
+        ...websiteEnvironment,
       },
     },
   )
@@ -93,4 +109,28 @@ test('production stack operates the public proxy, Portal, auth, and database sep
   ])
   assert.equal(config.services.migrate.build.target, 'migrate')
   assert.deepEqual(config.services.migrate.profiles, ['operations'])
+})
+
+test('production stack runs the website beside the Portal with its own migrations', () => {
+  const config = productionConfig()
+  const { postgres, website } = config.services
+
+  assert.ok(website)
+  assert.equal(website.ports, undefined)
+  assert.equal(website.restart, 'unless-stopped')
+  assert.ok(website.healthcheck)
+  assert.deepEqual(Object.keys(website.networks).sort(), [
+    'application',
+    'database',
+  ])
+  // Payload owns its own database, never the Portal's.
+  assert.match(website.environment.DATABASE_URI, /\/usstm_website$/)
+  assert.ok(
+    postgres.volumes.some(
+      (volume) => volume.target === '/docker-entrypoint-initdb.d',
+    ),
+  )
+
+  assert.equal(config.services['website-migrate'].build.target, 'migrate')
+  assert.deepEqual(config.services['website-migrate'].profiles, ['operations'])
 })

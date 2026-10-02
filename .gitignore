@@ -12,3 +12,6 @@ test-results
 apps/portal/routeTree.gen.ts
 .DS_Store
 .scratch/legacy-export/
+.turbo
+.next
+apps/website/media

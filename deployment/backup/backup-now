@@ -7,6 +7,7 @@ required=(
   DATABASE_USER
   RESTIC_PASSWORD
   RESTIC_REPOSITORY
+  WEBSITE_DATABASE_NAME
 )
 
 for name in "${required[@]}"; do
@@ -23,15 +24,23 @@ if ! restic snapshots --no-cache >/dev/null 2>&1; then
 fi
 
 timestamp="$(date -u +%Y-%m-%dT%H-%M-%SZ)"
-pg_dump \
-  --dbname "$DATABASE_NAME" \
-  --format custom \
-  --host postgres \
-  --no-acl \
-  --no-owner \
-  --username "$DATABASE_USER" |
-  restic backup \
-    --no-cache \
-    --stdin \
-    --stdin-filename "/usstm-portal-${timestamp}.dump" \
-    --tag usstm-portal
+
+# database name -> snapshot tag
+backup_database() {
+  local database="$1" tag="$2"
+  pg_dump \
+    --dbname "$database" \
+    --format custom \
+    --host postgres \
+    --no-acl \
+    --no-owner \
+    --username "$DATABASE_USER" |
+    restic backup \
+      --no-cache \
+      --stdin \
+      --stdin-filename "/${tag}-${timestamp}.dump" \
+      --tag "$tag"
+}
+
+backup_database "$DATABASE_NAME" usstm-portal
+backup_database "$WEBSITE_DATABASE_NAME" usstm-website
