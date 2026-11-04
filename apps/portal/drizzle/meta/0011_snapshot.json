@@ -27,13 +27,9 @@
         "administrators_member_id_members_id_fk": {
           "name": "administrators_member_id_members_id_fk",
           "tableFrom": "administrators",
-          "columnsFrom": [
-            "member_id"
-          ],
+          "columnsFrom": ["member_id"],
           "tableTo": "members",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "restrict"
         }
@@ -130,13 +126,9 @@
         "board_members_member_id_members_id_fk": {
           "name": "board_members_member_id_members_id_fk",
           "tableFrom": "board_members",
-          "columnsFrom": [
-            "member_id"
-          ],
+          "columnsFrom": ["member_id"],
           "tableTo": "members",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "restrict"
         }
@@ -210,26 +202,18 @@
         "bookings_member_id_members_id_fk": {
           "name": "bookings_member_id_members_id_fk",
           "tableFrom": "bookings",
-          "columnsFrom": [
-            "member_id"
-          ],
+          "columnsFrom": ["member_id"],
           "tableTo": "members",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "restrict"
         },
         "bookings_shift_slot_id_shift_slots_id_fk": {
           "name": "bookings_shift_slot_id_shift_slots_id_fk",
           "tableFrom": "bookings",
-          "columnsFrom": [
-            "shift_slot_id"
-          ],
+          "columnsFrom": ["shift_slot_id"],
           "tableTo": "shift_slots",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "restrict"
         }
@@ -238,11 +222,7 @@
       "uniqueConstraints": {
         "bookings_member_date_slot_unique": {
           "name": "bookings_member_date_slot_unique",
-          "columns": [
-            "member_id",
-            "date",
-            "shift_slot_id"
-          ],
+          "columns": ["member_id", "date", "shift_slot_id"],
           "nullsNotDistinct": false
         }
       },
@@ -272,26 +252,18 @@
         "club_access_member_id_members_id_fk": {
           "name": "club_access_member_id_members_id_fk",
           "tableFrom": "club_access",
-          "columnsFrom": [
-            "member_id"
-          ],
+          "columnsFrom": ["member_id"],
           "tableTo": "members",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "restrict"
         },
         "club_access_club_id_clubs_id_fk": {
           "name": "club_access_club_id_clubs_id_fk",
           "tableFrom": "club_access",
-          "columnsFrom": [
-            "club_id"
-          ],
+          "columnsFrom": ["club_id"],
           "tableTo": "clubs",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "restrict"
         }
@@ -299,10 +271,7 @@
       "compositePrimaryKeys": {
         "club_access_member_id_club_id_pk": {
           "name": "club_access_member_id_club_id_pk",
-          "columns": [
-            "member_id",
-            "club_id"
-          ]
+          "columns": ["member_id", "club_id"]
         }
       },
       "uniqueConstraints": {},
@@ -375,9 +344,7 @@
       "uniqueConstraints": {
         "clubs_short_name_unique": {
           "name": "clubs_short_name_unique",
-          "columns": [
-            "short_name"
-          ],
+          "columns": ["short_name"],
           "nullsNotDistinct": false
         }
       },
@@ -420,26 +387,18 @@
         "event_organizers_event_id_events_id_fk": {
           "name": "event_organizers_event_id_events_id_fk",
           "tableFrom": "event_organizers",
-          "columnsFrom": [
-            "event_id"
-          ],
+          "columnsFrom": ["event_id"],
           "tableTo": "events",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "event_organizers_club_id_clubs_id_fk": {
           "name": "event_organizers_club_id_clubs_id_fk",
           "tableFrom": "event_organizers",
-          "columnsFrom": [
-            "club_id"
-          ],
+          "columnsFrom": ["club_id"],
           "tableTo": "clubs",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "restrict"
         }
@@ -447,10 +406,7 @@
       "compositePrimaryKeys": {
         "event_organizers_event_id_club_id_pk": {
           "name": "event_organizers_event_id_club_id_pk",
-          "columns": [
-            "event_id",
-            "club_id"
-          ]
+          "columns": ["event_id", "club_id"]
         }
       },
       "uniqueConstraints": {},
@@ -543,39 +499,27 @@
         "events_owning_club_id_clubs_id_fk": {
           "name": "events_owning_club_id_clubs_id_fk",
           "tableFrom": "events",
-          "columnsFrom": [
-            "owning_club_id"
-          ],
+          "columnsFrom": ["owning_club_id"],
           "tableTo": "clubs",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "restrict"
         },
         "events_creator_member_id_members_id_fk": {
           "name": "events_creator_member_id_members_id_fk",
           "tableFrom": "events",
-          "columnsFrom": [
-            "creator_member_id"
-          ],
+          "columnsFrom": ["creator_member_id"],
           "tableTo": "members",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         },
         "events_last_editor_member_id_members_id_fk": {
           "name": "events_last_editor_member_id_members_id_fk",
           "tableFrom": "events",
-          "columnsFrom": [
-            "last_editor_member_id"
-          ],
+          "columnsFrom": ["last_editor_member_id"],
           "tableTo": "members",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "set null"
         }
@@ -659,9 +603,7 @@
       "uniqueConstraints": {
         "members_email_unique": {
           "name": "members_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "nullsNotDistinct": false
         }
       },
@@ -789,10 +731,7 @@
       "uniqueConstraints": {
         "shift_slots_start_end_unique": {
           "name": "shift_slots_start_end_unique",
-          "columns": [
-            "start_time",
-            "end_time"
-          ],
+          "columns": ["start_time", "end_time"],
           "nullsNotDistinct": false
         }
       },
@@ -810,26 +749,17 @@
     "public.club_lifecycle": {
       "name": "club_lifecycle",
       "schema": "public",
-      "values": [
-        "active",
-        "archived"
-      ]
+      "values": ["active", "archived"]
     },
     "public.member_lifecycle": {
       "name": "member_lifecycle",
       "schema": "public",
-      "values": [
-        "active",
-        "deactivated"
-      ]
+      "values": ["active", "deactivated"]
     },
     "public.resource_category": {
       "name": "resource_category",
       "schema": "public",
-      "values": [
-        "finance",
-        "operations"
-      ]
+      "values": ["finance", "operations"]
     }
   },
   "schemas": {},

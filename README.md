@@ -82,6 +82,7 @@ Configure Google OAuth in `AUTH_CLIENTS` within `.env.local`:
 - Set Authorized JavaScript origins to `http://localhost:3000`.
 - Set Authorized redirect URI to `http://localhost:3001/auth/callback/google`.
 - Update `clientId` and `clientSecret` in the `AUTH_CLIENTS` JSON array.
+- To sign in to the Website admin at `http://localhost:3002/admin`, also add `http://localhost:3002/auth/callback` as a redirect URI. The `website` client in `.env.example` uses it. Next.js proxies `/auth/*` to the auth service in development, so set `AUTH_TRUST_PROXY=true` for the auth service to see the Website origin.
 
 #### Superuser Setup
 

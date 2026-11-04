@@ -9,13 +9,16 @@ import {
   boardMembers,
   clubAccess,
   clubs,
+  contentManagers,
   members,
 } from '../db/schema.js'
 
 export interface MemberAccount {
   email: string
   displayName: string
-  grants: Array<'Club Access' | 'Board Member' | 'Administrator'>
+  grants: Array<
+    'Club Access' | 'Board Member' | 'Content Manager' | 'Administrator'
+  >
   clubs: Array<{ id: string; shortName: string; fullName: string }>
   boardPosition: string | null
 }
@@ -26,6 +29,7 @@ interface MemberAccountInput {
   administrator: boolean
   boardPosition: string | null
   clubs: Array<{ id: string; shortName: string; fullName: string }>
+  contentManager: boolean
 }
 
 export type PortalShell =
@@ -48,6 +52,10 @@ export function projectMemberAccount(input: MemberAccountInput): MemberAccount {
   const grants: MemberAccount['grants'] = []
   if (input.clubs.length > 0) grants.push('Club Access')
   if (input.boardPosition) grants.push('Board Member')
+  // Administrators hold Content Manager authority implicitly (ADR-0020).
+  if (input.contentManager || input.administrator) {
+    grants.push('Content Manager')
+  }
   if (input.administrator) grants.push('Administrator')
 
   return {
@@ -91,10 +99,12 @@ export const getPortalShell = createServerFn({ method: 'GET' }).handler(() =>
         clubId: clubs.id,
         clubShortName: clubs.shortName,
         clubFullName: clubs.fullName,
+        contentManagerId: contentManagers.memberId,
       })
       .from(members)
       .leftJoin(administrators, eq(administrators.memberId, members.id))
       .leftJoin(boardMembers, eq(boardMembers.memberId, members.id))
+      .leftJoin(contentManagers, eq(contentManagers.memberId, members.id))
       .leftJoin(clubAccess, eq(clubAccess.memberId, members.id))
       .leftJoin(clubs, eq(clubs.id, clubAccess.clubId))
       .where(eq(members.email, identity.email))
@@ -108,6 +118,7 @@ export const getPortalShell = createServerFn({ method: 'GET' }).handler(() =>
       displayName: firstGrant.displayName,
       administrator: firstGrant.administratorId !== null,
       boardPosition: firstGrant.boardPosition,
+      contentManager: firstGrant.contentManagerId !== null,
       clubs: grants.flatMap((grant) =>
         grant.clubId && grant.clubShortName && grant.clubFullName
           ? [

@@ -13,6 +13,9 @@ const websiteEnvironment = {
   S3_REGION: 'ca-central-1',
   S3_SECRET_ACCESS_KEY: 'deployment-test',
   WEBSITE_ADDRESS: 'example.test',
+  WEBSITE_AUTH_ISSUER: 'usstm-auth',
+  WEBSITE_AUTH_KEY_ID: 'current',
+  WEBSITE_AUTH_PUBLIC_JWK: '{}',
   WEBSITE_DATABASE_NAME: 'usstm_website',
   WEBSITE_DATABASE_PASSWORD: 'secret',
   WEBSITE_DATABASE_URI:
@@ -54,6 +57,11 @@ function productionConfig() {
         PORTAL_CONTACT_INSTAGRAM: 'https://instagram.com/example',
         PORTAL_CONTACT_LINKTREE: 'https://linktr.ee/example',
         PORTAL_CONTACT_WEBSITE: 'https://example.test',
+        PORTAL_S3_ACCESS_KEY_ID: 'deployment-test',
+        PORTAL_S3_BUCKET: 'usstm-portal-images',
+        PORTAL_S3_ENDPOINT: 'https://s3.example.test',
+        PORTAL_S3_REGION: 'ca-central-1',
+        PORTAL_S3_SECRET_ACCESS_KEY: 'deployment-test',
         PORTAL_SUPERUSER_EMAIL: 'admin@example.test',
         RESTIC_PASSWORD: 'deployment-test-encryption-key',
         RESTIC_REPOSITORY: 's3:s3.example.test/usstm-backups',
@@ -123,6 +131,12 @@ test('production stack runs the website beside the Portal with its own migration
     'application',
     'database',
   ])
+  // Content Managers sign in with the shared auth service's public key and
+  // confirm their authority with the Portal over the private network.
+  assert.equal(website.environment.WEBSITE_AUTH_ISSUER, 'usstm-auth')
+  assert.equal(website.environment.WEBSITE_AUTH_KEY_ID, 'current')
+  assert.equal(website.environment.WEBSITE_AUTH_PUBLIC_JWK, '{}')
+  assert.equal(website.environment.PORTAL_PUBLIC_URL, 'http://portal:3000')
   // Payload owns its own database, never the Portal's.
   assert.match(website.environment.DATABASE_URI, /\/usstm_website$/)
   assert.ok(

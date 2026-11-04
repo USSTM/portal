@@ -26,11 +26,18 @@ export async function browseAuditHistory(input: AuditHistoryInput) {
     input.actorEmail
       ? ilike(auditEntries.actorEmail, `%${input.actorEmail.trim()}%`)
       : undefined,
-    input.action ? ilike(auditEntries.action, `%${input.action.trim()}%`) : undefined,
-  ].filter((filter): filter is NonNullable<typeof filter> => filter !== undefined)
+    input.action
+      ? ilike(auditEntries.action, `%${input.action.trim()}%`)
+      : undefined,
+  ].filter(
+    (filter): filter is NonNullable<typeof filter> => filter !== undefined,
+  )
   const where = filters.length > 0 ? and(...filters) : undefined
   const db = getDb()
-  const [{ total }] = await db.select({ total: count() }).from(auditEntries).where(where)
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(auditEntries)
+    .where(where)
   const entries = await db
     .select()
     .from(auditEntries)

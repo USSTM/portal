@@ -1,7 +1,7 @@
 # USSTM Portal Privacy Policy
 
 **Effective Date:** September 4, 2026  
-**Last Updated:** September 4, 2026  
+**Last Updated:** October 29, 2026
 
 ---
 
@@ -10,6 +10,7 @@
 The **Undergraduate Science Society of TMU ("USSTM", "we", "us", or "our")** operates the **USSTM Portal** (the "Portal"), serving students and academic clubs at Toronto Metropolitan University (40 Gould Street, Toronto, Ontario, Canada).
 
 The USSTM Portal is an administrative and governance platform designed to:
+
 - Grant authorized individuals explicit authority to act on behalf of USSTM and affiliated science clubs and student organizations without using shared accounts.
 - Publish scheduled student events through an open public calendar and API.
 - Maintain an open Office Hours drop-in schedule for science students to connect with USSTM Board Members.
@@ -36,36 +37,48 @@ The USSTM Portal is intentionally built with strict **data minimization**, **zer
 The information processed by the Portal depends on your role and how you interact with the service:
 
 ### A. Public Visitors and Students
+
 If you visit the public-facing pages of the Portal or consume our public API:
+
 - **Technical Access Logs:** Standard web server access logs (HTTP method, requested URL, response status, user agent, IP address, and internal request IDs) strictly for operational reliability, abuse mitigation, and security diagnostics.
 - **No Tracking Cookies:** Visitors browsing public pages do not receive advertising, profiling, or tracking cookies.
 
 ### B. Authenticated Members (Students & Representatives with Portal Grants)
+
 When an admitted Member signs in using Google OAuth:
+
 - **Google Identity Information:**
   - **Verified Email Address:** Provided by Google's OpenID Connect user-info endpoint.
   - **Email Verification Status:** Confirming that the email address is actively verified by Google.
-  - *Note on Google Tokens:* Google OAuth access tokens are held transiently in server memory solely to verify your email address with Google during login, after which they are immediately discarded. We never store Google access tokens or refresh tokens in our database.
+  - _Note on Google Tokens:_ Google OAuth access tokens are held transiently in server memory solely to verify your email address with Google during login, after which they are immediately discarded. We never store Google access tokens or refresh tokens in our database.
 - **Member Profile Data (Configured by Administrators):**
   - **Display Name:** Your chosen or official public name (e.g., "Jane Doe").
   - **Normalized Email Address:** Used as the unique identifier to grant access.
   - **Account Lifecycle Status:** `active` or `deactivated`.
   - **Authorization Grants:** Specific organizational authority designations, including:
-    - *Club Access:* Associations with designated student clubs (e.g., Biology Course Union, Chemistry Society).
-    - *Board Member Status:* Your official executive or board title (e.g., "Vice President of Finance", "Director of Communications").
-    - *Administrator Status:* Authority to manage members, clubs, resources, and events.
+    - _Club Access:_ Associations with designated student clubs (e.g., Biology Course Union, Chemistry Society).
+    - _Board Member Status:_ Your official executive or board title (e.g., "Vice President of Finance", "Director of Communications").
+    - _Administrator Status:_ Authority to manage members, clubs, resources, and events.
+- **Member Profile (Optional, Self-Managed):**
+  - **Photo:** A JPEG, PNG, or WebP image of up to 2 MB, stored in a private object storage bucket.
+  - **Bio:** A short description of up to 500 characters.
+  - Only you can add, replace, or remove your own photo and bio. Administrators cannot edit them. Edits to your own Member Profile are not recorded in the administrative audit log.
+  - _Public Visibility:_ Your Member Profile is public **only while you are a Board Member**, when your photo and bio may appear alongside your Display Name and Board Position on the USSTM website. While you are not a Board Member, it is visible only to you.
 
 ### C. Office Hours & Calendar Bookings
+
 - **Booking Records:** When a Board Member reserves an Office Hours shift, the system records the date, time slot, and a snapshot of the Member's **Display Name** and **Board Position**.
-- *Public Visibility:* The current and upcoming week's Office Hours calendar is publicly visible to all visitors so that TMU students know when student leaders are available in person for drop-in support.
+- _Public Visibility:_ The current and upcoming week's Office Hours calendar is publicly visible to all visitors so that TMU students know when student leaders are available in person for drop-in support.
 
 ### D. Club & Event Management Data
+
 - **Club Information:** Club short name, full name, and club contact email address.
 - **Event Listings:** Event title, description, start and end timestamps, physical location (e.g., campus room or address), owning club, and collaborating organizing clubs.
-- *Public Exposure:* Event listings have no draft state; when created, event details are immediately published to the unauthenticated public Events API (`GET /api/v1/events`) for consumption by student-facing feeds and campus screens.
-- *Internal Attribution:* The system records the creating and editing Member IDs for internal accountability. This personal attribution is **confidential and strictly excluded** from the public Events API.
+- _Public Exposure:_ Event listings have no draft state; when created, event details are immediately published to the unauthenticated public Events API (`GET /api/v1/events`) for consumption by student-facing feeds and campus screens.
+- _Internal Attribution:_ The system records the creating and editing Member IDs for internal accountability. This personal attribution is **confidential and strictly excluded** from the public Events API.
 
 ### E. Administrative Audit Logs
+
 - Under our institutional governance architecture (ADR 0010), privileged administrative mutations (such as adding or modifying members, assigning board positions, or archiving clubs) generate an immutable audit log entry.
 - **Audit Data Collected:** `actorEmail` (email of the administrator taking the action), `action`, `targetType`, `targetId`, `changedValues` (JSON diff of modified fields), and the exact timestamp.
 
@@ -101,10 +114,10 @@ The USSTM Portal complies with the **Google API Services User Data Policy**, inc
 
 The Portal uses only strictly necessary, functional cookies to support authentication and security:
 
-| Cookie Name / Type | Purpose | Lifespan | Scope |
-| :--- | :--- | :--- | :--- |
-| **Session Cookie** (e.g., `usstm_portal_session`) | Asymmetrically signed JSON Web Token (JWT) verifying your authenticated email and authority. | 8 hours (Strictly enforced, non-sliding) | Host-only, `HttpOnly`, `Secure`, `SameSite=Lax` |
-| **OAuth State / PKCE Cookies** | Temporary cryptographic nonce and code verifier to prevent Cross-Site Request Forgery (CSRF) during the Google sign-in flow. | Single sign-in attempt (Minutes) | Host-only, `HttpOnly`, `Secure` |
+| Cookie Name / Type                                | Purpose                                                                                                                      | Lifespan                                 | Scope                                           |
+| :------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------- | :---------------------------------------------- |
+| **Session Cookie** (e.g., `usstm_portal_session`) | Asymmetrically signed JSON Web Token (JWT) verifying your authenticated email and authority.                                 | 8 hours (Strictly enforced, non-sliding) | Host-only, `HttpOnly`, `Secure`, `SameSite=Lax` |
+| **OAuth State / PKCE Cookies**                    | Temporary cryptographic nonce and code verifier to prevent Cross-Site Request Forgery (CSRF) during the Google sign-in flow. | Single sign-in attempt (Minutes)         | Host-only, `HttpOnly`, `Secure`                 |
 
 We **do not** use cookies for analytics, tracking across third-party websites, or advertising.
 
@@ -116,6 +129,7 @@ We do not sell, rent, lease, or monetize your personal information. We disclose 
 
 1. **Publicly Visible Operational Features:**
    - **Office Hours Calendar:** Board Members' display names and board titles are visible to anyone viewing the Office Hours schedule.
+   - **Board Member Profiles:** While you are a Board Member, your Member Profile photo and bio may be shown with your display name and board title on the USSTM website. No email address or other personal data is published with them.
    - **Public Events API:** Event titles, descriptions, schedules, locations, and participating club names are publicly exposed at `/api/v1/events` for integration with external campus calendars and student displays.
 2. **Internal USSTM Administration:**
    - Authorized Administrators and the deployment Superuser can view member rosters, club associations, and administrative audit logs for governance purposes.
@@ -138,9 +152,10 @@ Under our institutional records architecture ([ADR 0006](file:///docs/adr/0006-d
      - The individual is immediately blocked from signing in.
      - All active authorization grants (Club Access, Board Member, Administrator) are revoked.
      - Any future Office Hours bookings are automatically canceled.
+     - Your Member Profile stops being public, because deactivation revokes Board Member authority. It is kept privately and is never published while you are deactivated.
    - **Retention of Historical Records:**
      - Historical Office Hours shift bookings, event authorship records, and administrative audit entries remain intact.
-     - *Rationale:* Maintaining historical attribution is necessary for student union financial transparency, governance accountability, and audit compliance.
+     - _Rationale:_ Maintaining historical attribution is necessary for student union financial transparency, governance accountability, and audit compliance.
 2. **Past Booking Snapshots:**
    - Bookings retain a static snapshot of the Member's Display Name and Board Position at the time the booking was made. Subsequent name or role updates apply only to future bookings, ensuring historical calendars remain accurate.
 3. **Server Diagnostics & Backups:**
@@ -171,10 +186,11 @@ Under Canadian privacy legislation and USSTM governance standards, you have righ
 
 **USSTM Technology & Operations Team**  
 Undergraduate Science Society of TMU  
-40 Gould Street, Toronto, ON M5B 2K3, Canada  
-- **Support Email:** Contact the USSTM Tech Team via your administrator or check the [Contact Us](file:///apps/portal/src/routes/contact.tsx) page in the Portal.  
-- **Website:** [USSTM Official Website](https://usstm.ca)  
-- **Instagram:** [@usstmu](https://www.instagram.com/usstmu)  
+40 Gould Street, Toronto, ON M5B 2K3, Canada
+
+- **Support Email:** Contact the USSTM Tech Team via your administrator or check the [Contact Us](file:///apps/portal/src/routes/contact.tsx) page in the Portal.
+- **Website:** [USSTM Official Website](https://usstm.ca)
+- **Instagram:** [@usstmu](https://www.instagram.com/usstmu)
 
 ---
 

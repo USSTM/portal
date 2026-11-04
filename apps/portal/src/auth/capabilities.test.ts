@@ -38,6 +38,11 @@ describe('navigationForCapabilities', () => {
         description: 'Create and manage events for your club.',
       },
       {
+        label: 'Club Profiles',
+        to: '/club-profiles',
+        description: 'Edit how your club appears on the USSTM website.',
+      },
+      {
         label: 'Club Access',
         to: '/account',
         hash: 'clubs',
@@ -153,6 +158,11 @@ describe('navigationForCapabilities', () => {
         label: 'Events',
         to: '/events',
         description: 'Create and manage events for your club.',
+      },
+      {
+        label: 'Club Profiles',
+        to: '/club-profiles',
+        description: 'Edit how your club appears on the USSTM website.',
       },
       {
         label: 'Office Hours',

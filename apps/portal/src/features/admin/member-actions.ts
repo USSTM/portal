@@ -16,13 +16,14 @@ import {
 import { requireAdministratorManagementAuthority } from './authorization.js'
 
 const memberId = z.string().uuid()
-const clubIds = z.array(z.string().uuid()).min(1)
+const clubIds = z.array(z.string().uuid())
 
 export const createMemberAction = createServerFn({ method: 'POST' })
   .inputValidator(
     z.object({
       administrator: z.boolean().optional(),
-      clubIds: z.array(z.string().uuid()),
+      clubIds,
+      contentManager: z.boolean().optional(),
       displayName: z.string().trim().min(1).max(200),
       email: z.string().email(),
     }),
@@ -76,7 +77,13 @@ export const deactivateMemberAction = createServerFn({ method: 'POST' })
   )
 
 export const reactivateMemberAction = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({ clubIds, memberId }))
+  .inputValidator(
+    z
+      .object({ clubIds, contentManager: z.boolean().optional(), memberId })
+      .refine((data) => data.clubIds.length > 0 || data.contentManager, {
+        message: 'At least one grant is required',
+      }),
+  )
   .handler(async ({ data }) =>
     reactivateMember({
       ...data,

@@ -44,7 +44,7 @@
 		>Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
 	}
 	request_body {
-		max_size 1MB
+		max_size 3MB
 	}
 
 	@auth path /auth/*
@@ -72,6 +72,15 @@
 	# Admin media uploads.
 	request_body {
 		max_size 25MB
+	}
+
+	# Content Managers sign in to /admin through the shared auth service, which
+	# sets a host-only session cookie on this origin (ADR-0008).
+	@auth path /auth/*
+	reverse_proxy @auth auth:3001 {
+		header_up X-Request-ID {http.request.uuid}
+		header_up X-Forwarded-Host {http.request.host}
+		header_up X-Forwarded-Proto {http.request.scheme}
 	}
 
 	reverse_proxy website:3000 {

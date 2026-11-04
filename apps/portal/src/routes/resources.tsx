@@ -15,9 +15,12 @@ function Resources() {
   return (
     <>
       <header className="mb-10">
-        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2 tracking-tight">Resources Center</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2 tracking-tight">
+          Resources Center
+        </h1>
         <p className="text-lg text-muted-foreground max-w-3xl">
-          Access essential documents, guidelines, and portals to support your academic and administrative workflows within the Science Society.
+          Access essential documents, guidelines, and portals to support your
+          academic and administrative workflows within the Science Society.
         </p>
       </header>
 
@@ -26,7 +29,7 @@ function Resources() {
           (resource) => resource.category === category,
         )
         const Icon = category === 'finance' ? Landmark : HardHat
-        
+
         return (
           <section className="mb-12" key={category}>
             <div className="flex items-center gap-3 mb-6 border-b border-border pb-2">
@@ -35,7 +38,7 @@ function Resources() {
                 {category === 'finance' ? 'Finance' : 'Operations'}
               </h2>
             </div>
-            
+
             <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {entries.map((resource) => (
                 <li key={resource.id}>

@@ -8,6 +8,7 @@ import {
   auditEntries,
   boardMembers,
   clubAccess,
+  contentManagers,
   members,
 } from '../../db/schema.js'
 import {
@@ -124,7 +125,12 @@ export async function revokeBoardAuthority(input: BoardMemberInput) {
       .select({ total: count() })
       .from(clubAccess)
       .where(eq(clubAccess.memberId, input.memberId))
-    if (clubGrantCount === 0) {
+    const [{ total: contentManagerGrantCount }] = await tx
+      .select({ total: count() })
+      .from(contentManagers)
+      .where(eq(contentManagers.memberId, input.memberId))
+    const remainingGrants = clubGrantCount + contentManagerGrantCount
+    if (remainingGrants === 0) {
       await tx
         .update(members)
         .set({ lifecycle: 'deactivated', updatedAt: new Date() })
@@ -137,7 +143,7 @@ export async function revokeBoardAuthority(input: BoardMemberInput) {
       input.memberId,
       {
         cancelledFutureBookings,
-        deactivated: clubGrantCount === 0,
+        deactivated: remainingGrants === 0,
       },
     )
   })

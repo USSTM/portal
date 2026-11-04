@@ -397,15 +397,6 @@ export const Pages: CollectionConfig = {
                       },
                     },
                     {
-                      name: 'people',
-                      type: 'relationship',
-                      relationTo: 'people',
-                      hasMany: true,
-                      admin: {
-                        description: 'Select people to display',
-                      },
-                    },
-                    {
                       name: 'columns',
                       type: 'select',
                       defaultValue: '3',
@@ -414,14 +405,36 @@ export const Pages: CollectionConfig = {
                         { label: '3 Columns', value: '3' },
                         { label: '4 Columns', value: '4' },
                       ],
-                    },
-                    {
-                      name: 'showContactInfo',
-                      type: 'checkbox',
-                      defaultValue: true,
                       admin: {
                         description:
-                          'Show contact information for team members',
+                          'Shows the current board from the Portal, in the order Administrators set there.',
+                      },
+                    },
+                  ],
+                },
+                {
+                  slug: 'pastBoards',
+                  labels: {
+                    singular: 'Past Boards Block',
+                    plural: 'Past Boards Blocks',
+                  },
+                  fields: [
+                    {
+                      name: 'heading',
+                      type: 'text',
+                      admin: {
+                        description: 'Past boards section heading',
+                      },
+                    },
+                    {
+                      name: 'limit',
+                      type: 'number',
+                      min: 1,
+                      max: 50,
+                      admin: {
+                        description:
+                          'Most recent academic years to show; leave empty for all. Past boards come from the Portal’s Board Archives.',
+                        step: 1,
                       },
                     },
                   ],
@@ -501,6 +514,43 @@ export const Pages: CollectionConfig = {
                       defaultValue: true,
                       admin: {
                         description: 'Show event dates',
+                      },
+                    },
+                  ],
+                },
+                {
+                  slug: 'clubsDirectory',
+                  labels: {
+                    singular: 'Clubs Directory Block',
+                    plural: 'Clubs Directory Blocks',
+                  },
+                  fields: [
+                    {
+                      name: 'heading',
+                      type: 'text',
+                      admin: {
+                        description: 'Clubs section heading',
+                      },
+                    },
+                    {
+                      name: 'description',
+                      type: 'textarea',
+                      admin: {
+                        description: 'Optional introduction above the clubs',
+                      },
+                    },
+                    {
+                      name: 'clubType',
+                      type: 'select',
+                      defaultValue: 'all',
+                      options: [
+                        { label: 'All clubs', value: 'all' },
+                        { label: 'Student Groups', value: 'student_group' },
+                        { label: 'Course Unions', value: 'course_union' },
+                      ],
+                      admin: {
+                        description:
+                          'Clubs and their profiles come from the Portal, where Club members edit them.',
                       },
                     },
                   ],

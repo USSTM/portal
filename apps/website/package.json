@@ -16,6 +16,8 @@
     "migrate": "NODE_OPTIONS=--no-deprecation payload migrate",
     "migrate:create": "NODE_OPTIONS=--no-deprecation payload migrate:create",
     "payload": "NODE_OPTIONS=--no-deprecation payload",
+    "export:board-history": "NODE_OPTIONS=--no-deprecation tsx scripts/export-board-history.ts",
+    "export:student-groups": "NODE_OPTIONS=--no-deprecation tsx scripts/export-student-groups.ts",
     "seed:faq": "tsx scripts/seed-faq.ts"
   },
   "dependencies": {
@@ -25,6 +27,7 @@
     "@payloadcms/storage-s3": "3.90.2",
     "@payloadcms/ui": "3.90.2",
     "@radix-ui/react-accordion": "1.2.20",
+    "@usstm/auth-session": "workspace:*",
     "@radix-ui/react-dialog": "1.1.23",
     "@radix-ui/react-navigation-menu": "1.2.22",
     "@radix-ui/react-separator": "1.1.15",
@@ -38,6 +41,7 @@
     "framer-motion": "12.43.0",
     "graphql": "16.14.2",
     "hamburger-react": "2.5.2",
+    "jose": "6.2.3",
     "lucide-react": "0.577.0",
     "next": "15.4.11",
     "payload": "3.90.2",

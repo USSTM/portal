@@ -1,0 +1,30 @@
+# One-time copies of retired Website collections into the Portal: Student
+# Groups into Club Profiles (ticket 08) and BoardHistory into Board Archives
+# (ticket 11). Use it only together with compose.production.yaml; see "Copy
+# Website data into the Portal" in docs/production-deployment.md.
+#
+# WEBSITE_EXPORT_DIR is an absolute host directory shared by the Website
+# exports and the Portal imports. The Portal's migrate service also joins the
+# application network, because the Club Profile import downloads logos from the
+# Website and uploads them to the image bucket; the database network has no
+# internet access.
+services:
+  website-migrate:
+    environment:
+      NEXT_PUBLIC_SERVER_URL: https://${WEBSITE_ADDRESS:?WEBSITE_ADDRESS is required}
+    volumes:
+      - ${WEBSITE_EXPORT_DIR:?WEBSITE_EXPORT_DIR is required}:/export
+
+  migrate:
+    environment:
+      PORTAL_S3_ACCESS_KEY_ID: ${PORTAL_S3_ACCESS_KEY_ID:?PORTAL_S3_ACCESS_KEY_ID is required}
+      PORTAL_S3_BUCKET: ${PORTAL_S3_BUCKET:?PORTAL_S3_BUCKET is required}
+      PORTAL_S3_ENDPOINT: ${PORTAL_S3_ENDPOINT:?PORTAL_S3_ENDPOINT is required}
+      PORTAL_S3_REGION: ${PORTAL_S3_REGION:?PORTAL_S3_REGION is required}
+      PORTAL_S3_SECRET_ACCESS_KEY: ${PORTAL_S3_SECRET_ACCESS_KEY:?PORTAL_S3_SECRET_ACCESS_KEY is required}
+      PORTAL_SUPERUSER_EMAIL: ${PORTAL_SUPERUSER_EMAIL:?PORTAL_SUPERUSER_EMAIL is required}
+    networks:
+      - application
+      - database
+    volumes:
+      - ${WEBSITE_EXPORT_DIR:?WEBSITE_EXPORT_DIR is required}:/export:ro

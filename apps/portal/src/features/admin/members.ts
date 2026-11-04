@@ -19,6 +19,7 @@ import {
   boardMembers,
   clubAccess,
   clubs,
+  contentManagers,
   members,
 } from '../../db/schema.js'
 import {
@@ -34,11 +35,14 @@ export async function createMemberWithClubAccess(input: {
   actorEmail: string
   administrator?: boolean
   clubIds: string[]
+  contentManager?: boolean
   displayName: string
   email: string
 }) {
   const db = getDb()
   const administrator = input.administrator ?? false
+  // Administrators hold Content Manager authority implicitly, without a row.
+  const contentManager = !administrator && (input.contentManager ?? false)
   return db.transaction(async (tx) => {
     const email = normalizeEmail(input.email)
     await requireEmailAvailable(tx, email, administrator)
@@ -47,7 +51,11 @@ export async function createMemberWithClubAccess(input: {
       const usstm = await requireUsstmClub(tx)
       if (!requestedClubIds.includes(usstm.id)) requestedClubIds.push(usstm.id)
     }
-    const clubIds = await requireActiveClubs(tx, requestedClubIds)
+    const clubIds = await requireActiveClubs(
+      tx,
+      requestedClubIds,
+      contentManager,
+    )
     const [member] = await tx
       .insert(members)
       .values({
@@ -55,11 +63,16 @@ export async function createMemberWithClubAccess(input: {
         email,
       })
       .returning()
-    await tx
-      .insert(clubAccess)
-      .values(clubIds.map((clubId) => ({ clubId, memberId: member.id })))
+    if (clubIds.length > 0) {
+      await tx
+        .insert(clubAccess)
+        .values(clubIds.map((clubId) => ({ clubId, memberId: member.id })))
+    }
     if (administrator) {
       await tx.insert(administrators).values({ memberId: member.id })
+    }
+    if (contentManager) {
+      await tx.insert(contentManagers).values({ memberId: member.id })
     }
     await writeAudit(
       tx,
@@ -69,6 +82,7 @@ export async function createMemberWithClubAccess(input: {
       {
         administratorGrant: administrator,
         clubIds,
+        contentManagerGrant: contentManager,
         displayName: member.displayName,
         email: member.email,
         lifecycle: member.lifecycle,
@@ -120,7 +134,13 @@ export async function revokeClubAccess(
       .select({ total: count() })
       .from(boardMembers)
       .where(eq(boardMembers.memberId, input.memberId))
-    if (clubGrantCount + boardGrantCount === 0) {
+    const [{ total: contentManagerGrantCount }] = await tx
+      .select({ total: count() })
+      .from(contentManagers)
+      .where(eq(contentManagers.memberId, input.memberId))
+    const remainingGrants =
+      clubGrantCount + boardGrantCount + contentManagerGrantCount
+    if (remainingGrants === 0) {
       await cancelFutureBookingsForMember(tx, input.memberId)
       await tx
         .update(members)
@@ -134,7 +154,7 @@ export async function revokeClubAccess(
       input.memberId,
       {
         clubId: input.clubId,
-        deactivated: clubGrantCount + boardGrantCount === 0,
+        deactivated: remainingGrants === 0,
       },
     )
   })
@@ -153,6 +173,9 @@ export async function deactivateMember(input: MemberInput) {
       .delete(boardMembers)
       .where(eq(boardMembers.memberId, input.memberId))
     await tx
+      .delete(contentManagers)
+      .where(eq(contentManagers.memberId, input.memberId))
+    await tx
       .update(members)
       .set({ lifecycle: 'deactivated', updatedAt: new Date() })
       .where(eq(members.id, input.memberId))
@@ -170,22 +193,28 @@ export async function deactivateMember(input: MemberInput) {
 }
 
 export async function reactivateMember(
-  input: MemberInput & { clubIds: string[] },
+  input: MemberInput & { clubIds: string[]; contentManager?: boolean },
 ) {
   const db = getDb()
+  const contentManager = input.contentManager ?? false
   return db.transaction(async (tx) => {
     await requireNonAdministratorMember(tx, input.memberId, 'deactivated')
     if (await wasEverAdministrator(tx, input.memberId)) {
       throw new Error('Access denied')
     }
-    const clubIds = await requireActiveClubs(tx, input.clubIds)
+    const clubIds = await requireActiveClubs(tx, input.clubIds, contentManager)
     await tx
       .update(members)
       .set({ lifecycle: 'active', updatedAt: new Date() })
       .where(eq(members.id, input.memberId))
-    await tx
-      .insert(clubAccess)
-      .values(clubIds.map((clubId) => ({ clubId, memberId: input.memberId })))
+    if (clubIds.length > 0) {
+      await tx
+        .insert(clubAccess)
+        .values(clubIds.map((clubId) => ({ clubId, memberId: input.memberId })))
+    }
+    if (contentManager) {
+      await tx.insert(contentManagers).values({ memberId: input.memberId })
+    }
     await writeAudit(
       tx,
       input.actorEmail,
@@ -193,6 +222,7 @@ export async function reactivateMember(
       input.memberId,
       {
         clubIds,
+        contentManagerGrant: contentManager,
         restoredPreviousAccess: false,
       },
     )
@@ -282,6 +312,7 @@ export async function browseMembers(input: {
   const memberEntries = await db
     .select({
       boardPosition: boardMembers.boardPosition,
+      contentManagerId: contentManagers.memberId,
       displayName: members.displayName,
       email: members.email,
       id: members.id,
@@ -291,6 +322,7 @@ export async function browseMembers(input: {
     .from(members)
     .leftJoin(administrators, eq(administrators.memberId, members.id))
     .leftJoin(boardMembers, eq(boardMembers.memberId, members.id))
+    .leftJoin(contentManagers, eq(contentManagers.memberId, members.id))
     .where(where)
     .orderBy(desc(members.updatedAt), desc(members.id))
   const memberIds = memberEntries.map((member) => member.id)
@@ -305,10 +337,11 @@ export async function browseMembers(input: {
         .innerJoin(clubs, eq(clubs.id, clubAccess.clubId))
         .where(inArray(clubAccess.memberId, memberIds))
     : []
-  return memberEntries.map((member) => ({
+  return memberEntries.map(({ contentManagerId, ...member }) => ({
     ...member,
     isAdministrator: member.isAdministrator !== null,
     isBoardMember: member.boardPosition !== null,
+    isContentManager: contentManagerId !== null,
     grants: grants.filter((grant) => grant.memberId === member.id),
   }))
 }
@@ -338,10 +371,16 @@ async function requireEmailAvailable(
   }
 }
 
-async function requireActiveClubs(tx: Transaction, clubIds: string[]) {
+async function requireActiveClubs(
+  tx: Transaction,
+  clubIds: string[],
+  hasOtherGrant = false,
+) {
   const distinctClubIds = [...new Set(clubIds)]
-  if (distinctClubIds.length === 0)
+  if (distinctClubIds.length === 0) {
+    if (hasOtherGrant) return []
     throw new Error('At least one Club Access grant is required')
+  }
   const activeClubs = await tx
     .select({ id: clubs.id })
     .from(clubs)

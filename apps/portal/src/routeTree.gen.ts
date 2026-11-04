@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfficeHoursRouteImport } from './routes/office-hours'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ClubProfilesRouteImport } from './routes/club-profiles'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminResourcesRouteImport } from './routes/admin/resources'
@@ -51,6 +52,11 @@ const EventsRoute = EventsRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ClubProfilesRoute = ClubProfilesRouteImport.update({
+  id: '/club-profiles',
+  path: '/club-profiles',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AccountRoute = AccountRouteImport.update({
@@ -92,6 +98,7 @@ const AdminAuditHistoryRoute = AdminAuditHistoryRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/club-profiles': typeof ClubProfilesRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/office-hours': typeof OfficeHoursRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/club-profiles': typeof ClubProfilesRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/office-hours': typeof OfficeHoursRoute
@@ -123,6 +131,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account': typeof AccountRoute
+  '/club-profiles': typeof ClubProfilesRoute
   '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/office-hours': typeof OfficeHoursRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/account'
+    | '/club-profiles'
     | '/contact'
     | '/events'
     | '/office-hours'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/account'
+    | '/club-profiles'
     | '/contact'
     | '/events'
     | '/office-hours'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/account'
+    | '/club-profiles'
     | '/contact'
     | '/events'
     | '/office-hours'
@@ -186,6 +198,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountRoute: typeof AccountRoute
+  ClubProfilesRoute: typeof ClubProfilesRoute
   ContactRoute: typeof ContactRoute
   EventsRoute: typeof EventsRoute
   OfficeHoursRoute: typeof OfficeHoursRoute
@@ -243,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/club-profiles': {
+      id: '/club-profiles'
+      path: '/club-profiles'
+      fullPath: '/club-profiles'
+      preLoaderRoute: typeof ClubProfilesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account': {
       id: '/account'
       path: '/account'
@@ -298,6 +318,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountRoute: AccountRoute,
+  ClubProfilesRoute: ClubProfilesRoute,
   ContactRoute: ContactRoute,
   EventsRoute: EventsRoute,
   OfficeHoursRoute: OfficeHoursRoute,

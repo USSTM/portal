@@ -15,9 +15,13 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   admin: {
-    user: Collections.Users.slug,
+    user: Collections.ContentManagers.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    components: {
+      beforeLogin: ['/components/admin/SignIn#SignIn'],
+      logout: { Button: '/components/admin/SignOutButton#SignOutButton' },
     },
   },
   collections: [...Object.values(Collections)],

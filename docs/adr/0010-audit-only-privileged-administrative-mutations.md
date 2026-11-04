@@ -1,3 +1,5 @@
 # Audit only privileged administrative mutations
 
 The portal will keep one append-only audit log for Member and grant changes, Administrator changes by the Superuser, Club status changes, Resource changes, every Event mutation performed by an Administrator or the Superuser, and Administrator Booking overrides. Each Audit Entry records the actor email, action, target type and ID, timestamp, and a small JSON snapshot of changed values, and is visible read-only to Administrators and the Superuser. Page views, public API reads, Event mutations performed through Club Access, and Board Members managing their own Bookings are deliberately excluded to preserve accountability without building a general activity or event-sourcing system.
+
+_Applied to Club Profiles: as with Events, Club Profile and Club image changes made by an Administrator or the Superuser are audited (`club.profile_updated`, `club.image_replaced`, `club.image_removed`), while the same changes made through Club Access are not. Renaming and archiving a Club stay Administrator-only and audited._

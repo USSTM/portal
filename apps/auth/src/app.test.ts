@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { generateKeyPair } from 'jose'
+import { decodeJwt, generateKeyPair } from 'jose'
 
 import { createAuthApp, type GoogleBoundary } from './app.js'
 
@@ -35,12 +35,17 @@ describe('Google sign-in', () => {
   })
 
   it('creates an eight-hour host-only cookie after a verified Google email', async () => {
-    const google = fakeGoogle({ email: ' Admin@Example.com ', emailVerified: true })
+    const google = fakeGoogle({
+      email: ' Admin@Example.com ',
+      emailVerified: true,
+    })
     const auth = app({ google })
     const signIn = await auth.request(
       'https://portal.test/auth/sign-in?client=portal&returnTo=/account',
     )
-    const state = new URL(signIn.headers.get('location')!).searchParams.get('state')!
+    const state = new URL(signIn.headers.get('location')!).searchParams.get(
+      'state',
+    )!
     const cookie = signIn.headers.get('set-cookie')!
 
     const response = await auth.request(
@@ -50,7 +55,9 @@ describe('Google sign-in', () => {
 
     expect(response.status).toBe(302)
     expect(response.headers.get('location')).toBe('/account')
-    expect(response.headers.get('set-cookie')).toContain('__Host-portal-session=')
+    expect(response.headers.get('set-cookie')).toContain(
+      '__Host-portal-session=',
+    )
     expect(response.headers.get('set-cookie')).toContain('Max-Age=28800')
     expect(response.headers.get('set-cookie')).toContain('HttpOnly')
     expect(response.headers.get('set-cookie')).toContain('Secure')
@@ -62,7 +69,8 @@ describe('Google sign-in', () => {
     const auth = app()
 
     expect(
-      (await auth.request('https://portal.test/auth/sign-in?client=unknown')).status,
+      (await auth.request('https://portal.test/auth/sign-in?client=unknown'))
+        .status,
     ).toBe(400)
     expect(
       (
@@ -72,7 +80,8 @@ describe('Google sign-in', () => {
       ).status,
     ).toBe(400)
     expect(
-      (await auth.request('https://evil.test/auth/sign-in?client=portal')).status,
+      (await auth.request('https://evil.test/auth/sign-in?client=portal'))
+        .status,
     ).toBe(400)
   })
 
@@ -86,12 +95,17 @@ describe('Google sign-in', () => {
   })
 
   it('rejects unverified Google email addresses', async () => {
-    const google = fakeGoogle({ email: 'admin@example.com', emailVerified: false })
+    const google = fakeGoogle({
+      email: 'admin@example.com',
+      emailVerified: false,
+    })
     const auth = app({ google })
     const signIn = await auth.request(
       'https://portal.test/auth/sign-in?client=portal',
     )
-    const state = new URL(signIn.headers.get('location')!).searchParams.get('state')!
+    const state = new URL(signIn.headers.get('location')!).searchParams.get(
+      'state',
+    )!
 
     expect(
       (
@@ -114,6 +128,46 @@ describe('Google sign-in', () => {
       '__Host-portal-session=; Max-Age=0',
     )
     expect(response.headers.get('set-cookie')).not.toContain('oauth-pending')
+  })
+
+  it('signs the Website client into its own host-only session for its own audience', async () => {
+    const google = fakeGoogle({
+      email: 'editor@example.com',
+      emailVerified: true,
+    })
+    const auth = app({ google })
+    const signIn = await auth.request(
+      'https://website.test/auth/sign-in?client=website&returnTo=/admin',
+    )
+    const state = new URL(signIn.headers.get('location')!).searchParams.get(
+      'state',
+    )!
+
+    const response = await auth.request(
+      `https://website.test/auth/callback?code=code&state=${state}`,
+      { headers: { cookie: signIn.headers.get('set-cookie')! } },
+    )
+    const session = response.headers
+      .get('set-cookie')!
+      .match(/__Host-website-session=([^;]+)/)![1]
+
+    expect(google.authorizationRequest).toMatchObject({
+      clientId: 'website-client',
+      redirectUri: 'https://website.test/auth/callback',
+    })
+    expect(response.headers.get('location')).toBe('/admin')
+    expect(decodeJwt(session)).toMatchObject({
+      aud: 'website',
+      email: 'editor@example.com',
+    })
+  })
+
+  it('rejects a client signing in from another application origin', async () => {
+    const response = await app().request(
+      'https://website.test/auth/sign-in?client=portal&returnTo=/',
+    )
+
+    expect(response.status).toBe(400)
   })
 
   it('rejects logout from another Origin without clearing the session', async () => {
@@ -177,6 +231,14 @@ function app({ google = fakeGoogle() }: { google?: GoogleBoundary } = {}) {
         clientSecret: 'portal-secret',
         cookieName: '__Host-portal-session',
         origin: 'https://portal.test',
+      },
+      {
+        audience: 'website',
+        callbackPath: '/auth/callback',
+        clientId: 'website-client',
+        clientSecret: 'website-secret',
+        cookieName: '__Host-website-session',
+        origin: 'https://website.test',
       },
     ],
     google,

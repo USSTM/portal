@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { generateKeyPair, SignJWT } from 'jose'
 
-import {
-  sessionClaimsSchema,
-  signSession,
-  verifySession,
-} from './index.js'
+import { sessionClaimsSchema, signSession, verifySession } from './index.js'
 
 describe('session claims', () => {
   it('accepts the minimal claim set shared by auth clients', () => {

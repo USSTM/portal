@@ -1,5 +1,5 @@
 import React from 'react'
-import Image from 'next/image'
+import { UserRound } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -7,21 +7,19 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card'
-import type { Person, Media } from '@/payload-types'
+import { getPortalBoard, websiteBoardPhotoPath } from '@/lib/portal-board'
 
 interface TeamGridBlockProps {
   heading?: string
-  people: Person[]
   columns?: '2' | '3' | '4'
-  showContactInfo?: boolean
 }
 
-export function TeamGridBlock({
+// The current board, read from the portal in its Administrator-set order.
+export async function TeamGridBlock({
   heading,
-  people,
   columns = '3',
-  showContactInfo = true,
 }: TeamGridBlockProps) {
+  const boardMembers = await getPortalBoard()
   const gridClasses = {
     '2': 'grid-cols-1 md:grid-cols-2',
     '3': 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
@@ -37,46 +35,53 @@ export function TeamGridBlock({
           </h2>
         )}
 
-        <div className={`grid ${gridClasses[columns]} gap-6`}>
-          {people.map((person) => {
-            const photo = person.photo as Media | null
-            const photoUrl = photo?.url || null
-
-            return (
-              <Card
-                key={person.id}
-                className="overflow-hidden hover:shadow-lg transition-shadow"
-              >
-                <CardHeader className="p-0">
-                  {photoUrl && (
-                    <div className="relative w-full aspect-square">
-                      <Image
-                        src={photoUrl}
-                        alt={person.name}
-                        fill
-                        className="object-cover"
-                      />
+        {boardMembers.length === 0 ? (
+          <p className="text-center text-muted-foreground">
+            The board is not available right now. Check back soon!
+          </p>
+        ) : (
+          <div className={`grid ${gridClasses[columns]} gap-6`}>
+            {boardMembers.map((member) => {
+              const photoPath = websiteBoardPhotoPath(member.photoUrl)
+              return (
+                <Card
+                  key={`${member.boardPosition}-${member.displayName}`}
+                  className="overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <CardHeader className="p-0">
+                    <div className="relative w-full aspect-square bg-muted flex items-center justify-center">
+                      {photoPath ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- proxied portal photo
+                        <img
+                          alt={member.displayName}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          loading="lazy"
+                          src={photoPath}
+                        />
+                      ) : (
+                        <UserRound
+                          aria-hidden
+                          className="w-12 h-12 text-muted-foreground"
+                        />
+                      )}
                     </div>
-                  )}
-                </CardHeader>
-                <CardContent className="p-6">
-                  <CardTitle className="mb-2">{person.name}</CardTitle>
-                  <CardDescription className="mb-4">
-                    {person.position}
-                  </CardDescription>
-                  {showContactInfo && person.email && (
-                    <a
-                      href={`mailto:${person.email}`}
-                      className="text-highlight hover:text-highlight-dark text-sm hover:underline"
-                    >
-                      {person.email}
-                    </a>
-                  )}
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    <CardTitle className="mb-2">{member.displayName}</CardTitle>
+                    <CardDescription className={member.bio ? 'mb-4' : ''}>
+                      {member.boardPosition}
+                    </CardDescription>
+                    {member.bio && (
+                      <p className="text-sm whitespace-pre-line">
+                        {member.bio}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )
+            })}
+          </div>
+        )}
       </div>
     </section>
   )

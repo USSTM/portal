@@ -22,6 +22,8 @@ export const memberLifecycle = pgEnum('member_lifecycle', [
 
 export const clubLifecycle = pgEnum('club_lifecycle', ['active', 'archived'])
 
+export const clubType = pgEnum('club_type', ['student_group', 'course_union'])
+
 export const resourceCategory = pgEnum('resource_category', [
   'finance',
   'operations',
@@ -34,6 +36,10 @@ export const members = pgTable(
     email: text('email').notNull().unique(),
     displayName: text('display_name').notNull(),
     lifecycle: memberLifecycle('lifecycle').notNull().default('active'),
+    // Member Profile: edited only by the Member themselves, and public only
+    // while they are a Board Member. Both optional.
+    photoId: text('photo_id'),
+    bio: text('bio'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -45,6 +51,10 @@ export const members = pgTable(
     check(
       'members_email_normalized',
       sql`${table.email} = lower(btrim(${table.email}))`,
+    ),
+    check(
+      'members_bio_length',
+      sql`${table.bio} is null or length(${table.bio}) between 1 and 500`,
     ),
   ],
 )
@@ -81,6 +91,80 @@ export const boardMembers = pgTable(
   ],
 )
 
+// The Administrator-set order of Board Positions on the Website. Positions with
+// no row sort after the ordered ones (docs/api/board.md).
+export const boardPositionOrder = pgTable(
+  'board_position_order',
+  {
+    boardPosition: text('board_position').primaryKey(),
+    displayOrder: integer('display_order').notNull().unique(),
+  },
+  (table) => [
+    check(
+      'board_position_order_position_trimmed',
+      sql`length(btrim(${table.boardPosition})) > 0 and ${table.boardPosition} = btrim(${table.boardPosition})`,
+    ),
+  ],
+)
+
+export const boardArchiveSource = pgEnum('board_archive_source', [
+  'portal',
+  'legacy_import',
+])
+
+// A frozen record of a past board: names and Board Positions only, with no
+// Member references or photos. Database triggers (migration 0020) reject any
+// update or delete, so an archive cannot be edited once created.
+export const boardArchives = pgTable(
+  'board_archives',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    academicYear: text('academic_year').notNull().unique(),
+    source: boardArchiveSource('source').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    check(
+      'board_archives_academic_year_format',
+      sql`${table.academicYear} ~ '^[0-9]{4}-[0-9]{4}$' and split_part(${table.academicYear}, '-', 2)::int = split_part(${table.academicYear}, '-', 1)::int + 1`,
+    ),
+  ],
+)
+
+export const boardArchiveEntries = pgTable(
+  'board_archive_entries',
+  {
+    archiveId: uuid('archive_id')
+      .notNull()
+      .references(() => boardArchives.id, { onDelete: 'restrict' }),
+    position: integer('position').notNull(),
+    displayName: text('display_name').notNull(),
+    boardPosition: text('board_position').notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.archiveId, table.position] }),
+    check(
+      'board_archive_entries_display_name_nonblank',
+      sql`length(btrim(${table.displayName})) > 0`,
+    ),
+    check(
+      'board_archive_entries_board_position_nonblank',
+      sql`length(btrim(${table.boardPosition})) > 0`,
+    ),
+  ],
+)
+
+export const contentManagers = pgTable('content_managers', {
+  memberId: uuid('member_id')
+    .primaryKey()
+    .references(() => members.id, { onDelete: 'restrict' }),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+})
+
 export const clubs = pgTable(
   'clubs',
   {
@@ -90,6 +174,12 @@ export const clubs = pgTable(
     contactEmail: text('contact_email'),
     lifecycle: clubLifecycle('lifecycle').notNull().default('active'),
     protected: boolean('protected').notNull().default(false),
+    // Club Profile: the public face of the Club on the Website. All optional.
+    description: text('description'),
+    type: clubType('type'),
+    instagramHandle: text('instagram_handle'),
+    websiteUrl: text('website_url'),
+    imageId: text('image_id'),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -109,6 +199,18 @@ export const clubs = pgTable(
     check(
       'clubs_full_name_nonblank',
       sql`length(btrim(${table.fullName})) > 0`,
+    ),
+    check(
+      'clubs_description_length',
+      sql`${table.description} is null or length(${table.description}) between 1 and 1000`,
+    ),
+    check(
+      'clubs_instagram_handle_format',
+      sql`${table.instagramHandle} is null or ${table.instagramHandle} ~ '^[A-Za-z0-9._]{1,30}$'`,
+    ),
+    check(
+      'clubs_website_url_https',
+      sql`${table.websiteUrl} is null or ${table.websiteUrl} ~ '^https://'`,
     ),
   ],
 )

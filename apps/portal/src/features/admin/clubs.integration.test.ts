@@ -23,13 +23,18 @@ describeWithDatabase('Club lifecycle', () => {
         email: `member-${crypto.randomUUID()}@example.com`,
       })
       .returning()
-    await getDb().insert(clubAccess).values({ clubId: club.id, memberId: member.id })
+    await getDb()
+      .insert(clubAccess)
+      .values({ clubId: club.id, memberId: member.id })
 
     await archiveClub({ actorEmail: 'admin@example.com', clubId: club.id })
     await reactivateClub({ actorEmail: 'admin@example.com', clubId: club.id })
 
     const db = getDb()
-    const [storedClub] = await db.select().from(clubs).where(eq(clubs.id, club.id))
+    const [storedClub] = await db
+      .select()
+      .from(clubs)
+      .where(eq(clubs.id, club.id))
     const audit = await db
       .select()
       .from(auditEntries)
@@ -41,7 +46,11 @@ describeWithDatabase('Club lifecycle', () => {
 
     expect(storedClub).toMatchObject({ lifecycle: 'active', shortName })
     expect(audit.map((entry) => entry.action)).toEqual(
-      expect.arrayContaining(['club.created', 'club.archived', 'club.reactivated']),
+      expect.arrayContaining([
+        'club.created',
+        'club.archived',
+        'club.reactivated',
+      ]),
     )
     expect(remainingAccess).toHaveLength(0)
   })

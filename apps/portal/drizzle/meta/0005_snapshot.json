@@ -28,12 +28,8 @@
           "name": "administrators_member_id_members_id_fk",
           "tableFrom": "administrators",
           "tableTo": "members",
-          "columnsFrom": [
-            "member_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["member_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -131,12 +127,8 @@
           "name": "board_members_member_id_members_id_fk",
           "tableFrom": "board_members",
           "tableTo": "members",
-          "columnsFrom": [
-            "member_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["member_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -179,12 +171,8 @@
           "name": "club_access_member_id_members_id_fk",
           "tableFrom": "club_access",
           "tableTo": "members",
-          "columnsFrom": [
-            "member_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["member_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -192,12 +180,8 @@
           "name": "club_access_club_id_clubs_id_fk",
           "tableFrom": "club_access",
           "tableTo": "clubs",
-          "columnsFrom": [
-            "club_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["club_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -205,10 +189,7 @@
       "compositePrimaryKeys": {
         "club_access_member_id_club_id_pk": {
           "name": "club_access_member_id_club_id_pk",
-          "columns": [
-            "member_id",
-            "club_id"
-          ]
+          "columns": ["member_id", "club_id"]
         }
       },
       "uniqueConstraints": {},
@@ -275,9 +256,7 @@
         "clubs_short_name_unique": {
           "name": "clubs_short_name_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "short_name"
-          ]
+          "columns": ["short_name"]
         }
       },
       "policies": {},
@@ -350,9 +329,7 @@
         "members_email_unique": {
           "name": "members_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -369,18 +346,12 @@
     "public.club_lifecycle": {
       "name": "club_lifecycle",
       "schema": "public",
-      "values": [
-        "active",
-        "archived"
-      ]
+      "values": ["active", "archived"]
     },
     "public.member_lifecycle": {
       "name": "member_lifecycle",
       "schema": "public",
-      "values": [
-        "active",
-        "deactivated"
-      ]
+      "values": ["active", "deactivated"]
     }
   },
   "schemas": {},

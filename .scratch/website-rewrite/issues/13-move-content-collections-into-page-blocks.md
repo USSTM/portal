@@ -10,3 +10,4 @@
 - [ ] Committee members and election candidates are plain content and never reference Members.
 - [ ] Existing records are migrated into blocks on the Pages that showed them.
 - [ ] The five collections are removed with migrations.
+- [ ] The People collection is removed with a migration, once Committees and ElectionCycles no longer reference it (moved here from ticket 12).

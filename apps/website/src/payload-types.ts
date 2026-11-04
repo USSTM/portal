@@ -63,12 +63,12 @@ export type SupportedTimezones =
 
 export interface Config {
   auth: {
-    users: UserAuthOperations;
+    'content-managers': ContentManagerAuthOperations;
   };
   blocks: {};
   collections: {
-    'board-history': BoardHistory;
     committees: Committee;
+    'content-managers': ContentManager;
     documents: Document;
     'election-cycles': ElectionCycle;
     faqs: Faq;
@@ -76,8 +76,6 @@ export interface Config {
     media: Media;
     pages: Page;
     people: Person;
-    'student-groups': StudentGroup;
-    users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -85,8 +83,8 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    'board-history': BoardHistorySelect<false> | BoardHistorySelect<true>;
     committees: CommitteesSelect<false> | CommitteesSelect<true>;
+    'content-managers': ContentManagersSelect<false> | ContentManagersSelect<true>;
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
     'election-cycles': ElectionCyclesSelect<false> | ElectionCyclesSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
@@ -94,8 +92,6 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     people: PeopleSelect<false> | PeopleSelect<true>;
-    'student-groups': StudentGroupsSelect<false> | StudentGroupsSelect<true>;
-    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -115,13 +111,13 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: ContentManager;
   jobs: {
     tasks: unknown;
     workflows: unknown;
   };
 }
-export interface UserAuthOperations {
+export interface ContentManagerAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -141,28 +137,52 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "board-history".
+ * via the `definition` "committees".
  */
-export interface BoardHistory {
+export interface Committee {
   id: number;
   /**
-   * e.g., "2023-2024"
+   * e.g., "Academics", "Board of Directors", "Communications"
    */
-  academicYear: string;
+  name: string;
   /**
-   * Board groups for this year (Executives, Directors, etc.)
+   * URL-friendly identifier (auto-generated from name)
    */
-  groups: {
-    /**
-     * e.g., "Executives", "Program Directors", "First Year Directors"
-     */
-    groupName: string;
-    /**
-     * Members of this board group
-     */
-    members: (number | Person)[];
-    id?: string | null;
-  }[];
+  slug: string;
+  /**
+   * Committee description and responsibilities
+   */
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Current committee members
+   */
+  members?: (number | Person)[] | null;
+  /**
+   * Committee images for carousel display
+   */
+  images?: (number | Media)[] | null;
+  /**
+   * Academic year, e.g., "2023-2024"
+   */
+  year?: string | null;
+  /**
+   * Display order (lower numbers appear first)
+   */
+  order?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -240,55 +260,17 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Content Managers are granted in the Portal. This list shows who has signed in.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "committees".
+ * via the `definition` "content-managers".
  */
-export interface Committee {
+export interface ContentManager {
   id: number;
-  /**
-   * e.g., "Academics", "Board of Directors", "Communications"
-   */
-  name: string;
-  /**
-   * URL-friendly identifier (auto-generated from name)
-   */
-  slug: string;
-  /**
-   * Committee description and responsibilities
-   */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * Current committee members
-   */
-  members?: (number | Person)[] | null;
-  /**
-   * Committee images for carousel display
-   */
-  images?: (number | Media)[] | null;
-  /**
-   * Academic year, e.g., "2023-2024"
-   */
-  year?: string | null;
-  /**
-   * Display order (lower numbers appear first)
-   */
-  order?: number | null;
+  email: string;
   updatedAt: string;
   createdAt: string;
+  collection: 'content-managers';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -645,17 +627,25 @@ export interface Page {
          */
         heading?: string | null;
         /**
-         * Select people to display
+         * Shows the current board from the Portal, in the order Administrators set there.
          */
-        people?: (number | Person)[] | null;
         columns?: ('2' | '3' | '4') | null;
-        /**
-         * Show contact information for team members
-         */
-        showContactInfo?: boolean | null;
         id?: string | null;
         blockName?: string | null;
         blockType: 'teamGrid';
+      }
+    | {
+        /**
+         * Past boards section heading
+         */
+        heading?: string | null;
+        /**
+         * Most recent academic years to show; leave empty for all. Past boards come from the Portal’s Board Archives.
+         */
+        limit?: number | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'pastBoards';
       }
     | {
         /**
@@ -688,6 +678,23 @@ export interface Page {
         id?: string | null;
         blockName?: string | null;
         blockType: 'eventsGrid';
+      }
+    | {
+        /**
+         * Clubs section heading
+         */
+        heading?: string | null;
+        /**
+         * Optional introduction above the clubs
+         */
+        description?: string | null;
+        /**
+         * Clubs and their profiles come from the Portal, where Club members edit them.
+         */
+        clubType?: ('all' | 'student_group' | 'course_union') | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'clubsDirectory';
       }
     | {
         /**
@@ -841,95 +848,6 @@ export interface Page {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "student-groups".
- */
-export interface StudentGroup {
-  id: number;
-  /**
-   * Full name of the student group
-   */
-  name: string;
-  /**
-   * Acronym or abbreviation (e.g., "PACS", "WiCS")
-   */
-  shortName?: string | null;
-  /**
-   * URL-friendly identifier (auto-generated from name)
-   */
-  slug: string;
-  /**
-   * Group logo
-   */
-  logo?: (number | null) | Media;
-  /**
-   * Type of organization
-   */
-  type: 'sg' | 'cu';
-  /**
-   * Contact email address
-   */
-  contactEmail?: string | null;
-  /**
-   * Instagram handle (without @)
-   */
-  instagram?: string | null;
-  /**
-   * Website URL
-   */
-  website?: string | null;
-  /**
-   * Is this group currently active?
-   */
-  isActive?: boolean | null;
-  /**
-   * Group description and mission
-   */
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  resetPasswordRequestedAt?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -953,12 +871,12 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'board-history';
-        value: number | BoardHistory;
-      } | null)
-    | ({
         relationTo: 'committees';
         value: number | Committee;
+      } | null)
+    | ({
+        relationTo: 'content-managers';
+        value: number | ContentManager;
       } | null)
     | ({
         relationTo: 'documents';
@@ -987,19 +905,11 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'people';
         value: number | Person;
-      } | null)
-    | ({
-        relationTo: 'student-groups';
-        value: number | StudentGroup;
-      } | null)
-    | ({
-        relationTo: 'users';
-        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'users';
-    value: number | User;
+    relationTo: 'content-managers';
+    value: number | ContentManager;
   };
   updatedAt: string;
   createdAt: string;
@@ -1011,8 +921,8 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: number;
   user: {
-    relationTo: 'users';
-    value: number | User;
+    relationTo: 'content-managers';
+    value: number | ContentManager;
   };
   key?: string | null;
   value?:
@@ -1040,22 +950,6 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "board-history_select".
- */
-export interface BoardHistorySelect<T extends boolean = true> {
-  academicYear?: T;
-  groups?:
-    | T
-    | {
-        groupName?: T;
-        members?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "committees_select".
  */
 export interface CommitteesSelect<T extends boolean = true> {
@@ -1066,6 +960,15 @@ export interface CommitteesSelect<T extends boolean = true> {
   images?: T;
   year?: T;
   order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "content-managers_select".
+ */
+export interface ContentManagersSelect<T extends boolean = true> {
+  email?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1233,9 +1136,15 @@ export interface PagesSelect<T extends boolean = true> {
           | T
           | {
               heading?: T;
-              people?: T;
               columns?: T;
-              showContactInfo?: T;
+              id?: T;
+              blockName?: T;
+            };
+        pastBoards?:
+          | T
+          | {
+              heading?: T;
+              limit?: T;
               id?: T;
               blockName?: T;
             };
@@ -1255,6 +1164,15 @@ export interface PagesSelect<T extends boolean = true> {
               limit?: T;
               displayStyle?: T;
               showDate?: T;
+              id?: T;
+              blockName?: T;
+            };
+        clubsDirectory?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              clubType?: T;
               id?: T;
               blockName?: T;
             };
@@ -1373,47 +1291,6 @@ export interface PeopleSelect<T extends boolean = true> {
   status?: T;
   updatedAt?: T;
   createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "student-groups_select".
- */
-export interface StudentGroupsSelect<T extends boolean = true> {
-  name?: T;
-  shortName?: T;
-  slug?: T;
-  logo?: T;
-  type?: T;
-  contactEmail?: T;
-  instagram?: T;
-  website?: T;
-  isActive?: T;
-  description?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  resetPasswordRequestedAt?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -18,17 +18,24 @@ import {
   updateBoardMemberAction,
 } from '../../features/admin/board-member-actions'
 import { getMembers } from '../../features/admin/member-actions'
+import { getBoardPositionOrder } from '../../features/board/board-order-actions'
+import { getBoardArchives } from '../../features/board/board-archive-actions'
+import { BoardPositionOrder } from '../../components/board-position-order'
+import { BoardArchivesCard } from '../../components/board-archives-card'
 
 export const Route = createFileRoute('/admin/board-members')({
   component: BoardMembers,
   loader: async () => ({
+    boardArchives: await getBoardArchives(),
     boardMembers: await getBoardMembers(),
+    boardPositions: await getBoardPositionOrder(),
     members: await getMembers({ data: { lifecycle: 'active' } }),
   }),
 })
 
 function BoardMembers() {
-  const { boardMembers, members } = Route.useLoaderData()
+  const { boardArchives, boardMembers, boardPositions, members } =
+    Route.useLoaderData()
   const router = useRouter()
   const createBoardMember = useServerFn(createBoardMemberAction)
   const grantBoardAuthority = useServerFn(grantBoardAuthorityAction)
@@ -313,6 +320,12 @@ function BoardMembers() {
           </p>
         </div>
       </div>
+
+      <BoardPositionOrder
+        key={boardPositions.join('\n')}
+        positions={boardPositions}
+      />
+      <BoardArchivesCard archives={boardArchives.boardArchives} />
     </>
   )
 }

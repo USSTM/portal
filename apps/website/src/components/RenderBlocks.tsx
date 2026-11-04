@@ -6,8 +6,10 @@ import { TextSectionBlock } from './blocks/TextSectionBlock'
 import { ImageBlock } from './blocks/ImageBlock'
 import { FAQBlock } from './blocks/FAQBlock'
 import { TeamGridBlock } from './blocks/TeamGridBlock'
+import { PastBoardsBlock } from './blocks/PastBoardsBlock'
 import { CommitteeShowcaseBlock } from './blocks/CommitteeShowcaseBlock'
 import { EventsGridBlock } from './blocks/EventsGridBlock'
+import { ClubsDirectoryBlock } from './blocks/ClubsDirectoryBlock'
 import { GalleryBlock } from './blocks/GalleryBlock'
 import { FourPillarsBlock } from './blocks/FourPillarsBlock'
 import { LandAcknowledgementBlock } from './blocks/LandAcknowledgementBlock'
@@ -117,14 +119,16 @@ export async function RenderBlocks({ blocks }: RenderBlocksProps) {
               <TeamGridBlock
                 key={index}
                 heading={block.heading ?? undefined}
-                people={
-                  block.people?.filter(
-                    (person): person is Extract<typeof person, object> =>
-                      typeof person === 'object',
-                  ) ?? []
-                }
                 columns={block.columns ?? undefined}
-                showContactInfo={block.showContactInfo ?? undefined}
+              />
+            )
+
+          case 'pastBoards':
+            return (
+              <PastBoardsBlock
+                key={index}
+                heading={block.heading ?? undefined}
+                limit={block.limit ?? undefined}
               />
             )
 
@@ -153,6 +157,16 @@ export async function RenderBlocks({ blocks }: RenderBlocksProps) {
                 limit={block.limit ?? undefined}
                 displayStyle={block.displayStyle ?? undefined}
                 showDate={block.showDate ?? undefined}
+              />
+            )
+
+          case 'clubsDirectory':
+            return (
+              <ClubsDirectoryBlock
+                key={index}
+                heading={block.heading ?? undefined}
+                description={block.description ?? undefined}
+                clubType={block.clubType ?? undefined}
               />
             )
 

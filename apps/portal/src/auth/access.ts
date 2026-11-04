@@ -52,7 +52,9 @@ function getCookie(header: string | undefined, name: string) {
   return header
     .split(';')
     .map((part) => part.trim().split('='))
-    .find(([cookieName]) => cookieName === name)?.slice(1).join('=')
+    .find(([cookieName]) => cookieName === name)
+    ?.slice(1)
+    .join('=')
 }
 
 function normalizeEmail(email: string) {

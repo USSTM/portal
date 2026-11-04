@@ -4,9 +4,23 @@
 
 **Blocked by:** None — can start immediately
 
-**Status:** ready-for-agent
+**Status:** ready-for-human
 
-- [ ] A Member uploads, replaces or removes their own photo, and edits a short bio with a length limit.
-- [ ] Photos use the same S3-compatible storage and limits as Club images (07). Whichever issue lands first sets the storage up.
-- [ ] No one else can edit a Member Profile, Administrators included; deactivation keeps it private.
-- [ ] `docs/PRIVACY.md` states that a Member Profile is public only while the Member is a Board Member.
+- [x] A Member uploads, replaces or removes their own photo, and edits a short bio with a length limit.
+- [x] Photos use the same S3-compatible storage and limits as Club images (07). Whichever issue lands first sets the storage up.
+- [x] No one else can edit a Member Profile, Administrators included; deactivation keeps it private.
+- [x] `docs/PRIVACY.md` states that a Member Profile is public only while the Member is a Board Member.
+
+## Comments
+
+- Migration `0017_add-member-profiles` adds `members.photo_id` and `members.bio`. The bio is limited to 500 characters, in both the input and the database.
+- Photos use ticket 07's storage (`src/storage/images.ts`, `PORTAL_S3_*`) under the `member-photos/` prefix, with the same 2 MB limit and JPEG, PNG or WebP detected from the file's bytes. Replacing or removing a photo deletes the old object.
+- Ownership: the Member Profile section on the Account page uses server actions that take no Member ID and act only on the signed-in email, so no one, Administrators included, can edit another Member's profile. The Superuser is not a Member and has none.
+- Privacy: no route serves photos publicly yet. The Account page shows the Member their own photo as a data URL. Ticket 10 publishes photos and bios only for current Board Members, and deactivation revokes Board Member authority, so a deactivated Member's profile stays private. Deactivated Members cannot edit their profile; it is kept.
+- Audit: self-service edits are not privileged administrative mutations, so they are not audited (ADR-0010).
+- `docs/PRIVACY.md` and the Portal's `/privacy` page, which keeps its own copy of the text, both describe the Member Profile, its Board Member-only visibility and what deactivation does. Both "Last Updated" dates are now October 29, 2026.
+- Needs a human:
+  - Apply migration `0017`.
+  - Run `member-profiles.integration.test.ts` (no Docker where this was built).
+  - Upload, replace and remove a photo on the Account page in a browser.
+  - Review the privacy wording before it is published.

@@ -13,6 +13,7 @@ import {
   UserCheck,
   ShieldCheck,
   ShieldOff,
+  PenLine,
 } from 'lucide-react'
 
 import {
@@ -24,6 +25,10 @@ import {
   reactivateMemberAction,
   revokeClubAccessAction,
 } from '../../features/admin/member-actions'
+import {
+  grantContentManagerAction,
+  revokeContentManagerAction,
+} from '../../features/admin/content-manager-actions'
 import { getClubs } from '../../features/admin/club-actions'
 import {
   deactivateAdministratorAction,
@@ -93,8 +98,9 @@ function Members() {
     const form = new FormData(formElement)
     const clubIds = form.getAll('clubIds').map(String)
     const administrator = isSuperuser && form.get('administrator') === 'on'
-    if (!administrator && clubIds.length === 0) {
-      setError('At least one Club Access grant is required.')
+    const contentManager = form.get('contentManager') === 'on'
+    if (!administrator && !contentManager && clubIds.length === 0) {
+      setError('At least one grant is required.')
       return
     }
     try {
@@ -102,6 +108,7 @@ function Members() {
         data: {
           administrator,
           clubIds,
+          contentManager,
           displayName: String(form.get('displayName') ?? ''),
           email: String(form.get('email') ?? ''),
         },
@@ -167,6 +174,14 @@ function Members() {
                   Grant Administrator (includes USSTM Club Access)
                 </label>
               )}
+              <label className="flex items-center gap-2 text-sm cursor-pointer bg-secondary/30 border border-border rounded-md p-2">
+                <input
+                  name="contentManager"
+                  type="checkbox"
+                  className="rounded border-border text-primary focus:ring-primary"
+                />
+                Grant Content Manager (edits Website Pages)
+              </label>
               <fieldset>
                 <legend className="text-sm font-medium mb-2">
                   Initial Club Access
@@ -328,6 +343,11 @@ function Members() {
                           <ShieldCheck className="w-3 h-3" /> Administrator
                         </span>
                       )}
+                      {member.isContentManager && !member.isAdministrator && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-secondary/50 text-foreground text-[11px] font-medium border border-border">
+                          <PenLine className="w-3 h-3" /> Content Manager
+                        </span>
+                      )}
                       {member.grants.length > 0
                         ? member.grants.map((grant) => (
                             <span
@@ -337,7 +357,8 @@ function Members() {
                               {grant.shortName}
                             </span>
                           ))
-                        : !member.isAdministrator && (
+                        : !member.isAdministrator &&
+                          !member.isContentManager && (
                             <span className="text-xs italic text-muted-foreground/50">
                               None
                             </span>
@@ -424,6 +445,8 @@ function ManageMemberModal({
   const revokeAccess = useServerFn(revokeClubAccessAction)
   const deactivate = useServerFn(deactivateMemberAction)
   const reactivate = useServerFn(reactivateMemberAction)
+  const grantContentManager = useServerFn(grantContentManagerAction)
+  const revokeContentManager = useServerFn(revokeContentManagerAction)
 
   const editAdministrator = useServerFn(editAdministratorAction)
   const grantAdministrator = useServerFn(grantAdministratorAction)
@@ -757,6 +780,55 @@ function ManageMemberModal({
               )}
             </div>
 
+            {/* Content Manager (Administrators hold it implicitly) */}
+            {!member.isAdministrator && (
+              <div className="space-y-3 border-b border-border pb-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    Content Manager
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {member.isContentManager ? 'Granted' : 'Not granted'}
+                  </span>
+                </div>
+                {member.isContentManager ? (
+                  <button
+                    onClick={() =>
+                      runAction(
+                        () =>
+                          revokeContentManager({
+                            data: { memberId: member.id },
+                          }),
+                        'Content Manager revoked.',
+                      )
+                    }
+                    type="button"
+                    disabled={isSubmitting}
+                    className="w-full text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    Revoke Content Manager
+                  </button>
+                ) : (
+                  <button
+                    onClick={() =>
+                      runAction(
+                        () =>
+                          grantContentManager({
+                            data: { memberId: member.id },
+                          }),
+                        'Content Manager granted.',
+                      )
+                    }
+                    type="button"
+                    disabled={isSubmitting}
+                    className="w-full flex items-center justify-center gap-1 bg-primary/10 text-primary hover:bg-primary/20 px-3 py-1.5 rounded-md text-xs font-medium transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    <PenLine className="w-3.5 h-3.5" /> Grant Content Manager
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Board Position (Administrator only) */}
             {member.isAdministrator && isSuperuser && (
               <div className="space-y-3 border-b border-border pb-5">
@@ -940,12 +1012,16 @@ function ManageMemberModal({
                   'Administrator reactivated.',
                 )
               } else {
-                if (clubIds.length === 0) {
-                  setModalError('At least one Club Access grant is required.')
+                const contentManager = form.get('contentManager') === 'on'
+                if (!contentManager && clubIds.length === 0) {
+                  setModalError('At least one grant is required.')
                   return
                 }
                 await runAction(
-                  () => reactivate({ data: { clubIds, memberId: member.id } }),
+                  () =>
+                    reactivate({
+                      data: { clubIds, contentManager, memberId: member.id },
+                    }),
                   'Member reactivated.',
                 )
               }
@@ -960,6 +1036,16 @@ function ManageMemberModal({
                   className="rounded border-border text-primary focus:ring-primary"
                 />
                 Restore Administrator grant (includes USSTM Club Access)
+              </label>
+            )}
+            {!member.isAdministrator && (
+              <label className="flex items-center gap-2 text-xs cursor-pointer bg-secondary/30 border border-border rounded-md p-2.5">
+                <input
+                  name="contentManager"
+                  type="checkbox"
+                  className="rounded border-border text-primary focus:ring-primary"
+                />
+                Grant Content Manager
               </label>
             )}
             <fieldset className="border border-border rounded-md p-3">

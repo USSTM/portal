@@ -49,6 +49,11 @@ export function navigationForCapabilities(
       to: '/events',
       description: 'Create and manage events for your club.',
     })
+    navigation.push({
+      label: 'Club Profiles',
+      to: '/club-profiles',
+      description: 'Edit how your club appears on the USSTM website.',
+    })
   }
 
   if (capabilities.clubAccess) {

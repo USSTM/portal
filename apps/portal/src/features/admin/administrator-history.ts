@@ -17,7 +17,10 @@ export async function wasEverAdministrator(
     .select({ id: auditEntries.id })
     .from(auditEntries)
     .where(
-      and(eq(auditEntries.targetId, memberId), like(auditEntries.action, 'administrator.%')),
+      and(
+        eq(auditEntries.targetId, memberId),
+        like(auditEntries.action, 'administrator.%'),
+      ),
     )
   return found.length > 0
 }

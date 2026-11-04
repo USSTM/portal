@@ -22,7 +22,7 @@ function PrivacyRoute() {
       currentDocument="privacy"
       shell={shell}
       title="Privacy Policy"
-      lastUpdated="September 4, 2026"
+      lastUpdated="October 29, 2026"
     >
       <h2>1. Introduction &amp; Overview</h2>
       <p>
@@ -184,6 +184,15 @@ function PrivacyRoute() {
               </ul>
             </li>
           </ul>
+        </li>
+        <li>
+          <strong>Member Profile (Optional, Self-Managed):</strong> A photo
+          (JPEG, PNG, or WebP, up to 2 MB, kept in private object storage) and a
+          bio of up to 500 characters. Only you can add, replace, or remove
+          them; Administrators cannot edit them. Your Member Profile is public{' '}
+          <strong>only while you are a Board Member</strong>, when it may appear
+          with your display name and board title on the USSTM website. Otherwise
+          it is visible only to you.
         </li>
       </ul>
 
@@ -386,8 +395,9 @@ function PrivacyRoute() {
         <li>
           <strong>Publicly Visible Operational Features:</strong> Board
           Members&rsquo; display names and board titles on the Office Hours
-          calendar, and event listings on the public Events API (
-          <code>GET /api/v1/events</code>).
+          calendar, current Board Members&rsquo; Member Profile photos and bios
+          on the USSTM website (never with an email address), and event listings
+          on the public Events API (<code>GET /api/v1/events</code>).
         </li>
         <li>
           <strong>Internal USSTM Administration:</strong> Authorized
@@ -420,7 +430,8 @@ function PrivacyRoute() {
             <code>deactivated</code>
           </strong>{' '}
           rather than permanently deleted. Sign-in is immediately blocked, all
-          authority grants are revoked, and future bookings are canceled.
+          authority grants are revoked, and future bookings are canceled. Their
+          Member Profile stops being public and is kept privately.
         </li>
         <li>
           <strong>Historical Accountability:</strong> Historical Office Hours

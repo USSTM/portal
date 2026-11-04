@@ -28,12 +28,8 @@
           "name": "administrators_member_id_members_id_fk",
           "tableFrom": "administrators",
           "tableTo": "members",
-          "columnsFrom": [
-            "member_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["member_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -154,9 +150,7 @@
         "members_email_unique": {
           "name": "members_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -168,10 +162,7 @@
     "public.member_lifecycle": {
       "name": "member_lifecycle",
       "schema": "public",
-      "values": [
-        "active",
-        "deactivated"
-      ]
+      "values": ["active", "deactivated"]
     }
   },
   "schemas": {},

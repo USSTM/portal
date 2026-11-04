@@ -8,11 +8,12 @@ The production stack runs Caddy, the Portal, reusable auth, the public website (
 - TCP ports 80 and 443 reachable from the internet
 - DNS A/AAAA records for the Portal and the website pointing to the host
 - An S3-compatible bucket for website media
+- A private S3-compatible bucket, or a private prefix of the media bucket, for Portal images such as Club Profile images (`PORTAL_S3_*`). The Portal serves these images itself, so the bucket needs no public access.
 - An S3-compatible bucket or another [restic repository](https://restic.readthedocs.io/en/stable/030_preparing_a_new_repo.html) located off the host
 
-Copy `deployment/production.env.example` to a host-only file such as `/etc/usstm-portal/production.env`, fill every required value, and restrict it to the deployment operator. Do not commit that file. Generate the auth signing pair with `pnpm --filter @usstm/auth generate:session-key`; put the private JWK only in `AUTH_SESSION_PRIVATE_JWK` and the public JWK in `PORTAL_AUTH_PUBLIC_JWK`.
+Copy `deployment/production.env.example` to a host-only file such as `/etc/usstm-portal/production.env`, fill every required value, and restrict it to the deployment operator. Do not commit that file. Generate the auth signing pair with `pnpm --filter @usstm/auth generate:session-key`; put the private JWK only in `AUTH_SESSION_PRIVATE_JWK` and the public JWK in both `PORTAL_AUTH_PUBLIC_JWK` and `WEBSITE_AUTH_PUBLIC_JWK`, with matching `*_AUTH_ISSUER` and `*_AUTH_KEY_ID` values.
 
-`PORTAL_ADDRESS` must be the public DNS name without a scheme. The origin inside `AUTH_CLIENTS` must be the corresponding `https://` origin. `DATABASE_URL` uses the private Compose hostname `postgres`; URL-encode reserved characters in its credentials.
+`PORTAL_ADDRESS` must be the public DNS name without a scheme. The origin inside `AUTH_CLIENTS` must be the corresponding `https://` origin. `AUTH_CLIENTS` holds one client per application: `portal` with origin `https://$PORTAL_ADDRESS` and `website` with origin `https://$WEBSITE_ADDRESS`, both with callback path `/auth/callback`. Register both `https://<address>/auth/callback` URLs as authorized redirect URIs on the Google OAuth client. Content Managers then sign in to the Website at `/admin` (ADR-0020). `DATABASE_URL` uses the private Compose hostname `postgres`; URL-encode reserved characters in its credentials.
 
 ## Validate, start, and migrate
 
@@ -58,6 +59,44 @@ To move existing content off Supabase:
 4. After cutover, rotate the old Supabase credentials.
 
 The old database still contains `events` tables; drop them once you have confirmed the website reads Events from the Portal.
+
+### Copy Website data into the Portal
+
+Clubs and past boards on the Website now come from the Portal (ADR-0021). Their old Website records are copied once with a Website export and a Portal import, using `deployment/compose.website-data-copy.yaml`. Each import prints a dry run first; rerun it with `--apply` to write, which creates Audit Entries as the Superuser.
+
+```sh
+export WEBSITE_EXPORT_DIR=/var/lib/usstm-portal/website-export
+mkdir -p "$WEBSITE_EXPORT_DIR"
+COPY="docker compose --env-file /etc/usstm-portal/production.env -f compose.production.yaml -f deployment/compose.website-data-copy.yaml --profile operations"
+```
+
+#### Student Groups into Club Profiles
+
+The `remove_student_groups` Website migration keeps the retired Student Groups in a `student_groups_archive` table. After deploying that migration:
+
+```sh
+$COPY run --rm --build website-migrate \
+  pnpm --filter @usstm/website export:student-groups --output /export/student-groups.json
+$COPY run --rm --build migrate \
+  pnpm --filter @usstm/portal db:import-club-profiles --source /export/student-groups.json
+```
+
+The dry run shows which Club each Student Group matches by short or full name, which empty profile fields it would fill, and an `unmatched` list. Fix any Club names in the Portal if needed, then rerun the import with `--apply`. It never overwrites a field or image a Club has already set. Resolve the `unmatched` Student Groups by hand in **Club Profiles**. When the copy is confirmed, drop `student_groups_archive` from the Website database.
+
+#### BoardHistory into Board Archives
+
+The `remove_board_history` Website migration keeps every past board, flattened with each person's name and position, in a `board_history_archive` table. After deploying that migration:
+
+```sh
+$COPY run --rm --build website-migrate \
+  pnpm --filter @usstm/website export:board-history --output /export/board-history.json
+$COPY run --rm --build migrate \
+  pnpm --filter @usstm/portal db:import-board-archives --source /export/board-history.json
+```
+
+Each year becomes a Board Archive of names and Board Positions, using each person's position or, when that is blank, their group's name. The dry run lists `importable` years, with any people that could not be exported, and `notImported` years: unreadable academic years and years that already have a Board Archive, which is never changed. Rerun with `--apply` to create the archives. When the copy is confirmed, drop `board_history_archive` from the Website database.
+
+When both copies are confirmed, delete the export directory.
 
 ## Health and logs
 

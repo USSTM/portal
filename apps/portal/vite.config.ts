@@ -52,6 +52,30 @@ const config = defineConfig(({ mode }) => {
               handler: './server/public-events.ts',
             },
             {
+              route: '/api/v1/clubs',
+              handler: './server/public-clubs.ts',
+            },
+            {
+              route: '/api/v1/club-images/**',
+              handler: './server/public-club-images.ts',
+            },
+            {
+              route: '/api/v1/board',
+              handler: './server/public-board.ts',
+            },
+            {
+              route: '/api/v1/board-photos/**',
+              handler: './server/public-board-photos.ts',
+            },
+            {
+              route: '/api/v1/board-archives',
+              handler: './server/public-board-archives.ts',
+            },
+            {
+              route: '/api/website/content-manager-authority',
+              handler: './server/content-manager-authority.ts',
+            },
+            {
               route: '/auth/logout',
               method: 'POST',
               handler: './server/logout.ts',

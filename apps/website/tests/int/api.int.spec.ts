@@ -11,10 +11,20 @@ describe('API', () => {
     payload = await getPayload({ config: payloadConfig })
   })
 
-  it('fetches users', async () => {
-    const users = await payload.find({
-      collection: 'users',
+  it('fetches Content Managers', async () => {
+    const contentManagers = await payload.find({
+      collection: 'content-managers',
     })
-    expect(users).toBeDefined()
+    expect(contentManagers).toBeDefined()
+  })
+
+  it('does not let anyone create a Content Manager through the API', async () => {
+    await expect(
+      payload.create({
+        collection: 'content-managers',
+        data: { email: `editor-${crypto.randomUUID()}@example.com` },
+        overrideAccess: false,
+      }),
+    ).rejects.toThrow()
   })
 })

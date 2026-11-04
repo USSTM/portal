@@ -9,6 +9,7 @@ import {
   administrators,
   boardMembers,
   clubAccess,
+  contentManagers,
   members,
 } from '../db/schema.js'
 
@@ -39,6 +40,7 @@ export const resolvePortalIdentity = createServerOnlyFn(async () => {
         .from(members)
         .leftJoin(clubAccess, eq(clubAccess.memberId, members.id))
         .leftJoin(boardMembers, eq(boardMembers.memberId, members.id))
+        .leftJoin(contentManagers, eq(contentManagers.memberId, members.id))
         .where(
           and(
             eq(members.email, email),
@@ -46,6 +48,7 @@ export const resolvePortalIdentity = createServerOnlyFn(async () => {
             or(
               eq(clubAccess.memberId, members.id),
               eq(boardMembers.memberId, members.id),
+              eq(contentManagers.memberId, members.id),
             ),
           ),
         )
