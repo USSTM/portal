@@ -41,11 +41,12 @@ export async function TeamGridBlock({
           </p>
         ) : (
           <div className={`grid ${gridClasses[columns]} gap-6`}>
-            {boardMembers.map((member) => {
+            {boardMembers.map((member, index) => {
               const photoPath = websiteBoardPhotoPath(member.photoUrl)
               return (
                 <Card
-                  key={`${member.boardPosition}-${member.displayName}`}
+                  // The API has no IDs, and two entries can share a name and position.
+                  key={`${index}-${member.boardPosition}-${member.displayName}`}
                   className="overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   <CardHeader className="p-0">

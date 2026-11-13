@@ -9,6 +9,7 @@ import {
   updateOwnBioAction,
   uploadOwnPhotoAction,
 } from '../features/member-profiles/member-profile-actions'
+import { errorMessage } from '../lib/error-message'
 
 const MAX_BIO_LENGTH = 500
 
@@ -32,7 +33,7 @@ export function MemberProfileSection({
       setError(undefined)
       toast.success(message)
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Action failed.')
+      setError(errorMessage(caught, 'Action failed.'))
     } finally {
       setIsSubmitting(false)
     }

@@ -11,6 +11,7 @@ import {
   uploadClubImageAction,
 } from '../features/clubs/club-profile-actions'
 import { clubImagePath } from '../features/clubs/club-image-path'
+import { errorMessage } from '../lib/error-message'
 
 export const Route = createFileRoute('/club-profiles')({
   component: ClubProfiles,
@@ -84,7 +85,7 @@ function ClubImageEditor({ club }: { club: ClubProfile }) {
       setError(undefined)
       toast.success(message)
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'Action failed.')
+      setError(errorMessage(caught, 'Action failed.'))
     } finally {
       setIsSubmitting(false)
     }
@@ -197,11 +198,7 @@ function ClubProfileForm({ club }: { club: ClubProfile }) {
           setError(undefined)
           toast.success('Club Profile saved.')
         } catch (caught) {
-          setError(
-            caught instanceof Error
-              ? caught.message
-              : 'Unable to save profile.',
-          )
+          setError(errorMessage(caught, 'Unable to save profile.'))
         } finally {
           setIsSubmitting(false)
         }

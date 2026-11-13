@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Archive } from 'lucide-react'
 
 import { createBoardArchiveAction } from '../features/board/board-archive-actions'
+import { errorMessage } from '../lib/error-message'
 
 type BoardArchiveSummary = {
   academicYear: string
@@ -63,9 +64,7 @@ export function BoardArchivesCard({
               `Archived ${archive.entries} Board Members for ${archive.academicYear}.`,
             )
           } catch (caught) {
-            setError(
-              caught instanceof Error ? caught.message : 'Unable to archive.',
-            )
+            setError(errorMessage(caught, 'Unable to archive.'))
           } finally {
             setIsSaving(false)
           }

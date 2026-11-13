@@ -12,17 +12,8 @@ const nextConfig = {
   outputFileTracingRoot: path.join(dirname, '../..'),
   // The shared session package ships TypeScript source.
   transpilePackages: ['@usstm/auth-session'],
-  // In production Caddy routes /auth/* to the auth service before requests
-  // reach Next. In development, proxy it like the Portal's Vite config does.
-  async rewrites() {
-    if (process.env.NODE_ENV !== 'development') return []
-    return [
-      {
-        source: '/auth/:path*',
-        destination: `http://127.0.0.1:${process.env.AUTH_PORT ?? '3001'}/auth/:path*`,
-      },
-    ]
-  },
+  // /auth/* goes to the auth service: through Caddy in production, and through
+  // src/app/auth/[...path]/route.ts in development.
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

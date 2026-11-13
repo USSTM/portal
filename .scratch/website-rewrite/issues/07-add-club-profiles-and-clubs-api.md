@@ -21,8 +21,10 @@
 - Audit (recorded in ADR-0010): as with Events, changes by Administrators and the Superuser are audited (`club.profile_updated`, `club.image_replaced`, `club.image_removed`), and changes through Club Access are not.
 - `GET /api/v1/clubs` leaves out the USSTM Club, which represents USSTM itself rather than an associated organization (decided while building ticket 08).
 - `imageUrl` is a path on the Portal origin. The Website proxies it at `/club-images/<id>` (ticket 08), so neither CSP needs another origin.
-- Needs a human:
+- Validated locally (November 13, 2026), against PostgreSQL 17 and an S3-compatible test server (S3Mock):
+  - Migration `0016` applies, and the Club Profile integration tests and the deployment config tests pass.
+  - In the browser: a profile saved and appeared in `/api/v1/clubs`; an `http://` website was refused with a readable message.
+  - A PNG uploaded through `/club-profiles` displayed on the page and was served by `/api/v1/club-images/<id>` byte for byte, with `image/png`, a one-day public cache and open CORS. A text file named `.png` was refused ("Image must be a JPEG, PNG or WebP file") and the existing image was kept.
+- Needs a human, in production:
   - Create the bucket and set `PORTAL_S3_*` on the host.
   - Apply migration `0016`.
-  - Run the integration and deployment tests (no Docker where this was built).
-  - Upload an image through `/club-profiles` in a browser.

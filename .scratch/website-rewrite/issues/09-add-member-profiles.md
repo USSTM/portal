@@ -19,8 +19,7 @@
 - Privacy: no route serves photos publicly yet. The Account page shows the Member their own photo as a data URL. Ticket 10 publishes photos and bios only for current Board Members, and deactivation revokes Board Member authority, so a deactivated Member's profile stays private. Deactivated Members cannot edit their profile; it is kept.
 - Audit: self-service edits are not privileged administrative mutations, so they are not audited (ADR-0010).
 - `docs/PRIVACY.md` and the Portal's `/privacy` page, which keeps its own copy of the text, both describe the Member Profile, its Board Member-only visibility and what deactivation does. Both "Last Updated" dates are now October 29, 2026.
+- Validated locally (November 13, 2026): migration `0017` applies and the Member Profile integration tests pass. Signed in with Google as a regular Member who is also a Board Member (`amitoz.banga@torontomu.ca`, Computer Science Director), a JPEG photo uploaded on the Account page and a bio saved. `GET /api/v1/board` then returned that entry with the bio and a photo link and only its four public fields; the photo was served by `/api/v1/board-photos/<id>` and through the Website's `/board-photos/<id>` (the same 293,664-byte JPEG, `image/jpeg`, a 5-minute public cache); and the Website's Team Grid showed the photo and bio on that card once its 60-second cache expired. Photos staying private for Members who aren't on the board, or are deactivated, is covered by the integration tests.
 - Needs a human:
-  - Apply migration `0017`.
-  - Run `member-profiles.integration.test.ts` (no Docker where this was built).
-  - Upload, replace and remove a photo on the Account page in a browser.
+  - Apply migration `0017` in production.
   - Review the privacy wording before it is published.

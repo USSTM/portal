@@ -18,10 +18,10 @@
 - The Website asks the Portal for authority at `GET /api/website/content-manager-authority`, presenting its own session as a bearer token (`docs/api/content-manager-authority.md`). The apps share no secret, and the Website fails closed when the Portal is unavailable.
 - Payload still needs a stored auth collection, because its document locks and preferences reference user rows. `users` is replaced by a password-less `content-managers` collection that the strategy fills on first sign-in. Its rows cannot be created or edited through Payload.
 - Two migrations, because drizzle-kit's rename prompt needs a TTY: `add_content_managers`, then `remove_users`. The generated SQL dropped tables with CASCADE before dropping the constraints that referenced them, which would fail, so both were reordered. `remove_users` also deletes admin preferences and document locks held by the old users.
-- Needs a human:
-  - Apply the migrations against a copy of the website database.
-  - Add `https://<WEBSITE_ADDRESS>/auth/callback` (and `http://localhost:3002/auth/callback` for development) to the Google OAuth client.
+- Fixed while validating: in development, Next's rewrite proxy did not pass the Website's host to the auth service, so Website sign-in returned 400. `src/app/auth/[...path]/route.ts` now forwards `/auth/*` in development with `X-Forwarded-Host` and `X-Forwarded-Proto`; it returns 404 in production, where Caddy handles `/auth/*`.
+- Validated locally (November 13, 2026): the Website migrations apply; the integration and deployment config tests pass; a Content Manager (the Superuser account) signed in to `/admin` with Google through the shared auth service (`_strategy: usstm-auth`), the strategy created their `content-managers` row on first sign-in, the email is read-only, and the session held across admin pages and while creating a Page through Payload's API.
+- Still to check: signing in as a Member without Content Manager authority (needs a second account), and a session left open long enough to confirm Payload never tries to refresh a token.
+- Needs a human, in production:
+  - Add `https://<WEBSITE_ADDRESS>/auth/callback` to the Google OAuth client.
   - Set `WEBSITE_AUTH_*` and the `website` client in `AUTH_CLIENTS` on the host.
-  - Sign in to `/admin` in a browser as a Content Manager and as a denied Member.
-  - Check that Payload's admin keeps the session without trying to refresh a Payload token.
-  - The new integration and deployment tests were not run (no Docker where this was built).
+  - Apply the migrations against the restored website database (ticket 03).

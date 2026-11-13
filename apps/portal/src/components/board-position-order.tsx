@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { ArrowDown, ArrowUp, Save } from 'lucide-react'
 
 import { setBoardPositionOrderAction } from '../features/board/board-order-actions'
+import { errorMessage } from '../lib/error-message'
 
 /** Orders the current Board Positions as the Website lists the board. */
 export function BoardPositionOrder({ positions }: { positions: string[] }) {
@@ -87,11 +88,7 @@ export function BoardPositionOrder({ positions }: { positions: string[] }) {
             await router.invalidate()
             toast.success('Website order saved.')
           } catch (caught) {
-            toast.error(
-              caught instanceof Error
-                ? caught.message
-                : 'Unable to save order.',
-            )
+            toast.error(errorMessage(caught, 'Unable to save order.'))
           } finally {
             setIsSaving(false)
           }

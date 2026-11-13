@@ -43,6 +43,7 @@ import {
   updateAdministratorBoardPositionAction,
 } from '../../features/admin/actions'
 import { getPortalShell } from '../../auth/shell'
+import { errorMessage } from '../../lib/error-message'
 
 const ADMINISTRATOR_FILTER_VALUE = '__administrator__'
 
@@ -121,11 +122,7 @@ function Members() {
       )
       formElement.closest('details')?.removeAttribute('open')
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : 'Unable to provision Member.',
-      )
+      setError(errorMessage(caught, 'Unable to provision Member.'))
     }
   }
 
@@ -497,7 +494,7 @@ function ManageMemberModal({
         onClose()
       }
     } catch (caught) {
-      setModalError(caught instanceof Error ? caught.message : 'Action failed.')
+      setModalError(errorMessage(caught, 'Action failed.'))
     } finally {
       setIsSubmitting(false)
     }

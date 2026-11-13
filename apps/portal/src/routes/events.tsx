@@ -28,6 +28,7 @@ import {
   replaceEventOrganizersAction,
 } from '../features/events/event-actions'
 import { eventEditInput, eventInput } from '../features/events/event-input'
+import { errorMessage } from '../lib/error-message'
 
 const searchSchema = z.object({
   page: z.coerce.number().int().positive().catch(1),
@@ -96,10 +97,10 @@ function Events() {
       // close the details element
       formElement.closest('details')?.removeAttribute('open')
     } catch (caught) {
-      const message =
-        caught instanceof Error
-          ? caught.message
-          : 'Unable to publish the Event. Try again.'
+      const message = errorMessage(
+        caught,
+        'Unable to publish the Event. Try again.',
+      )
       setError(message)
       toast.error(message)
     }
@@ -140,11 +141,7 @@ function Events() {
       toast.success('Event updated.')
       formElement.closest('details')?.removeAttribute('open')
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : 'Unable to update the Event.',
-      )
+      setError(errorMessage(caught, 'Unable to update the Event.'))
     }
   }
 
@@ -160,11 +157,7 @@ function Events() {
       await router.invalidate()
       toast.success('Event deleted.')
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : 'Unable to delete the Event.',
-      )
+      setError(errorMessage(caught, 'Unable to delete the Event.'))
     }
   }
 
@@ -186,11 +179,7 @@ function Events() {
       toast.success('Organizing Clubs updated.')
       formElement.closest('details')?.removeAttribute('open')
     } catch (caught) {
-      setError(
-        caught instanceof Error
-          ? caught.message
-          : 'Unable to update Organizing Clubs.',
-      )
+      setError(errorMessage(caught, 'Unable to update Organizing Clubs.'))
     }
   }
 

@@ -46,6 +46,11 @@ export async function createBoardArchive(input: {
   actorEmail: string
 }) {
   const academicYear = requireAcademicYear(input.academicYear)
+  // Report a taken year before anything about the current board; the insert
+  // checks again inside its transaction.
+  if ((await listBoardArchiveYears()).has(academicYear)) {
+    throw new BoardArchiveExistsError(academicYear)
+  }
   const entries = (await listPublicBoard()).boardMembers.map(
     ({ boardPosition, displayName }) => ({ boardPosition, displayName }),
   )

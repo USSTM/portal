@@ -1,0 +1,4 @@
+# Shell scripts run inside Linux containers and on the production host, where a
+# Windows line ending makes the first line `#!/bin/sh\r` and the script fails.
+# Keep them LF even in checkouts that convert line endings (core.autocrlf).
+*.sh text eol=lf

@@ -56,7 +56,7 @@ const config = defineConfig(({ mode }) => {
               handler: './server/public-clubs.ts',
             },
             {
-              route: '/api/v1/club-images/**',
+              route: '/api/v1/club-images/:imageId',
               handler: './server/public-club-images.ts',
             },
             {
@@ -64,7 +64,7 @@ const config = defineConfig(({ mode }) => {
               handler: './server/public-board.ts',
             },
             {
-              route: '/api/v1/board-photos/**',
+              route: '/api/v1/board-photos/:photoId',
               handler: './server/public-board-photos.ts',
             },
             {

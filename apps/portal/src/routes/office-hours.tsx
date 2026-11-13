@@ -21,6 +21,7 @@ import {
   getOfficeHoursCalendarAction,
 } from '../features/office-hours/calendar-actions'
 import { addDays } from '../features/office-hours/calendar'
+import { errorMessage } from '../lib/error-message'
 
 const searchSchema = z.object({ week: z.string().optional() })
 
@@ -193,9 +194,10 @@ function OfficeHours() {
                                       await router.invalidate()
                                     } catch (caught) {
                                       setError(
-                                        caught instanceof Error
-                                          ? caught.message
-                                          : 'Unable to cancel Booking override.',
+                                        errorMessage(
+                                          caught,
+                                          'Unable to cancel Booking override.',
+                                        ),
                                       )
                                     }
                                   }}
@@ -233,9 +235,10 @@ function OfficeHours() {
                               await router.invalidate()
                             } catch (caught) {
                               setError(
-                                caught instanceof Error
-                                  ? caught.message
-                                  : 'Unable to cancel this Booking.',
+                                errorMessage(
+                                  caught,
+                                  'Unable to cancel this Booking.',
+                                ),
                               )
                             } finally {
                               setPending(undefined)
@@ -261,9 +264,10 @@ function OfficeHours() {
                               await router.invalidate()
                             } catch (caught) {
                               setError(
-                                caught instanceof Error
-                                  ? caught.message
-                                  : 'Unable to book this Shift.',
+                                errorMessage(
+                                  caught,
+                                  'Unable to book this Shift.',
+                                ),
                               )
                             } finally {
                               setPending(undefined)
@@ -295,9 +299,10 @@ function OfficeHours() {
                             await router.invalidate()
                           } catch (caught) {
                             setError(
-                              caught instanceof Error
-                                ? caught.message
-                                : 'Unable to create Booking override.',
+                              errorMessage(
+                                caught,
+                                'Unable to create Booking override.',
+                              ),
                             )
                           } finally {
                             setPending(undefined)
