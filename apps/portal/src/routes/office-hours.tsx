@@ -45,17 +45,6 @@ function OfficeHours() {
   const [overrideMemberId, setOverrideMemberId] = useState('')
   const previousWeek = addDays(calendar.week, -7)
   const nextWeek = addDays(calendar.week, 7)
-  const [selectedDay, setSelectedDay] = useState<string>()
-  // On phones, show the chosen day; otherwise today if it is in this week,
-  // else the first day of the week.
-  const dayDates = calendar.days.map((day) => day.date)
-  const today = torontoToday()
-  const mobileDay =
-    selectedDay && dayDates.includes(selectedDay)
-      ? selectedDay
-      : dayDates.includes(today)
-        ? today
-        : dayDates[0]
 
   return (
     <main className="mx-auto max-w-[1400px] space-y-8 px-4 py-8 sm:px-6 sm:py-12">
@@ -132,29 +121,10 @@ function OfficeHours() {
         </div>
       ) : null}
 
-      {/* Phones show one day at a time, picked here, instead of a long scroll */}
-      <label className="flex flex-col gap-1.5 md:hidden">
-        <span className="text-sm font-medium text-muted-foreground">Day</span>
-        <select
-          className="bg-card border border-border rounded-lg px-3 py-2 text-base font-medium text-foreground shadow-sm"
-          onChange={(event) => setSelectedDay(event.currentTarget.value)}
-          value={mobileDay}
-        >
-          {calendar.days.map((day) => (
-            <option key={day.date} value={day.date}>
-              {day.label}, {formatDate(day.date)}
-            </option>
-          ))}
-        </select>
-      </label>
-
       {/* Grid container: 1 col on mobile, 5 cols on lg+ */}
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-5 items-start">
         {calendar.days.map((day) => (
-          <section
-            className={`${day.date === mobileDay ? 'flex' : 'hidden md:flex'} flex-col gap-4`}
-            key={day.date}
-          >
+          <section className="flex flex-col gap-4" key={day.date}>
             {/* Day Header */}
             <div className="bg-card border border-border rounded-xl p-4 shadow-sm text-center">
               <h2 className="font-bold text-lg text-foreground">{day.label}</h2>
@@ -372,14 +342,4 @@ function formatTime(value: string) {
     minute: '2-digit',
     timeZone: 'UTC',
   }).format(new Date(Date.UTC(2026, 0, 1, hour, minute)))
-}
-
-// Today's date (YYYY-MM-DD) in Toronto, where office hours are held.
-function torontoToday() {
-  return new Intl.DateTimeFormat('en-CA', {
-    day: '2-digit',
-    month: '2-digit',
-    timeZone: 'America/Toronto',
-    year: 'numeric',
-  }).format(new Date())
 }
