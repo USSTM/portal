@@ -38,8 +38,8 @@ const legacyExportSchema = z.object({
 
 export type LegacyExport = z.infer<typeof legacyExportSchema>
 
-type PreparedClub = typeof clubs.$inferInsert
-type PreparedEvent = typeof events.$inferInsert
+type PreparedClub = typeof clubs.$inferInsert & { id: string }
+type PreparedEvent = typeof events.$inferInsert & { id: string }
 type PreparedOrganizer = typeof eventOrganizers.$inferInsert
 
 export interface PreparationReport {

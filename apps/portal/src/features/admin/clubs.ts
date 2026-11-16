@@ -37,7 +37,11 @@ export async function createClub(input: {
 }
 
 export async function editClub(
-  input: ClubInput & { contactEmail?: string; fullName: string; shortName: string },
+  input: ClubInput & {
+    contactEmail?: string
+    fullName: string
+    shortName: string
+  },
 ) {
   const db = getDb()
   return db.transaction(async (tx) => {
@@ -105,10 +109,15 @@ export async function browseClubs(input: {
           ilike(clubs.fullName, `%${input.search.trim()}%`),
         )
       : undefined,
-  ].filter((filter): filter is NonNullable<typeof filter> => filter !== undefined)
+  ].filter(
+    (filter): filter is NonNullable<typeof filter> => filter !== undefined,
+  )
   const where = filters.length > 0 ? and(...filters) : undefined
   const db = getDb()
-  const [{ total }] = await db.select({ total: count() }).from(clubs).where(where)
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(clubs)
+    .where(where)
   const entries = await db
     .select()
     .from(clubs)
@@ -136,7 +145,8 @@ async function requireUnprotectedClub(tx: Transaction, clubId: string) {
     .from(clubs)
     .where(eq(clubs.id, clubId))
   if (found.length === 0) throw new Error('Club not found')
-  if (found[0].protected) throw new Error('The USSTM Club cannot be edited or archived')
+  if (found[0].protected)
+    throw new Error('The USSTM Club cannot be edited or archived')
 }
 
 type Transaction = Parameters<

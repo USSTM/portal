@@ -7,3 +7,6 @@ coverage
 old-*.md
 apps/portal/.cta.json
 apps/portal/public
+apps/portal/drizzle/meta
+apps/portal/src/routeTree.gen.ts
+pnpm-lock.yaml

@@ -31,21 +31,24 @@ function Contact() {
   const socialEntries = [
     {
       label: 'Instagram',
-      description: 'Follow us for community updates, events, and announcements.',
+      description:
+        'Follow us for community updates, events, and announcements.',
       value: result.contact.instagram,
       href: result.contact.instagram,
       icon: Camera,
     },
     {
       label: 'Website',
-      description: 'Visit the main USSTM website for student resources and information.',
+      description:
+        'Visit the main USSTM website for student resources and information.',
       value: result.contact.website,
       href: result.contact.website,
       icon: Globe,
     },
     {
       label: 'Linktree',
-      description: 'Quick access to current forms, links, and active initiatives.',
+      description:
+        'Quick access to current forms, links, and active initiatives.',
       value: result.contact.linktree,
       href: result.contact.linktree,
       icon: LinkIcon,
@@ -69,7 +72,8 @@ function Contact() {
           Contact Us
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
-          Get in touch with the USSTM tech team or follow us on our official channels for the latest updates.
+          Get in touch with the USSTM tech team or follow us on our official
+          channels for the latest updates.
         </p>
       </header>
 

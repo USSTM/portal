@@ -15,7 +15,8 @@ describeWithDatabase('Member Club Access lifecycle', () => {
   it('provisions multiple grants and deactivates after the final revocation', async () => {
     const db = getDb()
     const clubs = await db.query.clubs.findMany({ limit: 2 })
-    if (clubs.length < 2) throw new Error('Integration test requires two active Clubs')
+    if (clubs.length < 2)
+      throw new Error('Integration test requires two active Clubs')
 
     const member = await createMemberWithClubAccess({
       actorEmail: 'admin@example.com',
@@ -39,7 +40,10 @@ describeWithDatabase('Member Club Access lifecycle', () => {
       memberId: member.id,
     })
 
-    const [storedMember] = await db.select().from(members).where(eq(members.id, member.id))
+    const [storedMember] = await db
+      .select()
+      .from(members)
+      .where(eq(members.id, member.id))
     const grants = await db
       .select()
       .from(clubAccess)
@@ -52,7 +56,11 @@ describeWithDatabase('Member Club Access lifecycle', () => {
     expect(storedMember.lifecycle).toBe('deactivated')
     expect(grants).toHaveLength(0)
     expect(audit.map((entry) => entry.action)).toEqual(
-      expect.arrayContaining(['member.created', 'club_access.granted', 'club_access.revoked']),
+      expect.arrayContaining([
+        'member.created',
+        'club_access.granted',
+        'club_access.revoked',
+      ]),
     )
   })
 })

@@ -17,7 +17,13 @@ import {
 } from './members.js'
 import { getDb } from '../../db/index.js'
 import { USSTM_CLUB_ID } from '../../db/seed/usstm-club.js'
-import { administrators, auditEntries, clubAccess, clubs, members } from '../../db/schema.js'
+import {
+  administrators,
+  auditEntries,
+  clubAccess,
+  clubs,
+  members,
+} from '../../db/schema.js'
 
 const describeWithDatabase = process.env.DATABASE_URL ? describe : describe.skip
 
@@ -203,7 +209,11 @@ describeWithDatabase('Superuser Administrator workflow', () => {
   })
 
   it('lets an ordinary Administrator grant USSTM Club Access to a non-administrator Member', async () => {
-    const [otherClub] = await getDb().select().from(clubs).where(eq(clubs.protected, false)).limit(1)
+    const [otherClub] = await getDb()
+      .select()
+      .from(clubs)
+      .where(eq(clubs.protected, false))
+      .limit(1)
     const member = await createMemberWithClubAccess({
       actorEmail: 'admin@example.com',
       clubIds: [otherClub.id],
@@ -221,7 +231,10 @@ describeWithDatabase('Superuser Administrator workflow', () => {
       .select()
       .from(clubAccess)
       .where(
-        and(eq(clubAccess.memberId, member.id), eq(clubAccess.clubId, USSTM_CLUB_ID)),
+        and(
+          eq(clubAccess.memberId, member.id),
+          eq(clubAccess.clubId, USSTM_CLUB_ID),
+        ),
       )
     expect(grants).toHaveLength(1)
   })

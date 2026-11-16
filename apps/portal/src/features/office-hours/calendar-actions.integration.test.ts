@@ -40,9 +40,7 @@ describeWithDatabase('Board Member authority resolution', () => {
     await expect(boardMemberIdForIdentity(asAdministrator)).resolves.toBe(
       member.id,
     )
-    await expect(boardMemberIdForIdentity(asSuperuser)).resolves.toBe(
-      member.id,
-    )
+    await expect(boardMemberIdForIdentity(asSuperuser)).resolves.toBe(member.id)
 
     await expect(requireBoardMember(asMember)).resolves.toBe(member.email)
     await expect(requireBoardMember(asAdministrator)).resolves.toBe(

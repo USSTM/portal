@@ -9,7 +9,10 @@ import { googleBoundary } from './google.js'
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url))
 
-config({ path: [join(repoRoot, '.env.local'), join(repoRoot, '.env')], quiet: true })
+config({
+  path: [join(repoRoot, '.env.local'), join(repoRoot, '.env')],
+  quiet: true,
+})
 
 const port = Number(process.env.AUTH_PORT ?? 3001)
 const clients = parseClients(process.env.AUTH_CLIENTS)
@@ -26,8 +29,13 @@ const authApp = createAuthApp({
 serve({ fetch: authApp.fetch, port })
 
 function parseClients(value: string | undefined): AuthClient[] {
-  const clients: unknown = JSON.parse(requiredEnvironmentValue(value, 'AUTH_CLIENTS'))
-  if (!Array.isArray(clients) || clients.some((client) => !isAuthClient(client))) {
+  const clients: unknown = JSON.parse(
+    requiredEnvironmentValue(value, 'AUTH_CLIENTS'),
+  )
+  if (
+    !Array.isArray(clients) ||
+    clients.some((client) => !isAuthClient(client))
+  ) {
     throw new Error('AUTH_CLIENTS must contain valid allowlisted clients')
   }
   return clients

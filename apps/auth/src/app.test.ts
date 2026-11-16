@@ -35,12 +35,17 @@ describe('Google sign-in', () => {
   })
 
   it('creates an eight-hour host-only cookie after a verified Google email', async () => {
-    const google = fakeGoogle({ email: ' Admin@Example.com ', emailVerified: true })
+    const google = fakeGoogle({
+      email: ' Admin@Example.com ',
+      emailVerified: true,
+    })
     const auth = app({ google })
     const signIn = await auth.request(
       'https://portal.test/auth/sign-in?client=portal&returnTo=/account',
     )
-    const state = new URL(signIn.headers.get('location')!).searchParams.get('state')!
+    const state = new URL(signIn.headers.get('location')!).searchParams.get(
+      'state',
+    )!
     const cookie = signIn.headers.get('set-cookie')!
 
     const response = await auth.request(
@@ -50,7 +55,9 @@ describe('Google sign-in', () => {
 
     expect(response.status).toBe(302)
     expect(response.headers.get('location')).toBe('/account')
-    expect(response.headers.get('set-cookie')).toContain('__Host-portal-session=')
+    expect(response.headers.get('set-cookie')).toContain(
+      '__Host-portal-session=',
+    )
     expect(response.headers.get('set-cookie')).toContain('Max-Age=28800')
     expect(response.headers.get('set-cookie')).toContain('HttpOnly')
     expect(response.headers.get('set-cookie')).toContain('Secure')
@@ -62,7 +69,8 @@ describe('Google sign-in', () => {
     const auth = app()
 
     expect(
-      (await auth.request('https://portal.test/auth/sign-in?client=unknown')).status,
+      (await auth.request('https://portal.test/auth/sign-in?client=unknown'))
+        .status,
     ).toBe(400)
     expect(
       (
@@ -72,7 +80,8 @@ describe('Google sign-in', () => {
       ).status,
     ).toBe(400)
     expect(
-      (await auth.request('https://evil.test/auth/sign-in?client=portal')).status,
+      (await auth.request('https://evil.test/auth/sign-in?client=portal'))
+        .status,
     ).toBe(400)
   })
 
@@ -86,12 +95,17 @@ describe('Google sign-in', () => {
   })
 
   it('rejects unverified Google email addresses', async () => {
-    const google = fakeGoogle({ email: 'admin@example.com', emailVerified: false })
+    const google = fakeGoogle({
+      email: 'admin@example.com',
+      emailVerified: false,
+    })
     const auth = app({ google })
     const signIn = await auth.request(
       'https://portal.test/auth/sign-in?client=portal',
     )
-    const state = new URL(signIn.headers.get('location')!).searchParams.get('state')!
+    const state = new URL(signIn.headers.get('location')!).searchParams.get(
+      'state',
+    )!
 
     expect(
       (

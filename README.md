@@ -131,7 +131,7 @@ The root `package.json` provides scripts to manage all workspace packages:
 | `pnpm db:migrate`        | Apply pending Drizzle migrations to local database                                            |
 | `pnpm db:test:up`        | Spin up dedicated test database container                                                     |
 | `pnpm db:test:reset`     | Reset and re-seed the test database                                                           |
-| `pnpm ci`                | Run the complete CI verification pipeline (format, lint, typecheck, migrations, tests, build) |
+| `pnpm run ci`            | Run the complete CI verification pipeline (format, lint, typecheck, migrations, tests, build) |
 | `pnpm deploy:production` | Execute the production deployment script ([`deployment/deploy.sh`](deployment/deploy.sh))     |
 
 ---

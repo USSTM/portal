@@ -19,10 +19,16 @@ describeWithDatabase('Board Member lifecycle', () => {
       email: `board-${crypto.randomUUID()}@example.com`,
     })
 
-    await revokeBoardAuthority({ actorEmail: 'admin@example.com', memberId: member.id })
+    await revokeBoardAuthority({
+      actorEmail: 'admin@example.com',
+      memberId: member.id,
+    })
 
     const db = getDb()
-    const [storedMember] = await db.select().from(members).where(eq(members.id, member.id))
+    const [storedMember] = await db
+      .select()
+      .from(members)
+      .where(eq(members.id, member.id))
     const grants = await db
       .select()
       .from(boardMembers)

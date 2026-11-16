@@ -46,18 +46,15 @@ type PendingSignIn = { returnTo: string; state: string; verifier: string }
 
 const signInQuerySchema = z.object({
   client: z.string().min(1).max(100),
-  returnTo: z
-    .string()
-    .min(1)
-    .max(2_048)
-    .refine(isRelativePath)
-    .default('/'),
+  returnTo: z.string().min(1).max(2_048).refine(isRelativePath).default('/'),
 })
 
 export function createAuthApp(dependencies: AuthDependencies) {
   assertClientsAreValid(dependencies.clients)
   const app = new Hono()
-  const clients = new Map(dependencies.clients.map((client) => [client.audience, client]))
+  const clients = new Map(
+    dependencies.clients.map((client) => [client.audience, client]),
+  )
 
   app.use('*', async (context, next) => {
     await next()
@@ -90,13 +87,18 @@ export function createAuthApp(dependencies: AuthDependencies) {
     const state = randomUrlValue(32)
     const verifier = randomUrlValue(96)
     const pending: PendingSignIn = { returnTo, state, verifier }
-    setCookie(context, pendingCookieName(client), encodeURIComponent(JSON.stringify(pending)), {
-      httpOnly: true,
-      maxAge: 10 * 60,
-      path: '/auth/callback',
-      sameSite: 'Lax',
-      secure: true,
-    })
+    setCookie(
+      context,
+      pendingCookieName(client),
+      encodeURIComponent(JSON.stringify(pending)),
+      {
+        httpOnly: true,
+        maxAge: 10 * 60,
+        path: '/auth/callback',
+        sameSite: 'Lax',
+        secure: true,
+      },
+    )
 
     return context.redirect(
       dependencies.google
@@ -119,7 +121,9 @@ export function createAuthApp(dependencies: AuthDependencies) {
       return context.text('Invalid sign-in response', 400)
     }
 
-    const pending = readPendingSignIn(getCookie(context, pendingCookieName(client)))
+    const pending = readPendingSignIn(
+      getCookie(context, pendingCookieName(client)),
+    )
     deleteCookie(context, pendingCookieName(client), { path: '/auth/callback' })
     if (!pending || pending.state !== state) {
       return context.text('Invalid sign-in response', 400)
@@ -134,7 +138,10 @@ export function createAuthApp(dependencies: AuthDependencies) {
         redirectUri: `${client.origin}${client.callbackPath}`,
       })
       const profile = await dependencies.google.getUserInfo(accessToken)
-      const email = profile.email && profile.emailVerified ? normalizeEmail(profile.email) : undefined
+      const email =
+        profile.email && profile.emailVerified
+          ? normalizeEmail(profile.email)
+          : undefined
       if (!email) return context.text('Access denied', 403)
 
       const session = await signSession(
@@ -143,7 +150,11 @@ export function createAuthApp(dependencies: AuthDependencies) {
           email,
           issuedAt: Math.floor(Date.now() / 1000),
         },
-        { issuer: dependencies.issuer, key: dependencies.key, keyId: dependencies.keyId },
+        {
+          issuer: dependencies.issuer,
+          key: dependencies.key,
+          keyId: dependencies.keyId,
+        },
       )
       setCookie(context, client.cookieName, session, {
         httpOnly: true,
@@ -203,7 +214,10 @@ function assertClientsAreValid(clients: AuthClient[]) {
   }
 }
 
-function getClient(clientId: string | undefined, clients: Map<string, AuthClient>) {
+function getClient(
+  clientId: string | undefined,
+  clients: Map<string, AuthClient>,
+) {
   return clientId ? clients.get(clientId) : undefined
 }
 
@@ -225,18 +239,24 @@ function getPublicRequestUrl(request: Request) {
   const forwardedHost = request.headers.get('x-forwarded-host')
   const forwardedProto = request.headers.get('x-forwarded-proto')
   if (!forwardedHost || !forwardedProto) return url
-  return new URL(`${forwardedProto}://${forwardedHost}${url.pathname}${url.search}`)
+  return new URL(
+    `${forwardedProto}://${forwardedHost}${url.pathname}${url.search}`,
+  )
 }
 
 function isRelativePath(value: string) {
-  return value.startsWith('/') && !value.startsWith('//') && !value.includes('\\')
+  return (
+    value.startsWith('/') && !value.startsWith('//') && !value.includes('\\')
+  )
 }
 
 function pendingCookieName(client: AuthClient) {
   return `${client.audience}-oauth-pending`
 }
 
-function readPendingSignIn(value: string | undefined): PendingSignIn | undefined {
+function readPendingSignIn(
+  value: string | undefined,
+): PendingSignIn | undefined {
   if (!value) return undefined
   try {
     const parsed: unknown = JSON.parse(decodeURIComponent(value))
@@ -256,7 +276,9 @@ function readPendingSignIn(value: string | undefined): PendingSignIn | undefined
 }
 
 function randomUrlValue(bytes: number) {
-  return Buffer.from(crypto.getRandomValues(new Uint8Array(bytes))).toString('base64url')
+  return Buffer.from(crypto.getRandomValues(new Uint8Array(bytes))).toString(
+    'base64url',
+  )
 }
 
 export function normalizeEmail(email: string) {

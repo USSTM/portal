@@ -1,7 +1,7 @@
 # USSTM Portal Terms of Service
 
 **Effective Date:** September 4, 2026  
-**Last Updated:** September 4, 2026  
+**Last Updated:** September 4, 2026
 
 ---
 
@@ -47,18 +47,22 @@ By accessing the Portal, authenticating as a Member, or consuming the public Eve
 Users of the Portal operate under defined roles and must comply with corresponding responsibilities:
 
 ### A. Public Visitors & API Consumers
+
 - You may freely view the public Office Hours schedule and consume the unauthenticated public Events API (`GET /api/v1/events`).
 - You agree not to abuse, overburden, scrape aggressively, flood, or circumvent rate limits on public endpoints.
 
 ### B. Club Representatives (Club Access)
+
 - Members granted Club Access have authority to manage event details and schedules for their designated club(s).
 - You represent and warrant that any event information, room location, promotional copy, or contact details submitted are accurate, current, and officially sanctioned by your student club.
 
 ### C. Board Members
+
 - Members designated as Board Members have authority to reserve and manage Office Hours shifts.
 - By booking a shift slot, you commit to staffing the designated USSTM Office Hours for the reserved duration. If you are unable to fulfill a scheduled shift, you must cancel your booking in advance through the Portal.
 
 ### D. Administrators & Superuser
+
 - Administrators possess privileged authority to manage member grants, clubs, resources, and event overrides.
 - Privileged administrative mutations are subject to immutable audit logging ([ADR 0010](file:///docs/adr/0006-deactivate-members-instead-of-deleting-them.md)). Privileged access must be exercised strictly for official USSTM governance and in good faith.
 
@@ -136,6 +140,7 @@ TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW IN THE PROVINCE OF ONTARIO AND
 ## 11. Indemnification
 
 You agree to defend, indemnify, and hold harmless USSTM, its directors, officers, executives, student leaders, and agents from and against any claims, liabilities, damages, losses, costs, or expenses (including reasonable legal fees) arising from:
+
 1. Your breach of these Terms or the Acceptable Use Policy;
 2. Any content or event information you post or submit through the Portal;
 3. Your violation of any third-party right or Toronto Metropolitan University policy; or
@@ -162,7 +167,8 @@ USSTM reserves the right to revise or replace these Terms at any time. When upda
 If you have questions, inquiries, or notice obligations concerning these Terms, please contact:
 
 **Undergraduate Science Society of TMU (USSTM)**  
-40 Gould Street, Toronto, ON M5B 2K3, Canada  
-- **Email:** View support contact details on the [Contact Us](file:///apps/portal/src/routes/contact.tsx) page within the Portal  
-- **Official Website:** [https://usstm.ca](https://usstm.ca)  
-- **Instagram:** [@usstmu](https://www.instagram.com/usstmu)  
+40 Gould Street, Toronto, ON M5B 2K3, Canada
+
+- **Email:** View support contact details on the [Contact Us](file:///apps/portal/src/routes/contact.tsx) page within the Portal
+- **Official Website:** [https://usstm.ca](https://usstm.ca)
+- **Instagram:** [@usstmu](https://www.instagram.com/usstmu)

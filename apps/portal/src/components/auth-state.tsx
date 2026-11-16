@@ -15,7 +15,11 @@ export function SignIn() {
         {/* Logo / Brand Anchor */}
         <div className="flex flex-col items-center gap-4">
           <div className="w-16 h-16 flex items-center justify-center">
-            <img src="/logo.png" alt="USSTM Logo" className="w-16 h-16 object-contain" />
+            <img
+              src="/logo.png"
+              alt="USSTM Logo"
+              className="w-16 h-16 object-contain"
+            />
           </div>
           <div className="space-y-1">
             <h1 className="text-2xl md:text-3xl font-bold text-primary tracking-tight">

@@ -46,7 +46,9 @@ export async function verifySession(
   const verified = await jwtVerify(token, options.key, {
     algorithms: ['ES256'],
     audience: options.audience,
-    currentDate: new Date((options.now?.() ?? Math.floor(Date.now() / 1000)) * 1000),
+    currentDate: new Date(
+      (options.now?.() ?? Math.floor(Date.now() / 1000)) * 1000,
+    ),
     issuer: options.issuer,
   })
   if (verified.protectedHeader.kid !== options.keyId) {

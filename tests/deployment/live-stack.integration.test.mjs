@@ -540,9 +540,9 @@ test('every protected feature denies each actor without its current authority', 
         data,
         actors[actor],
       )
-      assert.equal(
-        response.status,
-        500,
+      assert.match(
+        JSON.parse(response.body).p.v[1].s.message.s,
+        /^(Access denied|Board Member authority is required|Administrator authority is required)$/,
         `${feature} admitted ${actor}: ${response.body}`,
       )
     }
@@ -572,7 +572,7 @@ test('a current authorization change takes effect on the next request', async ()
     undefined,
     actors.member,
   )
-  assert.equal(after.status, 500, after.body)
+  assert.equal(JSON.parse(after.body).p.v[1].s.message.s, 'Access denied')
 })
 
 test('Portal rejects a cross-origin state-changing server function request', async () => {

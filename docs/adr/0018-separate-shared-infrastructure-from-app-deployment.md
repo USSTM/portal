@@ -1,0 +1,7 @@
+# Separate shared infrastructure from application deployment
+
+The shared Caddy proxy and host configuration will be owned by a USSTM infrastructure repository, independently of the Portal repository. Each application retains ownership of its deployment configuration, images, migrations, and runtime secrets; applications connect to the proxy over a shared Docker network. This removes the Portal deployment's ownership of routing for unrelated services while retaining the single-host Docker Compose model in ADR-0013.
+
+Changes merged to the respective main branches deploy automatically after checks pass. Portal releases use versioned ARM64 images built in CI, apply compatible migrations before starting the new release, and can restore the previous application image on a failed health check when the database remains compatible. Incompatible migrations require a separately planned release; database restoration is a human operation. Infrastructure and application deployments must be serialized, and maintainers are alerted to failures through a configurable Discord webhook.
+
+Moving the existing proxy requires a scheduled cutover that preserves all existing routes, connections, and Caddy certificate storage. Before automatic deployments that apply migrations are enabled, Portal backups must be stored off-host and restoration verified against a separate database. This decision revises ADR-0013's placement of Caddy in the Portal stack; its single-host and private-service boundaries remain in effect.
