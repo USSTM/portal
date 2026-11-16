@@ -1,0 +1,9 @@
+services:
+  portal:
+    image: ${PORTAL_IMAGE:?PORTAL_IMAGE is required}
+  auth:
+    image: ${AUTH_IMAGE:?AUTH_IMAGE is required}
+  migrate:
+    image: ${MIGRATE_IMAGE:?MIGRATE_IMAGE is required}
+  backup:
+    image: ${BACKUP_IMAGE:?BACKUP_IMAGE is required}

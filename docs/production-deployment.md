@@ -49,6 +49,8 @@ docker compose --env-file .env.production -f compose.production.yaml --profile o
 docker compose --env-file .env.production -f compose.production.yaml up -d --wait
 ```
 
+After the coordinated shared-proxy cutover, invoke the deployment script with `SHARED_PROXY=1`. It adds `deployment/compose.shared.yaml`, connects Portal and auth to the external `usstm-edge` network, and disables the legacy Caddy service. Do not enable this mode until the shared proxy and network are ready. The existing PostgreSQL project and volume names remain unchanged.
+
 Compose rejects missing required configuration before creating containers. Auth also validates its client allowlist and signing key when it starts. Runtime secrets are injected into server containers; they are neither build arguments nor client-side Vite variables.
 
 Apply migrations before starting a new application release. The migration command is safe to rerun and reaches PostgreSQL only over the private database network.
