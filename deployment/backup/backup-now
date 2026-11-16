@@ -17,10 +17,11 @@ for name in "${required[@]}"; do
 done
 
 export PGPASSWORD="$DATABASE_PASSWORD"
-
-if ! restic snapshots --no-cache >/dev/null 2>&1; then
-  restic init
+if [[ "${AWS_USE_EC2_ROLE:-false}" == "true" ]]; then
+  unset AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
 fi
+
+restic snapshots --no-cache >/dev/null
 
 timestamp="$(date -u +%Y-%m-%dT%H-%M-%SZ)"
 pg_dump \

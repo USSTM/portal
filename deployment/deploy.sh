@@ -7,6 +7,10 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${REPO_ROOT}"
 
 COMPOSE_FILE="${REPO_ROOT}/compose.production.yaml"
+COMPOSE_FILES=(-f "${COMPOSE_FILE}")
+if [[ "${SHARED_PROXY:-0}" == "1" ]]; then
+  COMPOSE_FILES+=(-f "${REPO_ROOT}/deployment/compose.shared.yaml")
+fi
 
 # Determine environment file location
 # 1. First argument if it is an existing file
@@ -89,7 +93,7 @@ fi
 
 # Helper function to run docker compose
 compose() {
-  docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" "$@"
+  docker compose --env-file "${ENV_FILE}" "${COMPOSE_FILES[@]}" "$@"
 }
 
 echo "Using environment file: ${ENV_FILE}"

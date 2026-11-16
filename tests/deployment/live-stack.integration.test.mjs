@@ -599,12 +599,35 @@ test('Portal rejects a cross-origin state-changing server function request', asy
 
 test('operator command writes an encrypted PostgreSQL backup to configured storage', () => {
   const volume = `${backupRepository}:/test-repository`
+  const backupUser = `${process.getuid()}:${process.getgid()}`
 
-  compose('run', '--rm', '--volume', volume, 'backup', 'backup-now')
+  compose(
+    'run',
+    '--rm',
+    '--user',
+    backupUser,
+    '--volume',
+    volume,
+    'backup',
+    'restic',
+    'init',
+  )
+  compose(
+    'run',
+    '--rm',
+    '--user',
+    backupUser,
+    '--volume',
+    volume,
+    'backup',
+    'backup-now',
+  )
   const snapshots = JSON.parse(
     compose(
       'run',
       '--rm',
+      '--user',
+      backupUser,
       '--volume',
       volume,
       'backup',
@@ -616,6 +639,29 @@ test('operator command writes an encrypted PostgreSQL backup to configured stora
 
   assert.equal(snapshots.length, 1)
   assert.match(snapshots[0].paths[0], /^\/usstm-portal-.*\.dump$/)
+  compose(
+    'run',
+    '--rm',
+    '--user',
+    backupUser,
+    '--volume',
+    volume,
+    'backup',
+    'sh',
+    '-ec',
+    'export PGPASSWORD="$DATABASE_PASSWORD"; createdb -h postgres -U "$DATABASE_USER" restore_test; restic dump latest "$1" | pg_restore -h postgres -U "$DATABASE_USER" -d restore_test --no-owner --no-acl',
+    'restore-test',
+    snapshots[0].paths[0],
+  )
+  const restored = compose(
+    'run',
+    '--rm',
+    'backup',
+    'sh',
+    '-ec',
+    `export PGPASSWORD="$DATABASE_PASSWORD"; psql -h postgres -U "$DATABASE_USER" -d restore_test -Atc "SELECT to_regclass('public.clubs') IS NOT NULL"`,
+  )
+  assert.equal(restored.trim(), 't')
 })
 
 function structuredLogs(service) {

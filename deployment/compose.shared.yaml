@@ -1,0 +1,9 @@
+services:
+  caddy:
+    profiles:
+      - legacy-proxy
+
+networks:
+  application:
+    name: usstm-edge
+    external: true

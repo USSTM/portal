@@ -5,13 +5,14 @@ import { fileURLToPath } from 'node:url'
 
 const repoRoot = fileURLToPath(new URL('../..', import.meta.url))
 
-function productionConfig() {
+function productionConfig(shared = false) {
   const output = execFileSync(
     'docker',
     [
       'compose',
       '-f',
       'compose.production.yaml',
+      ...(shared ? ['-f', 'deployment/compose.shared.yaml'] : []),
       '--profile',
       'operations',
       'config',
@@ -47,6 +48,20 @@ function productionConfig() {
   )
   return JSON.parse(output)
 }
+
+test('shared-proxy deployment connects apps to the independent edge network', () => {
+  const config = productionConfig(true)
+  assert.equal(config.services.caddy, undefined)
+  assert.equal(config.networks.application.name, 'usstm-edge')
+  assert.equal(config.networks.application.external, true)
+  assert.ok(Object.hasOwn(config.services.auth.networks, 'application'))
+  assert.ok(Object.hasOwn(config.services.portal.networks, 'application'))
+  assert.deepEqual(Object.keys(config.services.postgres.networks), ['database'])
+  assert.equal(
+    config.volumes['postgres-data'].name,
+    'usstm-portal-production_postgres-data',
+  )
+})
 
 test('production stack operates the public proxy, Portal, auth, and database separately', () => {
   const config = productionConfig()
