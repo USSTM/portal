@@ -178,7 +178,9 @@ jobs:
             fi
             errors=0
             case "$status" in
-              Success) exit 0 ;;
+              Success)
+                aws ssm get-command-invocation --command-id "$command_id" --instance-id "$INSTANCE_ID" --query StandardOutputContent --output text
+                exit 0 ;;
               Failed|Cancelled|TimedOut|Cancelling)
                 aws ssm get-command-invocation --command-id "$command_id" --instance-id "$INSTANCE_ID" --query '{Status:Status,Error:StandardErrorContent}' --output json
                 exit 1 ;;
