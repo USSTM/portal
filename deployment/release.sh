@@ -10,13 +10,13 @@ origin="${PORTAL_HEALTH_ORIGIN:-https://portal.usstm.ca}"
 for field in PORTAL_IMAGE AUTH_IMAGE MIGRATE_IMAGE BACKUP_IMAGE RELEASE_SHA RELEASE_RUN_NUMBER ROLLBACK_COMPATIBLE; do
   [[ -n "${!field:-}" ]] || { echo "$field is required" >&2; exit 1; }
 done
-[[ "$PORTAL_IMAGE" =~ ^ghcr\.io/usstm/portal-web@sha256:[a-f0-9]{64}$ ]]
-[[ "$AUTH_IMAGE" =~ ^ghcr\.io/usstm/portal-auth@sha256:[a-f0-9]{64}$ ]]
-[[ "$MIGRATE_IMAGE" =~ ^ghcr\.io/usstm/portal-migrate@sha256:[a-f0-9]{64}$ ]]
-[[ "$BACKUP_IMAGE" =~ ^ghcr\.io/usstm/portal-backup@sha256:[a-f0-9]{64}$ ]]
-[[ "$RELEASE_SHA" =~ ^[a-f0-9]{40}$ ]]
-[[ "$RELEASE_RUN_NUMBER" =~ ^[1-9][0-9]{0,9}$ ]]
-[[ "$ROLLBACK_COMPATIBLE" == true || "$ROLLBACK_COMPATIBLE" == false ]]
+[[ "$PORTAL_IMAGE" =~ ^ghcr\.io/usstm/portal-web@sha256:[a-f0-9]{64}$ ]] || { echo 'Invalid Portal image' >&2; exit 1; }
+[[ "$AUTH_IMAGE" =~ ^ghcr\.io/usstm/portal-auth@sha256:[a-f0-9]{64}$ ]] || { echo 'Invalid auth image' >&2; exit 1; }
+[[ "$MIGRATE_IMAGE" =~ ^ghcr\.io/usstm/portal-migrate@sha256:[a-f0-9]{64}$ ]] || { echo 'Invalid migration image' >&2; exit 1; }
+[[ "$BACKUP_IMAGE" =~ ^ghcr\.io/usstm/portal-backup@sha256:[a-f0-9]{64}$ ]] || { echo 'Invalid backup image' >&2; exit 1; }
+[[ "$RELEASE_SHA" =~ ^[a-f0-9]{40}$ ]] || { echo 'Invalid release commit' >&2; exit 1; }
+[[ "$RELEASE_RUN_NUMBER" =~ ^[1-9][0-9]{0,9}$ ]] || { echo 'Invalid run number' >&2; exit 1; }
+[[ "$ROLLBACK_COMPATIBLE" == true || "$ROLLBACK_COMPATIBLE" == false ]] || { echo 'Invalid rollback setting' >&2; exit 1; }
 
 mkdir -p "$state_dir"
 exec 9>"$state_dir/deploy.lock"
@@ -36,6 +36,16 @@ if [[ -f "$state_dir/current.env" ]]; then
     echo 'Release superseded by an already deployed run.'
     exit 0
   fi
+  if [[ -n "${RELEASE_GIT_DIR:-}" ]]; then
+    current_sha="$(sed -n 's/^RELEASE_SHA=//p' "$state_dir/current.env")"
+    ROLLBACK_COMPATIBLE=false
+    if [[ "$current_sha" =~ ^[a-f0-9]{40}$ ]] &&
+      git --git-dir="$RELEASE_GIT_DIR" diff --quiet --no-renames "$current_sha" "$RELEASE_SHA" -- \
+        apps/portal/drizzle apps/portal/drizzle.config.ts apps/portal/src/db \
+        apps/portal/package.json package.json pnpm-lock.yaml pnpm-workspace.yaml patches; then
+      ROLLBACK_COMPATIBLE=true
+    fi
+  fi
 fi
 printf '%s\n' "$RELEASE_RUN_NUMBER" > "$state_dir/highest-run.tmp"
 mv -f "$state_dir/highest-run.tmp" "$state_dir/highest-run"
@@ -54,7 +64,7 @@ compose() {
 
 compose "$candidate" --profile operations config --quiet
 compose "$candidate" --profile operations pull portal auth migrate backup
-compose "$candidate" up -d --wait postgres
+compose "$candidate" up -d --no-recreate --wait postgres
 compose "$candidate" run --rm --no-deps --no-build backup backup-now
 compose "$candidate" --profile operations run --rm --no-deps --no-build migrate
 if ! compose "$candidate" up -d --no-deps --no-build --wait portal auth backup ||

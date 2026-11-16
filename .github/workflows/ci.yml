@@ -113,3 +113,95 @@ jobs:
           name: digest-${{ matrix.name }}
           path: image-digest.txt
           if-no-files-found: error
+
+  deploy:
+    needs: [verify, release-changes, build-images]
+    if: github.event_name == 'push' && needs.release-changes.outputs.result == 'deploy' && vars.PRODUCTION_DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: usstm-portal-production
+      cancel-in-progress: false
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    steps:
+      - name: Require deployment configuration
+        env:
+          ROLE_ARN: ${{ vars.PORTAL_DEPLOY_ROLE_ARN }}
+          INSTANCE_ID: ${{ vars.PORTAL_INSTANCE_ID }}
+          DOCUMENT_NAME: ${{ vars.PORTAL_SSM_DOCUMENT }}
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          for field in ROLE_ARN INSTANCE_ID DOCUMENT_NAME WEBHOOK; do
+            if [[ -z "${!field}" ]]; then
+              echo "::error::$field is required before production deployment"
+              exit 1
+            fi
+          done
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: digest-*
+          path: digests
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.PORTAL_DEPLOY_ROLE_ARN }}
+          aws-region: ca-central-1
+      - name: Deploy verified images through Systems Manager
+        env:
+          INSTANCE_ID: ${{ vars.PORTAL_INSTANCE_ID }}
+          DOCUMENT_NAME: ${{ vars.PORTAL_SSM_DOCUMENT }}
+        run: |
+          web=$(cat digests/digest-portal-web/image-digest.txt)
+          auth=$(cat digests/digest-portal-auth/image-digest.txt)
+          migrate=$(cat digests/digest-portal-migrate/image-digest.txt)
+          backup=$(cat digests/digest-portal-backup/image-digest.txt)
+          for digest in "$web" "$auth" "$migrate" "$backup"; do
+            [[ "$digest" =~ ^sha256:[a-f0-9]{64}$ ]] || exit 1
+          done
+          jq -n --arg commit "$GITHUB_SHA" --arg run "$GITHUB_RUN_NUMBER" \
+            --arg web "$web" --arg auth "$auth" --arg migrate "$migrate" --arg backup "$backup" \
+            '{Commit:[$commit], RunNumber:[$run], WebDigest:[$web], AuthDigest:[$auth], MigrateDigest:[$migrate], BackupDigest:[$backup]}' > ssm-parameters.json
+          command_id=$(aws ssm send-command --instance-ids "$INSTANCE_ID" \
+            --document-name "$DOCUMENT_NAME" --parameters file://ssm-parameters.json \
+            --query 'Command.CommandId' --output text)
+          errors=0
+          for attempt in {1..180}; do
+            if ! status=$(aws ssm get-command-invocation --command-id "$command_id" --instance-id "$INSTANCE_ID" --query Status --output text 2>/dev/null); then
+              errors=$((errors + 1))
+              if (( errors > 6 )); then
+                echo '::error::Unable to read the deployment command status'
+                exit 1
+              fi
+              sleep 10
+              continue
+            fi
+            errors=0
+            case "$status" in
+              Success) exit 0 ;;
+              Failed|Cancelled|TimedOut|Cancelling)
+                aws ssm get-command-invocation --command-id "$command_id" --instance-id "$INSTANCE_ID" --query '{Status:Status,Error:StandardErrorContent}' --output json
+                exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo '::error::Timed out waiting for the deployment command'
+          exit 1
+
+  notify-failure:
+    needs: [verify, release-changes, build-images, deploy]
+    if: always() && github.event_name == 'push' && (needs.verify.result == 'failure' || needs.release-changes.result == 'failure' || needs.build-images.result == 'failure' || needs.deploy.result == 'failure' || needs.deploy.result == 'cancelled')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify maintainers
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [[ -z "$WEBHOOK" ]]; then
+            echo '::warning::Discord webhook is not configured'
+            exit 0
+          fi
+          payload=$(jq -n --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '{content: ("USSTM Portal CI or deployment failed: " + $url)}')
+          if ! curl --fail --silent --show-error -H 'Content-Type: application/json' -d "$payload" "$WEBHOOK" >/dev/null; then
+            echo '::warning::Discord notification failed'
+          fi
