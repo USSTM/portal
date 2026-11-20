@@ -12,6 +12,8 @@ import {
   timestamp,
   uuid,
   unique,
+  index,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
 
@@ -252,6 +254,59 @@ export const bookings = pgTable(
       table.date,
       table.shiftSlotId,
     ),
+  ],
+)
+
+export const roomBBookings = pgTable(
+  'room_b_bookings',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    date: date('date').notNull(),
+    startHour: integer('start_hour').notNull(),
+    clubId: uuid('club_id').references(() => clubs.id, {
+      onDelete: 'restrict',
+    }),
+    memberId: uuid('member_id').references(() => members.id, {
+      onDelete: 'restrict',
+    }),
+    bookedByMemberId: uuid('booked_by_member_id').references(() => members.id, {
+      onDelete: 'restrict',
+    }),
+    bookedByEmail: text('booked_by_email').notNull(),
+    ownerLabel: text('owner_label').notNull(),
+    boardPosition: text('board_position'),
+    createdAt: timestamp('created_at', { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    cancelledAt: timestamp('cancelled_at', { withTimezone: true }),
+    cancelledByEmail: text('cancelled_by_email'),
+  },
+  (table) => [
+    check(
+      'room_b_bookings_exactly_one_owner',
+      sql`(${table.clubId} IS NOT NULL) <> (${table.memberId} IS NOT NULL)`,
+    ),
+    check(
+      'room_b_bookings_opening_hours',
+      sql`${table.startHour} >= 8 AND ${table.startHour} < 22`,
+    ),
+    check(
+      'room_b_bookings_owner_label_nonblank',
+      sql`length(btrim(${table.ownerLabel})) > 0`,
+    ),
+    check(
+      'room_b_bookings_creator_email_normalized',
+      sql`length(btrim(${table.bookedByEmail})) > 0 AND ${table.bookedByEmail} = lower(btrim(${table.bookedByEmail}))`,
+    ),
+    check(
+      'room_b_bookings_cancellation_attribution',
+      sql`(${table.cancelledAt} IS NULL) = (${table.cancelledByEmail} IS NULL)`,
+    ),
+    uniqueIndex('room_b_bookings_active_hour_unique')
+      .on(table.date, table.startHour)
+      .where(sql`${table.cancelledAt} IS NULL`),
+    index('room_b_bookings_club_date_idx').on(table.clubId, table.date),
+    index('room_b_bookings_member_date_idx').on(table.memberId, table.date),
   ],
 )
 

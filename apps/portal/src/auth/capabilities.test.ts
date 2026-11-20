@@ -48,6 +48,11 @@ describe('navigationForCapabilities', () => {
         to: '/office-hours',
         description: 'View and book Office Hours shifts.',
       },
+      {
+        label: 'EPH 442B Room Booking',
+        to: '/room-b',
+        description: 'View EPH 442B availability and manage reservations.',
+      },
     ])
   })
 
@@ -90,6 +95,11 @@ describe('navigationForCapabilities', () => {
         label: 'Office Hours',
         to: '/office-hours',
         description: 'View and book Office Hours shifts.',
+      },
+      {
+        label: 'EPH 442B Room Booking',
+        to: '/room-b',
+        description: 'View EPH 442B availability and manage reservations.',
       },
     ])
   })
@@ -158,6 +168,11 @@ describe('navigationForCapabilities', () => {
         label: 'Office Hours',
         to: '/office-hours',
         description: 'View and book Office Hours shifts.',
+      },
+      {
+        label: 'EPH 442B Room Booking',
+        to: '/room-b',
+        description: 'View EPH 442B availability and manage reservations.',
       },
       {
         label: 'Members',

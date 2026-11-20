@@ -1,6 +1,7 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import {
   Clock,
+  DoorOpen,
   Book,
   Mail,
   Calendar,
@@ -28,6 +29,8 @@ function NavIcon({ label, className }: { label: string; className?: string }) {
       return <LayoutDashboard className={className} />
     case 'Office Hours':
       return <Clock className={className} />
+    case 'EPH 442B Room Booking':
+      return <DoorOpen className={className} />
     case 'Resources':
       return <Book className={className} />
     case 'Contact':

@@ -33,7 +33,7 @@ Authority granted to a Member to use Portal functionality for one specified Club
 _Avoid_: Club role, club membership, account access
 
 **Board Member**:
-A Member authorized to use Office Hours and manage their own Bookings.
+A Member authorized to use Office Hours, manage their own Bookings, and reserve Room B under their own name.
 _Avoid_: Board user, office-hours user
 
 **Board Position**:
@@ -73,6 +73,17 @@ A dated occurrence of a Shift Slot that may be staffed by multiple Board Members
 **Booking**:
 One Board Member's reservation of a Shift. A Board Member may have at most one Booking for a given Shift.
 _Avoid_: Sign-up, seat
+
+## Room B
+
+Managing Room B bookings at `/room-b` requires an active portal session. A public read-only calendar at `/room-b/calendar`, linked from sign-in, supports day, week, and month browsing. The public TV display at `/room-b/display` shows the current schedule. Both public views expose labels and times without booking controls or private identifiers. Office Hours remains public.
+
+**Room B Booking**:
+One owner's reservation of one whole hour in Room B, from 08:00 to 22:00 Monday–Friday. The owner is either an active Club or a Board Member; the Member who creates it is recorded separately. Club representatives share two hours per day and six hours per Monday–Sunday Toronto week. Board Members have their own equivalent allowance. Bookings are limited to future hours in the current or next week.
+
+**Administrator (Room B)**:
+An active Member with a current Administrator grant. They may reserve Room B for any active Club or Board Member and overwrite or cancel any future Room B reservation. If they also hold Board Member authority, their personal reservations have no hourly quota. Another owner's limits still apply when selected. Board Position titles confer no Room B privileges.
+The deployment-owned Superuser inherits this administrative authority without a Member or Administrator database record. Personal Room B reservations still require an active Board Member record.
 
 ## Resources
 

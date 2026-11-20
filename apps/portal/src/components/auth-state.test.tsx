@@ -4,12 +4,18 @@ import { describe, expect, it } from 'vitest'
 import { AccessDenied, SignIn } from './auth-state.js'
 
 describe('authentication sign in', () => {
-  it('renders Google sign in button and office hours calendar link', () => {
+  it('renders Google sign in and both public calendar links', () => {
     const page = renderToStaticMarkup(<SignIn />)
 
     expect(page).toContain('Sign in with Google')
     expect(page).toContain('View Office Hours Calendar')
     expect(page).toContain('/office-hours')
+    expect(page).toContain('View EPH 442B Room Calendar')
+    expect(page).toContain('href="/room-b/calendar"')
+    expect(page).not.toContain('href="/room-b"')
+    expect(page.indexOf('View EPH 442B Room Calendar')).toBeGreaterThan(
+      page.indexOf('View Office Hours Calendar'),
+    )
   })
 })
 

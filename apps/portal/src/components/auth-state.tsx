@@ -1,4 +1,4 @@
-import { Calendar, ShieldAlert } from 'lucide-react'
+import { Calendar, DoorOpen, ShieldAlert } from 'lucide-react'
 import { portalLogoutAction } from '../auth/logout'
 import { Button } from './ui/button'
 
@@ -75,6 +75,17 @@ export function SignIn() {
             <a href="/office-hours">
               <Calendar className="w-5 h-5" />
               View Office Hours Calendar
+            </a>
+          </Button>
+
+          <Button
+            asChild
+            variant="outline"
+            className="w-full h-auto min-h-12 whitespace-normal py-2 text-center flex items-center justify-center gap-3 bg-secondary/30 hover:bg-secondary/60 text-foreground font-medium text-sm transition-all duration-200 active:scale-[0.98]"
+          >
+            <a href="/room-b/calendar">
+              <DoorOpen className="w-5 h-5" />
+              View EPH 442B Room Calendar
             </a>
           </Button>
 

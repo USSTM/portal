@@ -14,6 +14,7 @@ import {
   cancelFutureBookingsForMember,
   updateFutureBookingSnapshots,
 } from '../office-hours/bookings.js'
+import { cancelFutureRoomBBookings, lockRoomB } from '../room-b/bookings.js'
 
 type BoardMemberInput = { actorEmail: string; memberId: string }
 
@@ -111,8 +112,13 @@ export async function updateBoardMember(
 export async function revokeBoardAuthority(input: BoardMemberInput) {
   const db = getDb()
   return db.transaction(async (tx) => {
+    await lockRoomB(tx)
     await requireNonAdministratorMember(tx, input.memberId)
     await requireBoardMember(tx, input.memberId)
+    const cancelledRoomBBookings = await cancelFutureRoomBBookings(tx, {
+      owner: { kind: 'boardMember', memberId: input.memberId },
+      actorEmail: input.actorEmail,
+    })
     const cancelledFutureBookings = await cancelFutureBookingsForMember(
       tx,
       input.memberId,
@@ -137,6 +143,7 @@ export async function revokeBoardAuthority(input: BoardMemberInput) {
       input.memberId,
       {
         cancelledFutureBookings,
+        cancelledRoomBBookings,
         deactivated: clubGrantCount === 0,
       },
     )

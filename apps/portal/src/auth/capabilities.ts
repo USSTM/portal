@@ -74,6 +74,11 @@ export function navigationForCapabilities(
     to: '/office-hours',
     description: 'View and book Office Hours shifts.',
   })
+  navigation.push({
+    label: 'EPH 442B Room Booking',
+    to: '/room-b',
+    description: 'View EPH 442B availability and manage reservations.',
+  })
 
   if (capabilities.administrator || capabilities.superuser) {
     navigation.push(

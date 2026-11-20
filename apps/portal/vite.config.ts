@@ -38,6 +38,14 @@ const config = defineConfig(({ mode }) => {
           plugins: ['./server/request-logging.ts'],
           handlers: [
             {
+              route: '/room-b/display',
+              handler: './server/room-b-display-page.ts',
+            },
+            {
+              route: '/api/v1/room-b/display',
+              handler: './server/room-b-display.ts',
+            },
+            {
               route: '/health/live',
               method: 'GET',
               handler: './server/health-live.ts',

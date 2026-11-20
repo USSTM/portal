@@ -15,6 +15,7 @@ import {
 } from '../office-hours/bookings.js'
 import { requireUsstmClub } from './clubs.js'
 import { wasEverAdministrator } from './administrator-history.js'
+import { cancelFutureRoomBBookings, lockRoomB } from '../room-b/bookings.js'
 
 type AdministratorInput = {
   actorEmail: string
@@ -69,7 +70,12 @@ export async function editAdministrator(
 export async function deactivateAdministrator(input: AdministratorInput) {
   const db = getDb()
   return db.transaction(async (tx) => {
+    await lockRoomB(tx)
     await requireAdministrator(tx, input.memberId)
+    const cancelledRoomBBookings = await cancelFutureRoomBBookings(tx, {
+      owner: { kind: 'boardMember', memberId: input.memberId },
+      actorEmail: input.actorEmail,
+    })
     const cancelledFutureBookings = await cancelFutureBookingsForMember(
       tx,
       input.memberId,
@@ -93,7 +99,8 @@ export async function deactivateAdministrator(input: AdministratorInput) {
       {
         administratorGrant: false,
         cancelledFutureBookings,
-        lifecycle: 'deactivated',
+        cancelledRoomBBookings,
+      lifecycle: 'deactivated',
         revokedAllGrants: true,
       },
     )
@@ -341,8 +348,13 @@ export async function revokeBoardPositionFromAdministrator(
 ) {
   const db = getDb()
   return db.transaction(async (tx) => {
+    await lockRoomB(tx)
     await requireAdministrator(tx, input.memberId)
     await requireBoardMember(tx, input.memberId)
+    const cancelledRoomBBookings = await cancelFutureRoomBBookings(tx, {
+      owner: { kind: 'boardMember', memberId: input.memberId },
+      actorEmail: input.actorEmail,
+    })
     const cancelledFutureBookings = await cancelFutureBookingsForMember(
       tx,
       input.memberId,
@@ -357,7 +369,8 @@ export async function revokeBoardPositionFromAdministrator(
       input.memberId,
       {
         cancelledFutureBookings,
-      },
+        cancelledRoomBBookings,
+    },
     )
   })
 }

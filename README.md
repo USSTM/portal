@@ -11,6 +11,7 @@ The USSTM Portal gives individuals explicit authority to act for USSTM and its a
 - **Public Events & Calendar**: Discover upcoming events across USSTM and affiliated clubs, complete with dates, locations, and participating club attribution.
 - **Public Events API**: Unauthenticated REST endpoint (`GET /api/v1/events`) with interval filtering, caching, and CORS support for external consumers.
 - **Office Hours**: Dedicated shift slot scheduling and shift booking management for USSTM Board Members.
+- **EPH 442B Room Booking**: Signed-in weekday room calendar from 8 AM to 10 PM, with Club and Board Member reservations, shared daily/weekly quotas, and Administrator booking on behalf.
 - **Resource Directory**: Curated operational links, funding forms, reimbursement guides, and room booking resources for active student leaders.
 - **Granular Authority & Grants**: Three fixed authorization levels (Club Access, Board Member, Administrator) managed by Administrators and anchored by a deployment Superuser.
 - **Immutable Audit History**: Full traceability and audit logging for privileged administrative mutations.

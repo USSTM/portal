@@ -17,6 +17,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import {
   LayoutDashboard,
   Clock,
+  DoorOpen,
   Book,
   Mail,
   Calendar,
@@ -80,6 +81,8 @@ function NavIcon({ label, className }: { label: string; className?: string }) {
       return <LayoutDashboard className={className} />
     case 'Office Hours':
       return <Clock className={className} />
+    case 'EPH 442B Room Booking':
+      return <DoorOpen className={className} />
     case 'Resources':
       return <Book className={className} />
     case 'Manage Resources':
@@ -317,7 +320,7 @@ function PortalLayout() {
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 md:ml-72 p-4 md:p-8 w-full mx-auto flex flex-col gap-8 max-w-6xl">
+      <main className="min-w-0 flex-1 md:ml-72 p-4 md:p-8 w-full mx-auto flex flex-col gap-8 max-w-6xl">
         <Outlet />
       </main>
     </div>

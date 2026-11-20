@@ -29,6 +29,7 @@ const MUTABLE_TABLES = [
   'events',
   'members',
   'resources',
+  'room_b_bookings',
   'shift_slots',
 ]
 

@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as RoomBRouteImport } from './routes/room-b'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as OfficeHoursRouteImport } from './routes/office-hours'
@@ -17,6 +18,7 @@ import { Route as EventsRouteImport } from './routes/events'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RoomBCalendarRouteImport } from './routes/room-b_.calendar'
 import { Route as AdminResourcesRouteImport } from './routes/admin/resources'
 import { Route as AdminMembersRouteImport } from './routes/admin/members'
 import { Route as AdminClubsRouteImport } from './routes/admin/clubs'
@@ -26,6 +28,11 @@ import { Route as AdminAuditHistoryRouteImport } from './routes/admin/audit-hist
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoomBRoute = RoomBRouteImport.update({
+  id: '/room-b',
+  path: '/room-b',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResourcesRoute = ResourcesRouteImport.update({
@@ -63,6 +70,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoomBCalendarRoute = RoomBCalendarRouteImport.update({
+  id: '/room-b_/calendar',
+  path: '/room-b/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminResourcesRoute = AdminResourcesRouteImport.update({
   id: '/admin/resources',
   path: '/admin/resources',
@@ -97,12 +109,14 @@ export interface FileRoutesByFullPath {
   '/office-hours': typeof OfficeHoursRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/room-b': typeof RoomBRoute
   '/terms': typeof TermsRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/resources': typeof AdminResourcesRoute
+  '/room-b/calendar': typeof RoomBCalendarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -112,12 +126,14 @@ export interface FileRoutesByTo {
   '/office-hours': typeof OfficeHoursRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/room-b': typeof RoomBRoute
   '/terms': typeof TermsRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/resources': typeof AdminResourcesRoute
+  '/room-b/calendar': typeof RoomBCalendarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -128,12 +144,14 @@ export interface FileRoutesById {
   '/office-hours': typeof OfficeHoursRoute
   '/privacy': typeof PrivacyRoute
   '/resources': typeof ResourcesRoute
+  '/room-b': typeof RoomBRoute
   '/terms': typeof TermsRoute
   '/admin/audit-history': typeof AdminAuditHistoryRoute
   '/admin/board-members': typeof AdminBoardMembersRoute
   '/admin/clubs': typeof AdminClubsRoute
   '/admin/members': typeof AdminMembersRoute
   '/admin/resources': typeof AdminResourcesRoute
+  '/room-b_/calendar': typeof RoomBCalendarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,12 +163,14 @@ export interface FileRouteTypes {
     | '/office-hours'
     | '/privacy'
     | '/resources'
+    | '/room-b'
     | '/terms'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
     | '/admin/members'
     | '/admin/resources'
+    | '/room-b/calendar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -160,12 +180,14 @@ export interface FileRouteTypes {
     | '/office-hours'
     | '/privacy'
     | '/resources'
+    | '/room-b'
     | '/terms'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
     | '/admin/members'
     | '/admin/resources'
+    | '/room-b/calendar'
   id:
     | '__root__'
     | '/'
@@ -175,12 +197,14 @@ export interface FileRouteTypes {
     | '/office-hours'
     | '/privacy'
     | '/resources'
+    | '/room-b'
     | '/terms'
     | '/admin/audit-history'
     | '/admin/board-members'
     | '/admin/clubs'
     | '/admin/members'
     | '/admin/resources'
+    | '/room-b_/calendar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -191,12 +215,14 @@ export interface RootRouteChildren {
   OfficeHoursRoute: typeof OfficeHoursRoute
   PrivacyRoute: typeof PrivacyRoute
   ResourcesRoute: typeof ResourcesRoute
+  RoomBRoute: typeof RoomBRoute
   TermsRoute: typeof TermsRoute
   AdminAuditHistoryRoute: typeof AdminAuditHistoryRoute
   AdminBoardMembersRoute: typeof AdminBoardMembersRoute
   AdminClubsRoute: typeof AdminClubsRoute
   AdminMembersRoute: typeof AdminMembersRoute
   AdminResourcesRoute: typeof AdminResourcesRoute
+  RoomBCalendarRoute: typeof RoomBCalendarRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -206,6 +232,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/room-b': {
+      id: '/room-b'
+      path: '/room-b'
+      fullPath: '/room-b'
+      preLoaderRoute: typeof RoomBRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/resources': {
@@ -257,6 +290,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/room-b_/calendar': {
+      id: '/room-b_/calendar'
+      path: '/room-b/calendar'
+      fullPath: '/room-b/calendar'
+      preLoaderRoute: typeof RoomBCalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/resources': {
       id: '/admin/resources'
       path: '/admin/resources'
@@ -303,12 +343,14 @@ const rootRouteChildren: RootRouteChildren = {
   OfficeHoursRoute: OfficeHoursRoute,
   PrivacyRoute: PrivacyRoute,
   ResourcesRoute: ResourcesRoute,
+  RoomBRoute: RoomBRoute,
   TermsRoute: TermsRoute,
   AdminAuditHistoryRoute: AdminAuditHistoryRoute,
   AdminBoardMembersRoute: AdminBoardMembersRoute,
   AdminClubsRoute: AdminClubsRoute,
   AdminMembersRoute: AdminMembersRoute,
   AdminResourcesRoute: AdminResourcesRoute,
+  RoomBCalendarRoute: RoomBCalendarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
