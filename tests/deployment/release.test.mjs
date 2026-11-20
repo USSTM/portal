@@ -135,6 +135,15 @@ test('a release pulls images, migrates, and checks the new services before recor
   })
   assert.equal(result.status, 0, result.stderr)
   const calls = readFileSync(log, 'utf8')
+  const runCalls = calls.split('\n').filter((line) => line.includes(' run '))
+  assert.equal(runCalls.length, 2)
+  for (const call of runCalls) {
+    const options = call.split(' run ')[1].split(' ').filter((arg) => arg.startsWith('--'))
+    const parsed = spawnSync('docker', ['compose', 'run', '--help', ...options], {
+      encoding: 'utf8',
+    })
+    assert.equal(parsed.status, 0, parsed.stderr)
+  }
   assert.match(calls, /docker .* pull .*portal.*auth.*migrate/)
   assert.match(calls, /docker .* run .*migrate/)
   assert.match(calls, /docker .* run .*backup.*backup-now/)
