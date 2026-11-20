@@ -190,20 +190,36 @@ jobs:
           echo '::error::Timed out waiting for the deployment command'
           exit 1
 
-  notify-failure:
+  notify:
     needs: [verify, release-changes, build-images, deploy]
-    if: always() && github.event_name == 'push' && (needs.verify.result == 'failure' || needs.release-changes.result == 'failure' || needs.build-images.result == 'failure' || needs.deploy.result == 'failure' || needs.deploy.result == 'cancelled')
+    if: always() && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Notify maintainers
         env:
           WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          JOB_RESULTS: ${{ toJSON(needs) }}
         run: |
           if [[ -z "$WEBHOOK" ]]; then
             echo '::warning::Discord webhook is not configured'
             exit 0
           fi
-          payload=$(jq -n --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" '{content: ("USSTM Portal CI or deployment failed: " + $url)}')
+          payload=$(jq -n --argjson jobs "$JOB_RESULTS" \
+            --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --arg sha "$GITHUB_SHA" '
+            if any($jobs[]; .result == "failure") then
+              {title: "Portal · Failed", color: 15158332}
+            elif any($jobs[]; .result == "cancelled") then
+              {title: "Portal · Cancelled", color: 16753920}
+            elif $jobs.deploy.result == "success" then
+              {title: "Portal · Deployment succeeded", color: 3066993}
+            else
+              {title: "Portal · Checks passed; deployment skipped", color: 3066993}
+            end | . + {
+              url: $url,
+              description: ("Commit `" + $sha[0:7] + "`"),
+              fields: ($jobs | to_entries | map({name: .key, value: .value.result, inline: true}))
+            } | {embeds: [.], allowed_mentions: {parse: []}}')
           if ! curl --fail --silent --show-error -H 'Content-Type: application/json' -d "$payload" "$WEBHOOK" >/dev/null; then
             echo '::warning::Discord notification failed'
           fi
