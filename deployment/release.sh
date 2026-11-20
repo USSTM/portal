@@ -65,8 +65,8 @@ compose() {
 compose "$candidate" --profile operations config --quiet
 compose "$candidate" --profile operations pull portal auth migrate backup
 compose "$candidate" up -d --no-recreate --wait postgres
-compose "$candidate" run --rm --no-deps --no-build backup backup-now
-compose "$candidate" --profile operations run --rm --no-deps --no-build migrate
+compose "$candidate" run --rm --no-deps --pull=never backup backup-now
+compose "$candidate" --profile operations run --rm --no-deps --pull=never migrate
 if ! compose "$candidate" up -d --no-deps --no-build --wait portal auth backup ||
   ! curl --fail --silent --show-error --retry 5 --retry-delay 2 "$origin/health/ready" >/dev/null ||
   ! curl --fail --silent --show-error --retry 5 --retry-delay 2 "$origin/auth/health/live" >/dev/null; then
